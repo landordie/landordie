@@ -1,7 +1,8 @@
 import pygame
-from classes.button import *
-from load_images import load_images
-from load_images import update as title_update
+from PyMunk.classes.button import *
+from PyMunk.load_images import load_images
+from PyMunk.load_images import update as title_update
+
 
 # (!) REMEMBER (!)
 # When changing scenes, resolution is hardcoded
@@ -34,8 +35,8 @@ class SceneBase:
     def __init__(self):
         self.next = self
 
-# Using this method mainly for testing
-# The game logic will be implemented in the Update() method
+    # Using this method mainly for testing
+    # The game logic will be implemented in the Update() method
     def ProcessInput(self, events, pressed_keys):
         print("(!) Override in child class (!)")
 
@@ -70,27 +71,36 @@ class TitleScene(SceneBase):
 
     @staticmethod
     def scene_wh(screen):
+        """
+        Scene width and height
+        """
         width = screen.get_surface().get_width()
         height = screen.get_surface().get_height()
         return width, height
 
-# (!) When adding buttons to the start screen
-# (!) Add them here, in this method
+    # (!) When adding buttons to the start screen
+    # (!) Add them here, in this method
     def Render(self, screen):
-        w, h = TitleScene.scene_wh(screen)  # -----------Width and height unpacking
-        menu_button = Button((w / 2 - 100, h / 2.5, 200, 50), YELLOW, 'Start')  # ---------------START BUTTON
-        menu_button_2 = Button((w / 2 - 100, h / 1.75, 200, 50), RED, 'Quit')  # ---------------QUIT BUTTON
+
+        # Width and height unpacking
+        w, h = TitleScene.scene_wh(screen)
+
+        # Start and Quit buttons
+        menu_button = Button((w / 2 - (BUTTON_WIDTH/2), h / 2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Start')
+        menu_button_2 = Button((w / 2 - (BUTTON_WIDTH/2), h / 1.5, BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
 
         game_title = load_images("frames/big")
         title_surfaces = game_title.values()
 
         screen.get_surface().fill(BLACK)
 
-        menu_button.update(screen.get_surface())  # -----------------Update button
-        menu_button_2.update(screen.get_surface())  # -----------------Update button
-        title_update(title_surfaces, screen)
-        #displayText(screen, "Land or Die", 'freesansbold.ttf', 75)
+        # Update buttons
+        menu_button.update(screen.get_surface())
+        menu_button_2.update(screen.get_surface())
 
+        # Update title
+        title_update(title_surfaces, screen)
+        # displayText(screen, "Land or Die", 'freesansbold.ttf', 75)
 
 
 class GameScene(SceneBase):
@@ -109,7 +119,7 @@ class GameScene(SceneBase):
 
     def Render(self, screen):
         # The game scene is just a blank blue screen
-        screen.set_mode((1280, 720))
+        screen.set_mode((G_SCREEN_WIDTH, G_SCREEN_HEIGHT))
         screen.get_surface().fill(BLUE)
 
 
@@ -143,4 +153,4 @@ class LoseScene(SceneBase):
     def Render(self, screen):
         screen.set_mode((800, 600))
         screen.get_surface().fill(RED)
-        displayText(screen, "Too bad! You have lost!", 'freesansbold.ttf',45)
+        displayText(screen, "Too bad! You have lost!", 'freesansbold.ttf', 45)
