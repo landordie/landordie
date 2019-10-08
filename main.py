@@ -1,11 +1,11 @@
-#------------------------------------------#
+# ------------------------------------------#
 
 # Code for scene architecture taken from:
 # https: // nerdparadise.com / programming / pygame / part7
 
-#------------------------------------------#
+# ------------------------------------------#
 
-from classes.Scenes import *
+from PyMunk.classes.Scenes import *
 
 
 def run_game(width, height, fps, starting_scene):
@@ -49,6 +49,4 @@ def run_game(width, height, fps, starting_scene):
 
 if __name__ == "__main__":
     myScene = TitleScene()
-    screenWidth = 800
-    screenHeight = 600
-    run_game(screenWidth, screenHeight, 60, TitleScene())
+    run_game(T_SCREEN_WIDTH, T_SCREEN_HEIGHT, 60, TitleScene())
