@@ -16,7 +16,6 @@ def load_images(path_to_directory):
 def update(surfaces, screen):
     w, h = screen.get_surface().get_width(), screen.get_surface().get_height()
     for surface in surfaces:
-        #screen.get_surface().blit(surface, (w / 2 - 250, h / 4))
         screen.get_surface().blit(surface, (w / 2 - 350, 50))
         screen.update()
 
