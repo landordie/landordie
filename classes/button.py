@@ -4,7 +4,7 @@ Button Class
 import random
 
 import pygame as pg
-from constants import *
+from PyMunk.constants import *
 
 
 class Button:
@@ -22,10 +22,16 @@ class Button:
         """
         self.color = [random.randint(0, 150) for _ in range(3)]
 
+    def on_click(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
     def check_hover(self):
         if self.rect.collidepoint(pg.mouse.get_pos()):
             if not self.hovered:
                 self.hovered = True
+                pg.mixer.Sound(HOVER_SOUND).play()  # improve?
         else:
             self.hovered = False
 
@@ -40,7 +46,6 @@ class Button:
         """
         Update needs to be called every frame in the main loop.
         """
-
         self.check_hover()
         if self.hovered:
             surface.fill(WHITE, self.rect)

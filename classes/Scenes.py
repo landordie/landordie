@@ -1,8 +1,8 @@
 import pygame
-from classes.button import *
-from load_images import load_images
-from load_images import update as title_update
-from constants import *
+from PyMunk.classes.button import *
+from PyMunk.load_images import load_images
+from PyMunk.load_images import update as title_update
+from PyMunk.constants import *
 
 pygame.font.init()
 # (!) REMEMBER (!)
@@ -59,19 +59,16 @@ class SceneBase:
     def Terminate(self):
         self.SwitchToScene(None)
 
-    @staticmethod
-    def scene_wh(screen):
-        """
-        Scene width and height
-        """
-        width = screen.get_surface().get_width()
-        height = screen.get_surface().get_height()
-        return width, height
-
 
 class TitleScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
+        self.width = T_SCREEN_WIDTH
+        self.height = T_SCREEN_HEIGHT
+
+        # Start and Quit buttons
+        self.menu_button = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Start')
+        self.menu_button_2 = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.5, BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -79,10 +76,8 @@ class TitleScene(SceneBase):
                 self.Terminate()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(GameScene())
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 self.SwitchToScene(SplashScene())
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                pg.mixer.Sound("blipshort1.wav").play()
 
     def Update(self):
         pass
@@ -91,21 +86,14 @@ class TitleScene(SceneBase):
     # (!) Add them here, in this method
     def Render(self, screen):
 
-        # Width and height unpacking
-        w, h = self.scene_wh(screen)
-
-        # Start and Quit buttons
-        menu_button = Button((w / 2 - (BUTTON_WIDTH/2), h / 2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Start')
-        menu_button_2 = Button((w / 2 - (BUTTON_WIDTH/2), h / 1.5, BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
-
         game_title = load_images("frames/big")
         title_surfaces = game_title.values()
 
         screen.get_surface().fill(BLACK)
 
         # Update buttons
-        menu_button.update(screen.get_surface())
-        menu_button_2.update(screen.get_surface())
+        self.menu_button.update(screen.get_surface())
+        self.menu_button_2.update(screen.get_surface())
 
         # Update title
         title_update(title_surfaces, screen)
@@ -114,22 +102,26 @@ class TitleScene(SceneBase):
 class SplashScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
+        self.width = S_SCREEN_WIDTH
+        self.height = S_SCREEN_HEIGHT
+
+        # Continue button
+        self.splash_button = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.25, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.splash_button.on_click(event):
                 self.SwitchToScene(GameScene())
 
     def Update(self):
         pass
 
     def Render(self, screen):
-        screen.set_mode((1280, 720))
-        w, h = self.scene_wh(screen)
+        screen.set_mode((S_SCREEN_WIDTH, S_SCREEN_HEIGHT))
         splash_w, splash_h = 700, 630
-        splash_x, splash_y = (w/2) - (splash_w/2), (h/2) - (splash_h/2)
+        splash_x, splash_y = (self.width/2) - (splash_w/2), (self.height/2) - (splash_h/2)
 
         controls_background = pygame.Surface((splash_w, splash_h)).convert_alpha()
         controls_background.fill(BLACK_HIGHLIGHT)
@@ -146,6 +138,7 @@ class SplashScene(SceneBase):
         self.draw_text(screen, "Player 1: ", (splash_x + 100, splash_y + 100), self.font_verdana, (255, 255, 255))
         self.draw_text(screen, "Player 2: ", (splash_x + 450, splash_y + 100), self.font_verdana, (255, 255, 255))
 
+        self.splash_button.update(screen.get_surface())
         pygame.display.update()
 
     @staticmethod
@@ -187,8 +180,7 @@ class WinScene(SceneBase):
     def Render(self, screen):
         screen.set_mode((800, 600))
         screen.get_surface().fill(GREEN)
-        display_text(screen, "Congratulations!"
-                            "You have won!", 'freesansbold.ttf', 50)
+        display_text(screen, "Congratulations! You have won!", 'freesansbold.ttf', 50)
 
 
 class LoseScene(SceneBase):
