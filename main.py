@@ -4,15 +4,13 @@
 # https: // nerdparadise.com / programming / pygame / part7
 
 # ------------------------------------------#
-import pygame
-from classes.Scenes import *
+
+from PyMunk.classes.Scenes import *
 
 
 def run_game(width, height, fps, starting_scene):
     pygame.init()
-    pygame.font.init()
     screen = pygame.display
-    screen.set_caption("Land or Die")
     screen.set_mode((width, height))
     clock = pygame.time.Clock()
 
@@ -51,4 +49,4 @@ def run_game(width, height, fps, starting_scene):
 
 if __name__ == "__main__":
     myScene = TitleScene()
-    run_game(T_SCREEN_WIDTH, T_SCREEN_HEIGHT, 600, TitleScene())
+    run_game(myScene.width, myScene.height, 60, myScene)
