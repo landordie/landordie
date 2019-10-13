@@ -1,4 +1,6 @@
 import pygame
+import pymunk
+import pymunk.pygame_util
 from PyMunk.classes.button import *
 from PyMunk.load_images import load_images
 from PyMunk.load_images import update as title_update
@@ -150,6 +152,9 @@ class SplashScene(SceneBase):
 class GameScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
+        self.space = pymunk.Space()
+        self.space.gravity = EARTH_GRAVITY
+        self.random_terrain()
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -161,10 +166,25 @@ class GameScene(SceneBase):
     def Update(self):
         pass
 
+    def random_terrain(self):
+        points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10)) for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
+        for i in range(1, len(points)):
+            floor = pymunk.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
+                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS)
+            floor.friction = TERRAIN_FRICTION
+            self.space.add(floor)
+
     def Render(self, screen):
         # The game scene is just a blank blue screen
         screen.set_mode((G_SCREEN_WIDTH, G_SCREEN_HEIGHT))
         screen.get_surface().fill(BLUE)
+
+        draw_options = pymunk.pygame_util.DrawOptions(screen.get_surface())
+        pymunk.pygame_util.positive_y_is_up = True
+
+        fps = 60
+        self.space.step(1. / fps)
+        self.space.debug_draw(draw_options)
 
 
 class WinScene(SceneBase):
