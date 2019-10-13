@@ -5,6 +5,7 @@ from PyMunk.classes.button import *
 from PyMunk.load_images import load_images
 from PyMunk.load_images import update as title_update
 from PyMunk.constants import *
+from .player import Player
 
 pygame.font.init()
 # (!) REMEMBER (!)
@@ -156,18 +157,34 @@ class GameScene(SceneBase):
         self.space.gravity = EARTH_GRAVITY
         self.random_terrain()
 
+        # Anti-spacecraft
+        self.anti_spacecraft = Player()
+        self.space.add(self.anti_spacecraft.body, self.anti_spacecraft.shape)
+
     def ProcessInput(self, events, pressed_keys):
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(WinScene())
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE:
                 self.SwitchToScene(LoseScene())
+            # Arrow keys movement
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RIGHT:
+                    self.anti_spacecraft.force_right()
+                elif event.key == pygame.K_LEFT:
+                    self.anti_spacecraft.force_left()
+            else:
+                self.anti_spacecraft.force = DEFAULT_FORCE
 
     def Update(self):
         pass
 
     def random_terrain(self):
-        points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10)) for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
+        # Tuples of points where new segment will be added to form the terrain
+        points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10))
+                  for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
+
+        # Loop to add the segments to the space
         for i in range(1, len(points)):
             floor = pymunk.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
                                    (points[i][0], points[i][1]), TERRAIN_THICKNESS)
@@ -185,6 +202,7 @@ class GameScene(SceneBase):
         fps = 60
         self.space.step(1. / fps)
         self.space.debug_draw(draw_options)
+        self.anti_spacecraft.apply_force()
 
 
 class WinScene(SceneBase):
