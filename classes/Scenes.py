@@ -18,6 +18,35 @@ def __text_objects(text, font):
     surface = font.render(text, True, BLACK)
     return surface, surface.get_rect()
 
+# Unpacking the images required to display the controls in the splash screen
+# If an incorrect player ID is used, an error will be raised
+# (!) TODO: Resize the images for the buttons to 60x60/70x70 so that they fit better (!)
+def load_controls_images(player):
+    if player == 1:
+        # Load player 1 images
+        rotate_left = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_A.png')
+        rotate_right = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_D.png')
+        thrust = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_W.png')
+        return rotate_left, rotate_right, thrust
+    elif player == 2:
+        # Load player 2 images
+        move_left = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Left.png')
+        move_right = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Right.png')
+        shoot = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Space.png')
+        cannon_left = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Down.png')
+        cannon_right = pygame.image.load(
+            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Up.png')
+        return move_left, move_right, shoot, cannon_left, cannon_right
+    else:
+        raise ValueError("Error when specifying player number.")
+
 
 # Method used to display text
 # It's used on multiple occasions that's why it's taken out as a separate method
@@ -140,6 +169,40 @@ class SplashScene(SceneBase):
         self.draw_text(screen, "Game Controls", (splash_x + (splash_w/3), splash_y), self.font_arial_black_large, (140, 123, 192))
         self.draw_text(screen, "Player 1: ", (splash_x + 100, splash_y + 100), self.font_verdana, (255, 255, 255))
         self.draw_text(screen, "Player 2: ", (splash_x + 450, splash_y + 100), self.font_verdana, (255, 255, 255))
+
+        # Display the controls for Player 1 (controlling the ship)
+        # on the splash screen
+
+        screen.get_surface().blit(player1_thrust, (splash_x + 125, splash_y + 150))
+        self.draw_text(screen, "Thruster On", (splash_x + 110,
+                                               splash_y + 140), self.font_freesans_bold, WHITE)
+
+        screen.get_surface().blit(player1_left, (splash_x + 50, splash_y + 250))
+        self.draw_text(screen, "Rotate Left", (splash_x + 35,
+                                               splash_y + 240), self.font_freesans_bold, WHITE)
+
+        screen.get_surface().blit(player1_right, (splash_x + 200, splash_y + 250))
+        self.draw_text(screen, "Rotate Right", (splash_x + 190,
+                                                splash_y + 240), self.font_freesans_bold, WHITE)
+
+        # Display the controls for Player 2 (controlling the tank)
+        # on the splash screen
+
+        screen.get_surface().blit(player2_cannon_right, (splash_x + 475, splash_y + 150))
+        self.draw_text(screen, "Cannon Right", (splash_x + 450,
+                                                splash_y + 140), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(player2_cannon_left, (splash_x + 475, splash_y + 350))
+        self.draw_text(screen, "Cannon Right", (splash_x + 450,
+                                                splash_y + 340), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(player2_left, (splash_x + 375, splash_y + 250))
+        self.draw_text(screen, "Move Left", (splash_x + 360,
+                                             splash_y + 240), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(player2_right, (splash_x + 575, splash_y + 250))
+        self.draw_text(screen, "Move Right", (splash_x + 560,
+                                              splash_y + 240), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(player2_shoot, (splash_x + 475, splash_y + 450))
+        self.draw_text(screen, "Shoot", (splash_x + 485,
+                                         splash_y + 445), self.font_freesans_bold, WHITE)
 
         self.splash_button.update(screen.get_surface())
         pygame.display.update()
