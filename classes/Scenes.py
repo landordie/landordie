@@ -1,10 +1,10 @@
 import pygame
 import pymunk
 import pymunk.pygame_util
-from PyMunk.classes.button import *
-from PyMunk.load_images import load_images
-from PyMunk.load_images import update as title_update
-from PyMunk.constants import *
+from classes.button import *
+from load_images import load_images
+from load_images import update as title_update
+from constants import *
 from .player import Player
 
 pygame.font.init()
@@ -21,6 +21,8 @@ def __text_objects(text, font):
 # Unpacking the images required to display the controls in the splash screen
 # If an incorrect player ID is used, an error will be raised
 # (!) TODO: Resize the images for the buttons to 60x60/70x70 so that they fit better (!)
+
+
 def load_controls_images(player):
     if player == 1:
         # Load player 1 images
@@ -99,8 +101,10 @@ class TitleScene(SceneBase):
         self.height = T_SCREEN_HEIGHT
 
         # Start and Quit buttons
-        self.menu_button = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Start')
-        self.menu_button_2 = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.5, BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
+        self.menu_button = Button((self.width / 2 - (BUTTON_WIDTH / 2),
+                                   self.height / 2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Start')
+        self.menu_button_2 = Button((self.width / 2 - (BUTTON_WIDTH / 2),
+                                     self.height / 1.5, BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -138,7 +142,8 @@ class SplashScene(SceneBase):
         self.height = S_SCREEN_HEIGHT
 
         # Continue button
-        self.splash_button = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.25, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
+        self.splash_button = Button((self.width / 2 - (BUTTON_WIDTH / 2),
+                                     self.height / 1.25, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -153,22 +158,32 @@ class SplashScene(SceneBase):
     def Render(self, screen):
         screen.set_mode((S_SCREEN_WIDTH, S_SCREEN_HEIGHT))
         splash_w, splash_h = 700, 630
-        splash_x, splash_y = (self.width/2) - (splash_w/2), (self.height/2) - (splash_h/2)
+        splash_x, splash_y = (self.width/2) - \
+            (splash_w/2), (self.height/2) - (splash_h/2)
 
-        controls_background = pygame.Surface((splash_w, splash_h)).convert_alpha()
+        controls_background = pygame.Surface(
+            (splash_w, splash_h)).convert_alpha()
         controls_background.fill(BLACK_HIGHLIGHT)
         logo = pygame.image.load('frames/Landordie.png')
         background = pygame.image.load('frames/backgr.png')
 
+        player1_left, player1_right, player1_thrust = load_controls_images(1)
+        player2_left, player2_right, player2_shoot, player2_cannon_left, player2_cannon_right = load_controls_images(
+            2)
+
         screen.get_surface().fill(WHITE)
 
         screen.get_surface().blit(background, (0, 0))
-        screen.get_surface().blit(controls_background, (splash_x, splash_y, splash_w, splash_h))
+        screen.get_surface().blit(controls_background,
+                                  (splash_x, splash_y, splash_w, splash_h))
         screen.get_surface().blit(logo, (splash_x, splash_y))
 
-        self.draw_text(screen, "Game Controls", (splash_x + (splash_w/3), splash_y), self.font_arial_black_large, (140, 123, 192))
-        self.draw_text(screen, "Player 1: ", (splash_x + 100, splash_y + 100), self.font_verdana, (255, 255, 255))
-        self.draw_text(screen, "Player 2: ", (splash_x + 450, splash_y + 100), self.font_verdana, (255, 255, 255))
+        self.draw_text(screen, "Game Controls", (splash_x + (splash_w/3),
+                                                 splash_y), self.font_arial_black_large, (140, 123, 192))
+        self.draw_text(screen, "Player 1: ", (splash_x + 100,
+                                              splash_y + 100), self.font_verdana, (255, 255, 255))
+        self.draw_text(screen, "Player 2: ", (splash_x + 450,
+                                              splash_y + 100), self.font_verdana, (255, 255, 255))
 
         # Display the controls for Player 1 (controlling the ship)
         # on the splash screen
@@ -281,7 +296,8 @@ class WinScene(SceneBase):
     def Render(self, screen):
         screen.set_mode((800, 600))
         screen.get_surface().fill(GREEN)
-        display_text(screen, "Congratulations! You have won!", 'freesansbold.ttf', 50)
+        display_text(screen, "Congratulations! You have won!",
+                     'freesansbold.ttf', 50)
 
 
 class LoseScene(SceneBase):
