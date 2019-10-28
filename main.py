@@ -5,7 +5,7 @@
 
 # ------------------------------------------#
 
-from PyMunk.classes.Scenes import *
+from classes.Scenes import *
 
 
 def run_game(width, height, fps, starting_scene):
