@@ -242,8 +242,8 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
-                       self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6,)
-        self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
+                       self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
+        self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.pin9, self.anti_spacecraft.cannon_mt)
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -255,12 +255,12 @@ class GameScene(SceneBase):
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     self.anti_spacecraft.force_right()
-                elif event.key == pygame.K_LEFT:
+                if event.key == pygame.K_LEFT:
                     self.anti_spacecraft.force_left()
-                elif event.key == pygame.K_a:
-                    self.anti_spacecraft.cannon_mt.rate = 2
-                elif event.key == pygame.K_d:
-                    self.anti_spacecraft.cannon_mt.rate = -2
+                if event.key == pygame.K_a:
+                    self.anti_spacecraft.cannon_mt.rate += 10
+                if event.key == pygame.K_d:
+                    self.anti_spacecraft.cannon_mt.rate -= 10
 
             else:
                 self.anti_spacecraft.cannon_mt.rate = 0

@@ -23,19 +23,29 @@ class AntiSpaceCraft:
         self.chassis_s.color = 255, 155, 0
 
         self.cannon_b, self.cannon_s = self.create_body(0.01, 0.1, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/2, position[1]), 'cannon')
-        self.cannon_s.filter = pymunk.ShapeFilter(group=2)
         # self.cannon_b.body_type = pymunk.Body.KINEMATIC
         # Anti-spacecraft joints
         # TODO: Use for-loop (?)
         self.pin1 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (-ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
+        self.pin1.collide_bodies = False
         self.pin2 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
+        self.pin2.collide_bodies = False
         self.pin3 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        self.pin3.collide_bodies = False
         self.pin4 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        self.pin4.collide_bodies = False
         self.pin5 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        self.pin5.collide_bodies = False
         self.pin6 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        self.pin6.collide_bodies = False
         self.pin7 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        self.pin7.collide_bodies = False
         self.pin8 = pymunk.PinJoint(self.cannon_b, self.chassis_b, (ANTI_SPACECRAFT_CANNON[0]/2, 0), (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
-        self.cannon_mt = pymunk.SimpleMotor(self.cannon_b,self.chassis_b, 0);
+        self.pin9 = pymunk.PinJoint(self.cannon_b, self.chassis_b, (ANTI_SPACECRAFT_CANNON[0] / 2, 0),
+                                    (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        self.pin8.collide_bodies = False
+        self.pin9.collide_bodies = False
+        self.cannon_mt = pymunk.SimpleMotor(self.cannon_b, self.chassis_b, 0)
 
     def create_body(self, mass, moment, position, shape_type, friction=DEFAULT_FRICTION):
         body = pymunk.Body(mass, moment)
@@ -43,8 +53,10 @@ class AntiSpaceCraft:
         if shape_type.lower() == 'wheel':
             self.wheels.append(body)
             shape = pymunk.Circle(body, ANTI_SPACECRAFT_WHEEL_SIZE)
+            body.moment = pymunk.moment_for_circle(mass, 0, ANTI_SPACECRAFT_WHEEL_SIZE)
         elif shape_type.lower() == 'chassis':
             shape = pymunk.Poly.create_box(body, ANTI_SPACECRAFT_CHASSIS)
+            body.moment = pymunk.moment_for_box(mass, ANTI_SPACECRAFT_CHASSIS)
         else:
             shape = pymunk.Poly.create_box(body, ANTI_SPACECRAFT_CANNON)
         shape.friction = friction
