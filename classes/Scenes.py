@@ -1,11 +1,11 @@
 import pygame
 import pymunk
 import pymunk.pygame_util
-from classes.button import *
+from .button import *
 from load_images import load_images
 from load_images import update as title_update
 from constants import *
-from .player import Player
+from .anti_space_craft import AntiSpaceCraft
 
 pygame.font.init()
 # (!) REMEMBER (!)
@@ -18,11 +18,10 @@ def __text_objects(text, font):
     surface = font.render(text, True, BLACK)
     return surface, surface.get_rect()
 
+
 # Unpacking the images required to display the controls in the splash screen
 # If an incorrect player ID is used, an error will be raised
 # (!) TODO: Resize the images for the buttons to 60x60/70x70 so that they fit better (!)
-
-
 def load_controls_images(player):
     if player == 1:
         # Load player 1 images
@@ -101,10 +100,10 @@ class TitleScene(SceneBase):
         self.height = T_SCREEN_HEIGHT
 
         # Start and Quit buttons
-        self.menu_button = Button((self.width / 2 - (BUTTON_WIDTH / 2),
-                                   self.height / 2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Start')
-        self.menu_button_2 = Button((self.width / 2 - (BUTTON_WIDTH / 2),
-                                     self.height / 1.5, BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
+        self.menu_button = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 2, BUTTON_WIDTH, BUTTON_HEIGHT),
+                                  YELLOW, 'Start')
+        self.menu_button_2 = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.5, BUTTON_WIDTH,
+                                     BUTTON_HEIGHT), RED, 'Quit')
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -143,7 +142,7 @@ class SplashScene(SceneBase):
 
         # Continue button
         self.splash_button = Button((self.width / 2 - (BUTTON_WIDTH / 2),
-                                     self.height / 1.25, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
+                                     self.height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -168,8 +167,7 @@ class SplashScene(SceneBase):
         background = pygame.image.load('frames/backgr.png')
 
         player1_left, player1_right, player1_thrust = load_controls_images(1)
-        player2_left, player2_right, player2_shoot, player2_cannon_left, player2_cannon_right = load_controls_images(
-            2)
+        player2_left, player2_right, player2_shoot, player2_cannon_left, player2_cannon_right = load_controls_images(2)
 
         screen.get_surface().fill(WHITE)
 
@@ -231,13 +229,21 @@ class SplashScene(SceneBase):
 class GameScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
+        self.screen_width = G_SCREEN_WIDTH
+        self.screen_height = G_SCREEN_HEIGHT
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
         self.random_terrain()
 
         # Anti-spacecraft
-        self.anti_spacecraft = Player()
-        self.space.add(self.anti_spacecraft.body, self.anti_spacecraft.shape)
+        self.anti_spacecraft = AntiSpaceCraft()
+        self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
+        self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
+        self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
+        self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
+        self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
+                       self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6,)
+        self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -251,7 +257,13 @@ class GameScene(SceneBase):
                     self.anti_spacecraft.force_right()
                 elif event.key == pygame.K_LEFT:
                     self.anti_spacecraft.force_left()
+                elif event.key == pygame.K_a:
+                    self.anti_spacecraft.cannon_mt.rate = 2
+                elif event.key == pygame.K_d:
+                    self.anti_spacecraft.cannon_mt.rate = -2
+
             else:
+                self.anti_spacecraft.cannon_mt.rate = 0
                 self.anti_spacecraft.force = DEFAULT_FORCE
 
     def Update(self):
@@ -267,18 +279,24 @@ class GameScene(SceneBase):
             floor = pymunk.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
                                    (points[i][0], points[i][1]), TERRAIN_THICKNESS)
             floor.friction = TERRAIN_FRICTION
+            floor.filter = pymunk.ShapeFilter(group=0)
             self.space.add(floor)
+
+        # Screen borders
+        border_left = pymunk.Segment(self.space.static_body, (0, 0), (0, self.screen_height), 1)
+        border_right = pymunk.Segment(self.space.static_body, (self.screen_width, 0), (self.screen_width,
+                                                                                       self.screen_height), 1)
+        border_top = pymunk.Segment(self.space.static_body, (0, self.screen_height), (self.screen_width,
+                                                                                      self.screen_height), 1)
+        self.space.add(border_left, border_right, border_top)
 
     def Render(self, screen):
         # The game scene is just a blank blue screen
-        screen.set_mode((G_SCREEN_WIDTH, G_SCREEN_HEIGHT))
+        screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().fill(BLUE)
 
+        self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(screen.get_surface())
-        pymunk.pygame_util.positive_y_is_up = True
-
-        fps = 60
-        self.space.step(1. / fps)
         self.space.debug_draw(draw_options)
         self.anti_spacecraft.apply_force()
 
@@ -296,8 +314,7 @@ class WinScene(SceneBase):
     def Render(self, screen):
         screen.set_mode((800, 600))
         screen.get_surface().fill(GREEN)
-        display_text(screen, "Congratulations! You have won!",
-                     'freesansbold.ttf', 50)
+        display_text(screen, "Congratulations! You have won!", 'freesansbold.ttf', 50)
 
 
 class LoseScene(SceneBase):
