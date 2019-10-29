@@ -233,7 +233,9 @@ class GameScene(SceneBase):
         self.screen_height = G_SCREEN_HEIGHT
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
-        self.random_terrain()
+        self.terrain = self.random_terrain(self.space)
+        self.borders()
+        self.space.add(self.terrain)
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
@@ -243,7 +245,7 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
-        self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.pin9, self.anti_spacecraft.cannon_mt)
+        self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -258,10 +260,9 @@ class GameScene(SceneBase):
                 if event.key == pygame.K_LEFT:
                     self.anti_spacecraft.force_left()
                 if event.key == pygame.K_a:
-                    self.anti_spacecraft.cannon_mt.rate += 10
+                    self.anti_spacecraft.cannon_mt.rate = 2.5
                 if event.key == pygame.K_d:
-                    self.anti_spacecraft.cannon_mt.rate -= 10
-
+                    self.anti_spacecraft.cannon_mt.rate = -2.5
             else:
                 self.anti_spacecraft.cannon_mt.rate = 0
                 self.anti_spacecraft.force = DEFAULT_FORCE
@@ -269,19 +270,23 @@ class GameScene(SceneBase):
     def Update(self):
         pass
 
-    def random_terrain(self):
+    @staticmethod
+    def random_terrain(space):
         # Tuples of points where new segment will be added to form the terrain
+        terrain = []
         points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10))
                   for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):
-            floor = pymunk.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
+            floor = pymunk.Segment(space.static_body, (points[i - 1][0], points[i - 1][1]),
                                    (points[i][0], points[i][1]), TERRAIN_THICKNESS)
             floor.friction = TERRAIN_FRICTION
             floor.filter = pymunk.ShapeFilter(group=0)
-            self.space.add(floor)
+            terrain.append(floor)
+        return terrain
 
+    def borders(self):
         # Screen borders
         border_left = pymunk.Segment(self.space.static_body, (0, 0), (0, self.screen_height), 1)
         border_right = pymunk.Segment(self.space.static_body, (self.screen_width, 0), (self.screen_width,
