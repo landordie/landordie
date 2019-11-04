@@ -11,6 +11,7 @@ class AntiSpaceCraft:
     def __init__(self, mass=DEFAULT_MASS, position=(G_SCREEN_WIDTH/4, G_SCREEN_HEIGHT/4)):
         self.force = DEFAULT_FORCE
         self.wheels = []
+        self.flying_missiles = []
 
         # Anti-spacecraft wheels
         self.wheel1_b, self.wheel1_s = self.create_body(mass, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/1.5,
@@ -25,7 +26,13 @@ class AntiSpaceCraft:
         self.chassis_b, self.chassis_s = self.create_body(mass/5, position, ANTI_SPACECRAFT_CHASSIS)
         self.chassis_s.color = 255, 155, 0
 
-        self.cannon_b, self.cannon_s = self.create_body(0.01, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/2, position[1] + ANTI_SPACECRAFT_CHASSIS[1]/2), ANTI_SPACECRAFT_CANNON)
+        # Create cannon
+        self.cannon_b, self.cannon_s = self.create_body(0.01, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/2, position[1] +
+                                                               ANTI_SPACECRAFT_CHASSIS[1]/2), ANTI_SPACECRAFT_CANNON)
+
+        # Create missiles
+        self.missile_body, self.missile_shape = self.create_missile()
+
         # Anti-spacecraft joints
         # TODO: Use for-loop (?)
         self.pin1 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (-ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
@@ -53,6 +60,19 @@ class AntiSpaceCraft:
         shape.friction = friction
         shape.filter = AntiSpaceCraft.sf
         return body, shape
+
+    @staticmethod
+    def create_missile():
+        vs = [(-30, 0), (0, 3), (10, 0), (0, -3)]
+        mass = 1
+        moment = pymunk.moment_for_poly(mass, vs)
+        missile_body = pymunk.Body(mass, moment)
+
+        missile_shape = pymunk.Poly(missile_body, vs)
+        missile_shape.friction = .5
+        missile_shape.collision_type = 1
+        missile_shape.filter = AntiSpaceCraft.sf
+        return missile_body, missile_shape
 
     def apply_force(self):
         for wheel in self.wheels:

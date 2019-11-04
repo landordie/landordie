@@ -1,6 +1,9 @@
+import math
 import pygame
 import pymunk
 import pymunk.pygame_util
+from pymunk import Vec2d
+
 from .button import *
 from load_images import load_images
 from load_images import update as title_update
@@ -229,6 +232,8 @@ class SplashScene(SceneBase):
 class GameScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
+        self.end_time = 0
+        self.start_time = 0
         self.screen_width = G_SCREEN_WIDTH
         self.screen_height = G_SCREEN_HEIGHT
         self.space = pymunk.Space()
@@ -239,12 +244,15 @@ class GameScene(SceneBase):
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
+
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
         self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
+        self.space.add(self.anti_spacecraft.missile_shape)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
+
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
     def ProcessInput(self, events, pressed_keys):
@@ -253,19 +261,59 @@ class GameScene(SceneBase):
                 self.SwitchToScene(WinScene())
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE:
                 self.SwitchToScene(LoseScene())
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.start_time = pygame.time.get_ticks()
+            elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                self.end_time = pygame.time.get_ticks()
+
+                diff = self.end_time - self.start_time
+                power = max(min(diff, 1000), 10) * 1.5
+                impulse = power * Vec2d(1, 0)
+                impulse.rotate(self.anti_spacecraft.missile_body.angle)
+
+                self.anti_spacecraft.missile_body.apply_impulse_at_world_point(impulse, self.anti_spacecraft.missile_body.position)
+
+                self.space.add(self.anti_spacecraft.missile_body)
+                self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
+
+                self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = self.anti_spacecraft.create_missile()
+                self.space.add(self.anti_spacecraft.missile_shape)
+
+            # Position the missile
+            self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
+                self.anti_spacecraft.cannon_s.radius - 55, 0).rotated(self.anti_spacecraft.cannon_b.angle)
+            self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
+
+            for missile in self.anti_spacecraft.flying_missiles:
+                drag_constant = 0.0002
+
+                pointing_direction = Vec2d(1, 0).rotated(missile.angle)
+                flight_direction = Vec2d(missile.velocity)
+                flight_speed = flight_direction.normalize_return_length()
+                dot = flight_direction.dot(pointing_direction)
+
+                drag_force_magnitude = (1 - abs(dot)) * flight_speed ** 2 * drag_constant * missile.mass
+                missile_tail_position = Vec2d(-50, 0).rotated(missile.angle)
+                missile.apply_impulse_at_world_point(drag_force_magnitude * -flight_direction, missile.position)
+
+                missile.angular_velocity *= 0.5
+
             # Arrow keys movement
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RIGHT:
-                    self.anti_spacecraft.force_right()
-                if event.key == pygame.K_LEFT:
-                    self.anti_spacecraft.force_left()
-                if event.key == pygame.K_a:
-                    self.anti_spacecraft.cannon_mt.rate = 2.5
-                if event.key == pygame.K_d:
-                    self.anti_spacecraft.cannon_mt.rate = -2.5
+            keys = pygame.key.get_pressed()  # checking pressed keys
+            if keys[pygame.K_RIGHT]:
+                self.anti_spacecraft.force_right()
+            elif keys[pygame.K_LEFT]:
+                self.anti_spacecraft.force_left()
+            else:
+                self.anti_spacecraft.force = DEFAULT_FORCE
+
+            if keys[pygame.K_DOWN]:
+                self.anti_spacecraft.cannon_mt.rate = 2.5
+            elif keys[pygame.K_UP]:
+                self.anti_spacecraft.cannon_mt.rate = -2.5
             else:
                 self.anti_spacecraft.cannon_mt.rate = 0
-                self.anti_spacecraft.force = DEFAULT_FORCE
+
 
     def Update(self):
         pass
@@ -299,6 +347,13 @@ class GameScene(SceneBase):
         # The game scene is just a blank blue screen
         screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().fill(BLUE)
+
+        if pygame.key.get_pressed()[pygame.K_SPACE]:
+            current_time = pygame.time.get_ticks()
+            diff = current_time - self.start_time
+            power = max(min(diff, 1000), 10)
+            h = power / 2
+            pygame.draw.line(screen.get_surface(), pygame.color.THECOLORS["red"], (30, 550), (30, 550 - h), 10)
 
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(screen.get_surface())
