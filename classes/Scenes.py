@@ -256,6 +256,21 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
     def ProcessInput(self, events, pressed_keys):
+
+        # Arrow keys movement
+        keys = pygame.key.get_pressed()  # checking pressed keys
+        if keys[pygame.K_RIGHT]:
+            self.anti_spacecraft.force_right()
+        if keys[pygame.K_LEFT]:
+            self.anti_spacecraft.force_left()
+        if not keys[pygame.K_LEFT] and keys[pygame.K_RIGHT]:
+            self.anti_spacecraft.force = DEFAULT_FORCE
+
+        if keys[pygame.K_DOWN]:
+            self.anti_spacecraft.cannon_mt.rate = 0.8
+        if keys[pygame.K_UP]:
+            self.anti_spacecraft.cannon_mt.rate = -0.8
+
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(WinScene())
@@ -265,13 +280,15 @@ class GameScene(SceneBase):
                 self.start_time = pygame.time.get_ticks()
             elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 self.end_time = pygame.time.get_ticks()
+                self.anti_spacecraft.cannon_mt.rate = 0
 
                 diff = self.end_time - self.start_time
                 power = max(min(diff, 1000), 10) * 1.5
                 impulse = power * Vec2d(1, 0)
                 impulse.rotate(self.anti_spacecraft.missile_body.angle)
 
-                self.anti_spacecraft.missile_body.apply_impulse_at_world_point(impulse, self.anti_spacecraft.missile_body.position)
+                self.anti_spacecraft.missile_body.apply_impulse_at_world_point\
+                    (impulse, self.anti_spacecraft.missile_body.position)
 
                 self.space.add(self.anti_spacecraft.missile_body)
                 self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
@@ -297,23 +314,6 @@ class GameScene(SceneBase):
                 missile.apply_impulse_at_world_point(drag_force_magnitude * -flight_direction, missile.position)
 
                 missile.angular_velocity *= 0.5
-
-            # Arrow keys movement
-            keys = pygame.key.get_pressed()  # checking pressed keys
-            if keys[pygame.K_RIGHT]:
-                self.anti_spacecraft.force_right()
-            elif keys[pygame.K_LEFT]:
-                self.anti_spacecraft.force_left()
-            else:
-                self.anti_spacecraft.force = DEFAULT_FORCE
-
-            if keys[pygame.K_DOWN]:
-                self.anti_spacecraft.cannon_mt.rate = 2.5
-            elif keys[pygame.K_UP]:
-                self.anti_spacecraft.cannon_mt.rate = -2.5
-            else:
-                self.anti_spacecraft.cannon_mt.rate = 0
-
 
     def Update(self):
         pass
