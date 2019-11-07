@@ -9,6 +9,7 @@ from load_images import load_images
 from load_images import update as title_update
 from constants import *
 from .anti_space_craft import AntiSpaceCraft
+from classes.Spacecraft import Spacecraft
 
 pygame.font.init()
 # (!) REMEMBER (!)
@@ -255,6 +256,9 @@ class GameScene(SceneBase):
 
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
+        self.spacecraft = Spacecraft((200, 500))
+        self.space.add(self.spacecraft.body, self.spacecraft.shape)
+
     def ProcessInput(self, events, pressed_keys):
 
         # Arrow keys movement
@@ -263,13 +267,25 @@ class GameScene(SceneBase):
             self.anti_spacecraft.force_right()
         if keys[pygame.K_LEFT]:
             self.anti_spacecraft.force_left()
-        if not keys[pygame.K_LEFT] and keys[pygame.K_RIGHT]:
+        if not keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
             self.anti_spacecraft.force = DEFAULT_FORCE
 
         if keys[pygame.K_DOWN]:
-            self.anti_spacecraft.cannon_mt.rate = 0.8
+            self.anti_spacecraft.cannon_mt.rate = 2.5
         if keys[pygame.K_UP]:
-            self.anti_spacecraft.cannon_mt.rate = -0.8
+            self.anti_spacecraft.cannon_mt.rate = -2.5
+        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP]:
+            self.anti_spacecraft.cannon_mt.rate = 0
+
+        if keys[pygame.K_a]:
+            self.spacecraft.rotate_left()
+        if keys[pygame.K_d]:
+            self.spacecraft.rotate_right()
+        if not keys[pygame.K_d] and not keys[pygame.K_a]:
+            self.spacecraft.body.angular_velocity = 0
+
+        if keys[pygame.K_w]:
+            self.spacecraft.move_up()
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
@@ -355,6 +371,7 @@ class GameScene(SceneBase):
             h = power / 2
             pygame.draw.line(screen.get_surface(), pygame.color.THECOLORS["red"], (30, 550), (30, 550 - h), 10)
 
+        self.spacecraft.update()
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(screen.get_surface())
         self.space.debug_draw(draw_options)
