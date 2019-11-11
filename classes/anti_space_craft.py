@@ -74,6 +74,10 @@ class AntiSpaceCraft:
         missile_shape.filter = AntiSpaceCraft.sf
         return missile_body, missile_shape
 
+    def is_collided_with(self, sprite):
+        return self.missile_body.position == sprite.position
+
+
     def apply_force(self):
         for wheel in self.wheels:
             wheel.apply_force_at_local_point(self.force, wheel.position)

@@ -3,6 +3,9 @@ import pygame
 import pymunk
 import pymunk.pygame_util
 from pymunk import Vec2d
+import csv
+from datetime import date
+import pandas as pd
 
 from .button import *
 from load_images import load_images
@@ -230,6 +233,29 @@ class SplashScene(SceneBase):
         screen.get_surface().blit(text, position)
 
 
+def stick_arrow_to_target(space, arrow_body, target_body, position, flying_arrows):
+    pivot_joint = pymunk.PivotJoint(arrow_body, target_body, position)
+    phase = target_body.angle - arrow_body.angle
+    gear_joint = pymunk.GearJoint(arrow_body, target_body, phase, 1)
+    space.add(pivot_joint)
+    space.add(gear_joint)
+    try:
+        flying_arrows.remove(arrow_body)
+    except:
+        pass
+
+
+def post_solve_arrow_hit(arbiter, space, data):
+    if arbiter.total_impulse.length > 300:
+        a, b = arbiter.shapes
+        position = arbiter.contact_point_set.points[0].point_a
+        b.collision_type = 0
+        b.group = 1
+        other_body = a.body
+        arrow_body = b.body
+        space.add_post_step_callback(
+            stick_arrow_to_target, arrow_body, other_body, position, data["flying_missiles"])
+
 class GameScene(SceneBase):
     def __init__(self):
         SceneBase.__init__(self)
@@ -240,11 +266,16 @@ class GameScene(SceneBase):
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
         self.terrain = self.random_terrain(self.space)
+        self.player1_pts = 0
+        self.player2_pts = 0
         self.borders()
         self.space.add(self.terrain)
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
+        self.handler = self.space.add_collision_handler(0, 1)
+        self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
+        self.handler.post_solve = post_solve_arrow_hit
 
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
@@ -265,23 +296,23 @@ class GameScene(SceneBase):
         keys = pygame.key.get_pressed()  # checking pressed keys
         if keys[pygame.K_RIGHT]:
             self.anti_spacecraft.force_right()
-        if keys[pygame.K_LEFT]:
+        elif keys[pygame.K_LEFT]:
             self.anti_spacecraft.force_left()
-        if not keys[pygame.K_LEFT] and not keys[pygame.K_RIGHT]:
+        else:
             self.anti_spacecraft.force = DEFAULT_FORCE
 
         if keys[pygame.K_DOWN]:
             self.anti_spacecraft.cannon_mt.rate = 2.5
-        if keys[pygame.K_UP]:
+        elif keys[pygame.K_UP]:
             self.anti_spacecraft.cannon_mt.rate = -2.5
-        if not keys[pygame.K_DOWN] and not keys[pygame.K_UP]:
+        else:
             self.anti_spacecraft.cannon_mt.rate = 0
 
         if keys[pygame.K_a]:
             self.spacecraft.rotate_left()
-        if keys[pygame.K_d]:
+        elif keys[pygame.K_d]:
             self.spacecraft.rotate_right()
-        if not keys[pygame.K_d] and not keys[pygame.K_a]:
+        else:
             self.spacecraft.body.angular_velocity = 0
 
         if keys[pygame.K_w]:
@@ -289,7 +320,7 @@ class GameScene(SceneBase):
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                self.SwitchToScene(WinScene())
+                self.SwitchToScene(ResultScene())
             if event.type == pygame.KEYDOWN and event.key == pygame.K_DELETE:
                 self.SwitchToScene(LoseScene())
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
@@ -311,11 +342,6 @@ class GameScene(SceneBase):
 
                 self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = self.anti_spacecraft.create_missile()
                 self.space.add(self.anti_spacecraft.missile_shape)
-
-            # Position the missile
-            self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
-                self.anti_spacecraft.cannon_s.radius - 55, 0).rotated(self.anti_spacecraft.cannon_b.angle)
-            self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
 
             for missile in self.anti_spacecraft.flying_missiles:
                 drag_constant = 0.0002
@@ -364,6 +390,11 @@ class GameScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().fill(BLUE)
 
+        # Position the missile
+        self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
+            self.anti_spacecraft.cannon_s.radius - 55, 0).rotated(self.anti_spacecraft.cannon_b.angle)
+        self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
+
         if pygame.key.get_pressed()[pygame.K_SPACE]:
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
@@ -408,3 +439,31 @@ class LoseScene(SceneBase):
         screen.set_mode((800, 600))
         screen.get_surface().fill(RED)
         display_text(screen, "Too bad! You have lost!", 'freesansbold.ttf', 45)
+
+
+class ResultScene(SceneBase):
+    def __init__(self):
+        SceneBase.__init__(self)
+        self.store_result()
+
+    @staticmethod
+    def store_result():
+        with open('highscore_list.csv', mode='w') as csv_file:
+            fieldnames = ['Name', 'Score', 'Date']
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+            writer.writeheader()
+            writer.writerow({'Name': 'xXnoChance', 'Score': GameScene().player1_pts, 'Date': date.today()})
+            writer.writerow({'Name': 'xXyouBet', 'Score': GameScene().player2_pts, 'Date': date.today()})
+
+    def ProcessInput(self, events, pressed_keys):
+        pass
+
+    def Update(self):
+        pass
+
+    def Render(self, screen):
+        screen.set_mode((800, 600))
+        screen.get_surface().fill(RED)
+
+        display_text(screen, str(GameScene().player1_pts), 'freesansbold.ttf', 45)
