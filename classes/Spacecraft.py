@@ -13,6 +13,7 @@ class Spacecraft(pg.sprite.Sprite):
 
     def __init__(self, pos):
         super().__init__()
+        self.crashed = False
         self.image = pg.Surface((46, 52), pg.SRCALPHA)
         pg.draw.polygon(self.image, (0, 50, 200),
                         [(0, 0), (48, 0), (48, 54), (24, 54)])
@@ -23,6 +24,7 @@ class Spacecraft(pg.sprite.Sprite):
         moment = pm.moment_for_poly(mass, vs)
         self.body = pm.Body(mass, moment)
         self.shape = pm.Poly(self.body, vs)
+        self.shape.collision_type = 3
         self.body.position = pos
 
     def update(self):
@@ -33,11 +35,11 @@ class Spacecraft(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
     def rotate_left(self):
-        self.body.angular_velocity = -1.5
-
-    def rotate_right(self):
         self.body.angular_velocity = 1.5
 
+    def rotate_right(self):
+        self.body.angular_velocity = -1.5
+
     def move_up(self):
-        """ This method is helps the ship to counter-react the gravitation effect of the planet """
-        self.body.apply_impulse_at_local_point(Vec2d(0, 50))
+        """ This method helps the ship to counter-react the gravitation effect of the planet """
+        self.body.apply_impulse_at_local_point(Vec2d(0, 35))

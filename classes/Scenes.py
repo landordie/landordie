@@ -12,7 +12,7 @@ from load_images import load_images
 from load_images import update as title_update
 from constants import *
 from .anti_space_craft import AntiSpaceCraft
-from classes.Spacecraft import Spacecraft
+from .Spacecraft import Spacecraft
 
 pygame.font.init()
 # (!) REMEMBER (!)
@@ -81,6 +81,11 @@ class SceneBase:
         self.font_arial_black_large = pygame.font.SysFont('Arial Black', 50)
         self.font_verily_mono = pygame.font.SysFont('Verily Serif Mono', 27)
         self.font_freesans_bold = pygame.font.SysFont("Freesans Bold", 35)
+
+    @staticmethod
+    def draw_text(screen, message, position, font, color=(0, 0, 0)):
+        text = font.render(message, False, color)
+        screen.get_surface().blit(text, position)
 
     # Using this method mainly for testing
     # The game logic will be implemented in the Update() method
@@ -227,36 +232,11 @@ class SplashScene(SceneBase):
         self.splash_button.update(screen.get_surface())
         pygame.display.update()
 
-    @staticmethod
-    def draw_text(screen, message, position, font, color=(0, 0, 0)):
-        text = font.render(message, False, color)
-        screen.get_surface().blit(text, position)
-
-
-def stick_arrow_to_target(space, arrow_body, target_body, position, flying_arrows):
-    pivot_joint = pymunk.PivotJoint(arrow_body, target_body, position)
-    phase = target_body.angle - arrow_body.angle
-    gear_joint = pymunk.GearJoint(arrow_body, target_body, phase, 1)
-    space.add(pivot_joint)
-    space.add(gear_joint)
-    try:
-        flying_arrows.remove(arrow_body)
-    except:
-        pass
-
-
-def post_solve_arrow_hit(arbiter, space, data):
-    if arbiter.total_impulse.length > 300:
-        a, b = arbiter.shapes
-        position = arbiter.contact_point_set.points[0].point_a
-        b.collision_type = 0
-        b.group = 1
-        other_body = a.body
-        arrow_body = b.body
-        space.add_post_step_callback(
-            stick_arrow_to_target, arrow_body, other_body, position, data["flying_missiles"])
 
 class GameScene(SceneBase):
+    player1_pts = 0
+    player2_pts = 0
+
     def __init__(self):
         SceneBase.__init__(self)
         self.end_time = 0
@@ -266,16 +246,14 @@ class GameScene(SceneBase):
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
         self.terrain = self.random_terrain(self.space)
-        self.player1_pts = 0
-        self.player2_pts = 0
         self.borders()
         self.space.add(self.terrain)
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
-        self.handler = self.space.add_collision_handler(0, 1)
+        self.handler = self.space.add_collision_handler(2,3)
         self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
-        self.handler.post_solve = post_solve_arrow_hit
+        self.handler.post_solve = self.post_solve_adjust_scores
 
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
@@ -289,6 +267,21 @@ class GameScene(SceneBase):
 
         self.spacecraft = Spacecraft((200, 500))
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
+
+        self.handler_2 = self.space.add_collision_handler(0, 3)
+        self.handler_2.data["spacecraft_land"] = self.spacecraft.body
+        self.handler_2.post_solve = self.post_solve_adjust_2
+
+    @staticmethod
+    def post_solve_adjust_scores(arbiter, space, data):
+        if arbiter.total_impulse.length > 300:
+            GameScene.player1_pts +=10
+
+    def post_solve_adjust_2(self, arbiter, space, data):
+        if self.spacecraft.body.velocity.length < 100:
+            GameScene.player2_pts = 50
+        elif self.spacecraft.body.velocity.length > 500:
+            self.spacecraft.crashed = True
 
     def ProcessInput(self, events, pressed_keys):
 
@@ -308,15 +301,15 @@ class GameScene(SceneBase):
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
 
-        if keys[pygame.K_a]:
-            self.spacecraft.rotate_left()
-        elif keys[pygame.K_d]:
-            self.spacecraft.rotate_right()
-        else:
-            self.spacecraft.body.angular_velocity = 0
-
-        if keys[pygame.K_w]:
-            self.spacecraft.move_up()
+        if not self.spacecraft.crashed:
+            if keys[pygame.K_a]:
+                self.spacecraft.rotate_left()
+            elif keys[pygame.K_d]:
+                self.spacecraft.rotate_right()
+            elif keys[pygame.K_w]:
+                self.spacecraft.move_up()
+            else:
+                self.spacecraft.body.angular_velocity = 0
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
@@ -352,7 +345,6 @@ class GameScene(SceneBase):
                 dot = flight_direction.dot(pointing_direction)
 
                 drag_force_magnitude = (1 - abs(dot)) * flight_speed ** 2 * drag_constant * missile.mass
-                missile_tail_position = Vec2d(-50, 0).rotated(missile.angle)
                 missile.apply_impulse_at_world_point(drag_force_magnitude * -flight_direction, missile.position)
 
                 missile.angular_velocity *= 0.5
@@ -464,6 +456,8 @@ class ResultScene(SceneBase):
 
     def Render(self, screen):
         screen.set_mode((800, 600))
-        screen.get_surface().fill(RED)
-
-        display_text(screen, str(GameScene().player1_pts), 'freesansbold.ttf', 45)
+        screen.get_surface().fill(GREEN)
+        self.draw_text(screen, f"Player 1 Score = {str(GameScene().player1_pts)} points", (300, 200),
+                       self.font_arial_black, BLACK)
+        self.draw_text(screen, f"Player 2 Score = {str(GameScene().player2_pts)} points", (300, 300),
+                       self.font_arial_black, BLACK)
