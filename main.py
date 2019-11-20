@@ -5,7 +5,8 @@
 
 # ------------------------------------------#
 
-from classes.Scenes import *
+from classes.scene_base import *
+from classes.menu_scene import MenuScene
 
 
 def run_game(width, height, fps, starting_scene):
@@ -48,5 +49,5 @@ def run_game(width, height, fps, starting_scene):
 
 
 if __name__ == "__main__":
-    myScene = TitleScene()
+    myScene = MenuScene()
     run_game(myScene.width, myScene.height, 60, myScene)
