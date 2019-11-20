@@ -4,7 +4,8 @@ Button Class
 import random
 
 import pygame as pg
-from PyMunk.constants import *
+from constants import *
+
 
 
 class Button:
