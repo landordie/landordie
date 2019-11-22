@@ -1,11 +1,19 @@
+"""
+    Splash Scene Module (Subclass of Scene Base)
+"""
+
 from .scene_base import *
 from .game_scene import GameScene
 from .button import Button
 
 
 class SplashScene(SceneBase):
+    """Splash Scene Instance Class"""
+    
     def __init__(self):
         SceneBase.__init__(self)
+        
+        # Set screen dimension attributes
         self.width = S_SCREEN_WIDTH
         self.height = S_SCREEN_HEIGHT
 
@@ -14,16 +22,15 @@ class SplashScene(SceneBase):
                                      self.height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
     def ProcessInput(self, events, pressed_keys):
+        """Event loop handler method"""
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.splash_button.on_click(event):
                 self.SwitchToScene(GameScene())
 
-    def Update(self):
-        pass
-
     def Render(self, screen):
+        """Render screen and display buttons and instructions"""
         screen.set_mode((S_SCREEN_WIDTH, S_SCREEN_HEIGHT))
         splash_w, splash_h = 700, 630
         splash_x, splash_y = (self.width/2) - \
