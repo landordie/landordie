@@ -1,15 +1,26 @@
+"""
+    Result Scene Module (Subclass of Scenebase)
+"""
 import csv
 from datetime import date
 from .scene_base import *
 
 
 class ResultScene(SceneBase):
+    """Result Scene Instance Class"""
+    
     def __init__(self, player1_pts, player2_pts):
         SceneBase.__init__(self)
+        
+        # set screen dimension attributes
         self.screen_width = R_SCREEN_WIDTH
         self.screen_height = R_SCREEN_HEIGHT
+        
+        # player point attributes
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
+        
+        # call store result static method
         self.store_result(player1_pts, player2_pts)
 
     @staticmethod
@@ -22,13 +33,9 @@ class ResultScene(SceneBase):
             writer.writerow({'Name': 'xXnoChance', 'Score': player1_pts, 'Date': date.today()})
             writer.writerow({'Name': 'xXyouBet', 'Score': player2_pts, 'Date': date.today()})
 
-    def ProcessInput(self, events, pressed_keys):
-        pass
-
-    def Update(self):
-        pass
-
     def Render(self, screen):
+        """Render the screen and show game results"""
+        
         screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().fill(GREEN)
 
