@@ -1,5 +1,5 @@
 """
-Button Class
+    Button Module
 """
 import random
 
