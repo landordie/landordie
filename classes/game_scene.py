@@ -1,3 +1,6 @@
+"""
+    Game Scene Module (Subclass of Scene Base)
+"""
 import math
 import random
 import pymunk
@@ -9,28 +12,35 @@ from .anti_spacecraft import AntiSpaceCraft
 
 
 class GameScene(SceneBase):
+    """Game Scene Instance Class"""
 
     def __init__(self):
         SceneBase.__init__(self)
+        self.player1_pts = 0
         self.player2_pts = 0
         self.display_crash_text = False
-        self.player1_pts = 0
+        
         self.end_time = 0
         self.start_time = 0
+        
+        # Set screen dimensions
         self.screen_width = G_SCREEN_WIDTH
         self.screen_height = G_SCREEN_HEIGHT
+        
+        # Prepare pymunk physics space
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
         self.terrain = self.random_terrain(self.space)
         self.borders()
         self.space.add(self.terrain)
 
-        # Anti-spacecraft
+        # Initialize Anti-spacecraft instance
         self.anti_spacecraft = AntiSpaceCraft()
         self.handler = self.space.add_collision_handler(2, 3)
         self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
-        self.handler.post_solve = self.post_solve_adjust_scores
-
+        self.handler.post_solve = self.post_solve_anti_spacecraft
+        
+        # Add shapes to pymunk space
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
         self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
@@ -40,30 +50,33 @@ class GameScene(SceneBase):
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
 
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
-
+        
+        #Initialize Spacecraft instance
         self.spacecraft = Spacecraft((200, 500))
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
         self.crash_handler = self.space.add_collision_handler(0, 3)
         self.crash_handler.data["spacecraft_land"] = self.spacecraft.body
-        self.crash_handler.post_solve = self.post_solve_crashed
-
-    def post_solve_adjust_scores(self, arbiter, space, data):
+        self.crash_handler.post_solve = self.post_solve_spacecraft
+    
+    def post_solve_anti_spacecraft(self, arbiter, space, data):
+        """Increment score by 10 when a missile hits the spacecraft"""
         if arbiter.total_impulse.length > 100:
             self.player1_pts += 10
 
-    def post_solve_crashed(self, arbiter, space, data):
-        """ Set the spacecraft score to 50 only if it is a smooth landing. """
+    def post_solve_spacecraft(self, arbiter, space, data):
+        """Set the spacecraft score to 50 only if it is a smooth landing"""
         if self.spacecraft.body.velocity.length < 10 and not self.spacecraft.crashed:
             self.player2_pts = 50
             self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
-        # set spacecraft crashed attribute to True when it collides too fast
+            
+        # Set spacecraft crashed attribute to True when it collides too fast
         elif self.spacecraft.body.velocity.length > 100:
             self.display_crash_text = True
             self.spacecraft.crashed = True
 
     def ProcessInput(self, events, pressed_keys):
-
+        """Event loop and keyboard input handler method"""
         # Arrow keys movement
         keys = pygame.key.get_pressed()  # checking pressed keys
         if keys[pygame.K_RIGHT]:
@@ -131,6 +144,7 @@ class GameScene(SceneBase):
 
     @staticmethod
     def random_terrain(space):
+        """Introduce random terrain surface"""
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
         points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10))
@@ -146,7 +160,7 @@ class GameScene(SceneBase):
         return terrain
 
     def borders(self):
-        # Screen borders
+        """Screen borders"""
         border_left = pymunk.Segment(self.space.static_body, (0, 0), (0, self.screen_height), 10)
         border_right = pymunk.Segment(self.space.static_body, (self.screen_width, 0), (self.screen_width,
                                                                                        self.screen_height), 10)
@@ -156,7 +170,7 @@ class GameScene(SceneBase):
         self.space.add(border_left, border_right, border_top)
 
     def Render(self, screen):
-        # The game scene is just a blank blue screen
+        """Render and update screen"""
         display = screen.get_surface()
         screen.set_mode((self.screen_width, self.screen_height))
         display.fill(BLUE)
@@ -165,7 +179,8 @@ class GameScene(SceneBase):
         self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
             self.anti_spacecraft.cannon_s.radius - 55, 0).rotated(self.anti_spacecraft.cannon_b.angle)
         self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
-
+        
+        # Anti-spacecraft power bar
         if pygame.key.get_pressed()[pygame.K_SPACE]:
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
