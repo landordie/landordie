@@ -4,12 +4,15 @@
 # https: // nerdparadise.com / programming / pygame / part7
 
 # ------------------------------------------#
-
+"""
+    Main Module
+"""
 from classes.scene_base import *
 from classes.menu_scene import MenuScene
 
 
 def run_game(width, height, fps, starting_scene):
+    """Function to run the program"""
     pygame.init()
     screen = pygame.display
     screen.set_mode((width, height))
