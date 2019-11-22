@@ -1,3 +1,6 @@
+"""
+    Menu Module (Subclass of Scene Base)
+"""
 from load_images import load_images, update as title_update
 from .scene_base import *
 from .game_scene import GameScene
@@ -6,8 +9,12 @@ from .button import Button
 
 
 class MenuScene(SceneBase):
+    """Menu Scene Instance Class"""
+    
     def __init__(self):
         SceneBase.__init__(self)
+        
+        # Set screen dimension attributes
         self.width = M_SCREEN_WIDTH
         self.height = M_SCREEN_HEIGHT
 
@@ -18,6 +25,7 @@ class MenuScene(SceneBase):
                                      BUTTON_HEIGHT), RED, 'Quit')
 
     def ProcessInput(self, events, pressed_keys):
+        """Event loop method to handle events"""
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
@@ -26,13 +34,8 @@ class MenuScene(SceneBase):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 self.SwitchToScene(SplashScene())
 
-    def Update(self):
-        pass
-
-    # (!) When adding buttons to the start screen
-    # (!) Add them here, in this method
     def Render(self, screen):
-
+        """Render screen method which draws the buttons and the background"""
         game_title = load_images("frames/big")
         title_surfaces = game_title.values()
 
