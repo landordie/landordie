@@ -12,15 +12,15 @@ class ResultScene(SceneBase):
     def __init__(self, player1_pts, player2_pts):
         SceneBase.__init__(self)
         
-        # set screen dimension attributes
+        # Set screen dimension attributes
         self.screen_width = R_SCREEN_WIDTH
         self.screen_height = R_SCREEN_HEIGHT
         
-        # player point attributes
+        # Player point attributes
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
         
-        # call store result static method
+        # Call store result static method
         self.store_result(player1_pts, player2_pts)
 
     @staticmethod
