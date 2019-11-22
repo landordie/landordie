@@ -50,8 +50,8 @@ class GameScene(SceneBase):
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
 
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
-        
-        #Initialize Spacecraft instance
+
+        # Initialize Spacecraft instance
         self.spacecraft = Spacecraft((200, 500))
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
@@ -105,7 +105,7 @@ class GameScene(SceneBase):
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                self.SwitchToScene(ResultScene(self.player1_pts,self.player2_pts))
+                self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.start_time = pygame.time.get_ticks()
             elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
@@ -126,9 +126,11 @@ class GameScene(SceneBase):
                 self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = self.anti_spacecraft.create_missile()
                 self.space.add(self.anti_spacecraft.missile_shape)
 
+            # For each missile in the space
             for missile in self.anti_spacecraft.flying_missiles:
                 drag_constant = 0.0002
 
+                # Control physics and movement in the space
                 pointing_direction = Vec2d(1, 0).rotated(missile.angle)
                 flight_direction = Vec2d(missile.velocity)
                 flight_speed = flight_direction.normalize_return_length()

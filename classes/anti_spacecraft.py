@@ -1,21 +1,17 @@
 """
-    Anti-spacecraft Module
+AntiSpaceCraft class
 """
 from constants import *
 import pymunk
 
 
 class AntiSpaceCraft:
-    """Anti-spacecraft Instance Class"""
-    
-    # All shapes in this class belong to shape group 1
     sf = pymunk.ShapeFilter(group=1)
 
     def __init__(self, mass=DEFAULT_MASS, position=(G_SCREEN_WIDTH/2, G_SCREEN_HEIGHT/4)):
-        
-        self.force = DEFAULT_FORCE  # Used to update the force of the anti-spacecraft vehicle
-        self.wheels = []  # Will hold wheel bodies
-        self.flying_missiles = []  # Will hold missile bodies
+        self.force = DEFAULT_FORCE
+        self.wheels = []
+        self.flying_missiles = []
 
         # Anti-spacecraft wheels
         self.wheel1_b, self.wheel1_s = self.create_body(mass, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/1.5,
@@ -38,6 +34,7 @@ class AntiSpaceCraft:
         self.missile_body, self.missile_shape = self.create_missile()
 
         # Anti-spacecraft joints
+        # TODO: Use for-loop (?)
         self.pin1 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (-ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
         self.pin2 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
         self.pin3 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
@@ -51,7 +48,6 @@ class AntiSpaceCraft:
 
     @staticmethod
     def create_body(mass, position, shape_type, friction=TERRAIN_FRICTION):
-        """Static method to create the desired shape"""
         body = pymunk.Body()
         body.mass = mass
         body.position = position
@@ -67,7 +63,6 @@ class AntiSpaceCraft:
 
     @staticmethod
     def create_missile():
-        """Static method to create the missiles"""
         vs = [(-30, 0), (0, 3), (10, 0), (0, -3)]
         mass = 0.5
         moment = pymunk.moment_for_poly(mass, vs)
@@ -79,15 +74,15 @@ class AntiSpaceCraft:
         missile_shape.filter = AntiSpaceCraft.sf
         return missile_body, missile_shape
 
+    def is_collided_with(self, sprite):
+        return self.missile_body.position == sprite.position
+
     def apply_force(self):
-        """Apply current force to vehicle wheels"""
         for wheel in self.wheels:
             wheel.apply_force_at_local_point(self.force, wheel.position)
 
     def force_right(self):
-        """Change force to positive x-axis direction"""
         self.force = (ANTI_SPACECRAFT_MOVE_FORCE, 0)
 
     def force_left(self):
-        """Change force to negative x-axis direction"""
         self.force = (-ANTI_SPACECRAFT_MOVE_FORCE, 0)

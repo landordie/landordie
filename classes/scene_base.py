@@ -77,16 +77,14 @@ class SceneBase:
         text_rect = text.get_rect(center=position)
         screen.get_surface().blit(text, text_rect)
 
-    # Using this method mainly for testing
-    # The game logic will be implemented in the Update() method
     def ProcessInput(self, events, pressed_keys):
-        print("(!) Override in child class (!)")
+        pass
 
     def Update(self):
-        print("(!) Override in child class (!)")
+        pass
 
     def Render(self, screen):
-        print("(!) Override in child class (!)")
+        pass
 
     def SwitchToScene(self, next_scene):
         self.next = next_scene

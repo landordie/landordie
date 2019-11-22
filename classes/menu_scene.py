@@ -36,6 +36,7 @@ class MenuScene(SceneBase):
 
     def Render(self, screen):
         """Render screen method which draws the buttons and the background"""
+        # Load the logo frames
         game_title = load_images("frames/big")
         title_surfaces = game_title.values()
 
