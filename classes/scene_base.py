@@ -65,9 +65,10 @@ class SceneBase:
         self.next = self
         # Fonts:
         self.font_arial_black = pygame.font.SysFont('Arial Black', 18)
-        self.font_verdana = pygame.font.SysFont('Verdana', 35)
+        self.font_verdana = pygame.font.SysFont('Verdana', 25)
         self.font_arial_black_large = pygame.font.SysFont('Arial Black', 50)
         self.font_verily_mono = pygame.font.SysFont('Verily Serif Mono', 27)
+        self.font_consolas = pygame.font.SysFont('Consolas', 30)
         self.font_freesans_bold = pygame.font.SysFont("Freesans Bold", 35)
 
     @staticmethod
