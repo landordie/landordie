@@ -35,7 +35,6 @@ class ResultScene(SceneBase):
 
     def Render(self, screen):
         """Render the screen and show game results"""
-        
         screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().fill(GREEN)
 
