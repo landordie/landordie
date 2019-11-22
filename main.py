@@ -1,7 +1,3 @@
-"""
-    Main Module
-"""
-
 # ------------------------------------------#
 
 # Code for scene architecture taken from:
@@ -15,13 +11,16 @@ from classes.menu_scene import MenuScene
 
 def run_game(width, height, fps, starting_scene):
     """Function to run the program"""
+    # Initialize pygame objects
     pygame.init()
     screen = pygame.display
     screen.set_mode((width, height))
     clock = pygame.time.Clock()
 
+    # Set the active scene
     active_scene = starting_scene
 
+    # If there is an active scene start program loop
     while active_scene is not None:
         pressed_keys = pygame.key.get_pressed()
 
@@ -29,6 +28,7 @@ def run_game(width, height, fps, starting_scene):
         filtered_events = []
         for event in pygame.event.get():
             quit_attempt = False
+            # If a quit is attempted
             if event.type == pygame.QUIT:
                 quit_attempt = True
             elif event.type == pygame.KEYDOWN:
@@ -42,18 +42,23 @@ def run_game(width, height, fps, starting_scene):
             if quit_attempt:
                 active_scene.Terminate()
             else:
+                # If not quitting add events into list
                 filtered_events.append(event)
 
+        # Pass the list of events and pressed keys for processing by the current scene
         active_scene.ProcessInput(filtered_events, pressed_keys)
         active_scene.Update()
+        # Render current scene's objects to the screen
         active_scene.Render(screen)
-        
-        # Switch to next scene
+
+        # Switch the scene after exiting the current scene loop
         active_scene = active_scene.next
+        # Update the display
         pygame.display.flip()
         clock.tick(fps)
 
 
 if __name__ == "__main__":
+    # Initiate the program loop with the first scene
     myScene = MenuScene()
     run_game(myScene.width, myScene.height, 60, myScene)
