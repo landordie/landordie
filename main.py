@@ -1,12 +1,14 @@
+"""
+    Main Module
+"""
+
 # ------------------------------------------#
 
 # Code for scene architecture taken from:
 # https: // nerdparadise.com / programming / pygame / part7
 
 # ------------------------------------------#
-"""
-    Main Module
-"""
+
 from classes.scene_base import *
 from classes.menu_scene import MenuScene
 
