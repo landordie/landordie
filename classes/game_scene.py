@@ -149,8 +149,8 @@ class GameScene(SceneBase):
         """Introduce random terrain surface"""
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
-        points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10))
-                  for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
+        points = [(i, random.randint(G_SCREEN_HEIGHT//5000, G_SCREEN_HEIGHT//5))
+                  for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH+50)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):

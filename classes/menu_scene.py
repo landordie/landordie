@@ -27,7 +27,9 @@ class MenuScene(SceneBase):
     def ProcessInput(self, events, pressed_keys):
         """Event loop method to handle events"""
         for event in events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE) or (event.type == pygame.MOUSEBUTTONDOWN
+                                                                                   and event.button == 1 and
+                                                                                   self.menu_button_2.on_click(event)):
                 self.Terminate()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(GameScene())
