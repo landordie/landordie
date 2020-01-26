@@ -25,31 +25,26 @@ class SplashScene(SceneBase):
 
     def Render(self, screen):
         screen.set_mode((S_SCREEN_WIDTH, S_SCREEN_HEIGHT))
-        # Create a box on the splash screen with medium opacity
         splash_w, splash_h = 700, 630
         splash_x, splash_y = (self.width/2) - \
             (splash_w/2), (self.height/2) - (splash_h/2)
 
-        # Set the background image
         controls_background = pygame.Surface(
             (splash_w, splash_h)).convert_alpha()
         controls_background.fill(BLACK_HIGHLIGHT)
         logo = pygame.image.load('frames/Landordie.png')
         background = pygame.image.load('frames/backgr.png')
 
-        # Load the images for the control scheme
         player1_left, player1_right, player1_thrust = load_controls_images(1)
         player2_left, player2_right, player2_shoot, player2_cannon_left, player2_cannon_right = load_controls_images(2)
 
         screen.get_surface().fill(WHITE)
 
-        # Display everything on the screen
         screen.get_surface().blit(background, (0, 0))
         screen.get_surface().blit(controls_background,
                                   (splash_x, splash_y, splash_w, splash_h))
         screen.get_surface().blit(logo, (splash_x, splash_y))
 
-        # Write text to the screen
         self.draw_text(screen, "Game Controls", (splash_x + (splash_w/1.5),
                                                  splash_y * 1.7), self.font_arial_black_large, (140, 123, 192))
         self.draw_text(screen, "Player 1: ", (splash_x + (splash_w/3.75),
@@ -57,7 +52,9 @@ class SplashScene(SceneBase):
         self.draw_text(screen, "Player 2: ", (splash_x + 535,
                                               splash_y + 100), self.font_verdana, (255, 255, 255))
 
-        # Display the controls for Player 1 (controlling the ship) on the splash screen
+        # Display the controls for Player 1 (controlling the ship)
+        # on the splash screen
+
         screen.get_surface().blit(player1_thrust, (splash_x + 125, splash_y + 150))
         self.draw_text(screen, "Thruster On", (splash_x + 175,
                                                splash_y + 150), self.font_freesans_bold, WHITE)
@@ -70,7 +67,9 @@ class SplashScene(SceneBase):
         self.draw_text(screen, "Rotate Right", (splash_x + 255,
                                                 splash_y + 250), self.font_freesans_bold, WHITE)
 
-        # Display the controls for Player 2 (controlling the tank) on the splash screen
+        # Display the controls for Player 2 (controlling the tank)
+        # on the splash screen
+
         screen.get_surface().blit(player2_cannon_right, (splash_x + 475, splash_y + 150))
         self.draw_text(screen, "Cannon Right", (splash_x + 525,
                                                 splash_y + 150), self.font_freesans_bold, WHITE)

@@ -1,5 +1,5 @@
 """
-    Button Module
+Button Class
 """
 import random
 
@@ -9,8 +9,7 @@ from constants import *
 
 
 class Button:
-    """Button Instance Class"""
-    
+
     def __init__(self, rect, color, text, **kwargs):
         self.rect = pg.Rect(rect)
         self.color = color
@@ -18,28 +17,36 @@ class Button:
         self.text = self.font.render(text, True, BLACK)
         self.hovered = False
 
+    def change_color(self):
+        """
+        Not used yet
+        """
+        self.color = [random.randint(0, 150) for _ in range(3)]
 
     def on_click(self, event):
         if self.rect.collidepoint(event.pos):
             return True
         return False
-    
+
     def check_hover(self):
-        """Check if the mouse cursor is over a button and if so play the hover sound"""
         if self.rect.collidepoint(pg.mouse.get_pos()):
             if not self.hovered:
                 self.hovered = True
-                pg.mixer.Sound(HOVER_SOUND).play()  # play sound
+                pg.mixer.Sound(HOVER_SOUND).play()  # improve?
         else:
             self.hovered = False
 
     def wh_text(self):
-        """Text rectangle width and height as tuple"""
+        """
+        Text rectangle width and height as tuple
+        """
         text_rect = self.text.get_rect()
         return text_rect.width, text_rect.height
 
     def update(self, surface):
-        """Update needs to be called every frame in the main loop"""
+        """
+        Update needs to be called every frame in the main loop.
+        """
         self.check_hover()
         if self.hovered:
             surface.fill(WHITE, self.rect)
