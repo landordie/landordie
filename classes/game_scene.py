@@ -6,7 +6,9 @@ from classes.spacecraft import Spacecraft
 from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
+import constants
 
+# (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
 
@@ -17,8 +19,8 @@ class GameScene(SceneBase):
         self.player1_pts = 0
         self.end_time = 0
         self.start_time = 0
-        self.screen_width = G_SCREEN_WIDTH
-        self.screen_height = G_SCREEN_HEIGHT
+        self.screen_width = constants.G_SCREEN_WIDTH
+        self.screen_height = constants.G_SCREEN_HEIGHT
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
         self.terrain = self.random_terrain(self.space)
@@ -133,8 +135,8 @@ class GameScene(SceneBase):
     def random_terrain(space):
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
-        points = [(i, random.randint(G_SCREEN_HEIGHT//20, G_SCREEN_HEIGHT//10))
-                  for i in range(0, G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
+        points = [(i, random.randint(constants.G_SCREEN_WIDTH//20, constants.G_SCREEN_HEIGHT//10))
+                  for i in range(0, constants.G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):
