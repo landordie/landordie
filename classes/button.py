@@ -15,6 +15,7 @@ class Button:
         self.color = color
         self.font = pg.font.SysFont('freesansbold.ttf', 30)
         self.text = self.font.render(text, True, BLACK)
+        self._text = text
         self.hovered = False
 
     def change_color(self):
