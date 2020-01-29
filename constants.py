@@ -1,7 +1,10 @@
 """
 Constants here
 """
+import pygame as pg
+pg.font.init()
 
+DEFAULT_FONT = pg.font.SysFont("Freesans Bold", 30)
 # ------------------------COLORS
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -25,8 +28,8 @@ G_SCREEN_HEIGHT = 800
 S_SCREEN_WIDTH = 1280
 S_SCREEN_HEIGHT = 720
 
-R_SCREEN_WIDTH = 800
-R_SCREEN_HEIGHT = 600
+R_SCREEN_WIDTH = 1200
+R_SCREEN_HEIGHT = 800
 
 # ------------------------SOUNDS
 HOVER_SOUND = "blipshort1.wav"
