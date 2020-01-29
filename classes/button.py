@@ -7,10 +7,9 @@ import pygame as pg
 from constants import *
 
 
-
 class Button:
 
-    def __init__(self, rect, color, text, **kwargs):
+    def __init__(self, rect, color, text):
         self.rect = pg.Rect(rect)
         self.color = color
         self.font = pg.font.SysFont('freesansbold.ttf', 30)

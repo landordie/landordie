@@ -10,6 +10,7 @@ import constants
 
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
+
 class GameScene(SceneBase):
 
     def __init__(self):

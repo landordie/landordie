@@ -14,36 +14,6 @@ def __text_objects(text, font):
     return surface, surface.get_rect()
 
 
-# Unpacking the images required to display the controls in the splash screen
-# If an incorrect player ID is used, an error will be raised
-# (!) TODO: Resize the images for the buttons to 60x60/70x70 so that they fit better (!)
-def load_controls_images(player):
-    if player == 1:
-        # Load player 1 images
-        rotate_left = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_A.png')
-        rotate_right = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_D.png')
-        thrust = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_W.png')
-        return rotate_left, rotate_right, thrust
-    elif player == 2:
-        # Load player 2 images
-        move_left = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Left.png')
-        move_right = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Right.png')
-        shoot = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Space.png')
-        cannon_left = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Down.png')
-        cannon_right = pygame.image.load(
-            'frames/keys/Keyboard & Mouse/Light/Keyboard_White_Arrow_Up.png')
-        return move_left, move_right, shoot, cannon_left, cannon_right
-    else:
-        raise ValueError("Error when specifying player number.")
-
-
 # Method used to display text
 # It's used on multiple occasions that's why it's taken out as a separate method
 # Args: screen -> pygame.display object

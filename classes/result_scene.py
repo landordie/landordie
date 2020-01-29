@@ -27,7 +27,10 @@ class ResultScene(SceneBase):
             writer.writerow({'Name': 'xXyouBet', 'Score': player2_pts, 'Date': date.today()})
 
     def ProcessInput(self, events, pressed_keys):
-        pass
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
+                from classes import MenuScene
+                self.SwitchToScene(MenuScene())
 
     def Update(self):
         pass
