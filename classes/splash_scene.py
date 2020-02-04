@@ -14,7 +14,10 @@ class SplashScene(SceneBase):
                                      self.height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
         from .options_scene import OptionsScene
-        self.controls = box_texts
+        if not box_texts:
+            self.controls = DEFAULT_CONTROLS
+        else:
+            self.controls = box_texts
         self.player1_left, self.player1_right, self.player1_thrust = self.load_controls_images(1)
         self.player2_left, self.player2_right, self.player2_shoot, self.player2_cannon_left, self.player2_cannon_right \
             = self.load_controls_images(2)
