@@ -49,4 +49,5 @@ DEFAULT_FORCE = (0, 0)
 DEFAULT_MOMENT = 1
 DEFAULT_MASS = 1
 DEFAULT_FRICTION = .5
+DEFAULT_CONTROLS = ['A', 'W', 'D', 'Left', 'Up', 'Right', 'Down', 'Space']
 
