@@ -3,15 +3,16 @@ from constants import *
 
 class InputBox:
     # class variable with all input box texts
-    boxes = []
-    no = -1
+    boxes = DEFAULT_CONTROLS
+    no = 0
 
     def __init__(self, x, y, w, h, text=''):
         self.rect = pg.Rect(x, y, w, h)
         self.color = RED
         self.text = text
         self.txt_surface = DEFAULT_FONT.render(text, True, WHITE)
-        InputBox.boxes.append(self.text)
+        self.id_num = InputBox.no
+
         InputBox.no += 1
         self.active = False
 
@@ -41,21 +42,20 @@ class InputBox:
                     elif event.key == pg.K_RSHIFT:
                         self.text = 'RShift'
                     elif event.key == pg.K_LCTRL:
-                        self.text = 'LCtrl'
+                        self.text = 'Ctrl'
                     elif event.key == pg.K_RCTRL:
-                        self.text = 'RCtrl'
+                        self.text = 'Ctrl'
                     elif event.key == pg.K_SPACE:
                         self.text = 'Space'
                     elif event.key == pg.K_LALT:
-                        self.text = 'LAlt'
+                        self.text = 'Alt'
                     elif event.key == pg.K_RALT:
-                        self.text = 'RAlt'
+                        self.text = 'Alt'
                     else:
                         self.text = event.unicode.upper()
 
                     # update boxes list
-                    InputBox.boxes[InputBox.no] = self.text
-
+                    InputBox.boxes[self.id_num] = self.text
                     self.active = False
                 # Re-render the text.
                 self.txt_surface = DEFAULT_FONT.render(self.text, True, WHITE)

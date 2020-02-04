@@ -11,6 +11,7 @@ class OptionsScene(SceneBase):
         SceneBase.__init__(self)
         self.width = M_SCREEN_WIDTH
         self.height = M_SCREEN_HEIGHT
+        self.input_boxes = []
 
         self.menu_button = Button(
             (self.width * 0.75 - (BUTTON_WIDTH / 2), self.height * 0.75, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW,
@@ -32,6 +33,9 @@ class OptionsScene(SceneBase):
         self.input_box6 = InputBox(self.width / 1.2, self.height / 2, 100, 35, 'Right')
         self.input_box7 = InputBox(self.width / 1.37, self.height / 2, 100, 35, 'Down')
         self.input_box8 = InputBox(self.width / 1.1, self.height / 2.5, 100, 35, 'Space')
+
+        self.input_boxes = [self.input_box1, self.input_box2,self.input_box3, self.input_box4, self.input_box5,
+                            self.input_box6, self.input_box7, self.input_box8]
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:

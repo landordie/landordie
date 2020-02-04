@@ -13,7 +13,6 @@ class SplashScene(SceneBase):
         self.splash_button = Button((self.width / 2 - (BUTTON_WIDTH / 2),
                                      self.height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
-        from .options_scene import OptionsScene
         if not box_texts:
             self.controls = DEFAULT_CONTROLS
         else:

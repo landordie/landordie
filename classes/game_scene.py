@@ -44,12 +44,12 @@ class GameScene(SceneBase):
 
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
-        self.spacecraft = Spacecraft((200, 500))
-        self.space.add(self.spacecraft.body, self.spacecraft.shape)
+        self.spacecraft = Spacecraft(constants.G_SCREEN_WIDTH)
+        # self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
-        self.crash_handler = self.space.add_collision_handler(0, 3)
-        self.crash_handler.data["spacecraft_land"] = self.spacecraft.body
-        self.crash_handler.post_solve = self.post_solve_crashed
+        # self.crash_handler = self.space.add_collision_handler(0, 3)
+        # self.crash_handler.data["spacecraft_land"] = self.spacecraft.body
+        # self.crash_handler.post_solve = self.post_solve_crashed
 
     def post_solve_adjust_scores(self, arbiter, space, data):
         if arbiter.total_impulse.length > 100:
@@ -83,21 +83,22 @@ class GameScene(SceneBase):
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
 
-        if not self.spacecraft.crashed:
+        if not self.spacecraft.crashed :
             if keys[pygame.K_a]:
-                self.spacecraft.rotate_left()
+                self.spacecraft.rotate("left")
             elif keys[pygame.K_d]:
-                self.spacecraft.rotate_right()
+                self.spacecraft.rotate("right")
             elif keys[pygame.K_w]:
-                self.spacecraft.move_up()
-            else:
-                self.spacecraft.body.angular_velocity = 0
+                self.spacecraft.active_engines = True
+                self.spacecraft.activate_engines()
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts,self.player2_pts))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.start_time = pygame.time.get_ticks()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
+                self.spacecraft.gravity_control_system()
             elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 self.end_time = pygame.time.get_ticks()
                 self.anti_spacecraft.cannon_mt.rate = 0
@@ -176,7 +177,10 @@ class GameScene(SceneBase):
             h = power / 2
             pygame.draw.line(display, pygame.color.THECOLORS["red"], (30, 550), (30, 550 - h), 10)
 
-        self.spacecraft.update()
+        display.blit(self.spacecraft.rotatedImg, self.spacecraft.rect)
+
+        self.spacecraft.fall_down()
+
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
@@ -184,4 +188,13 @@ class GameScene(SceneBase):
             text = self.font_verily_mono.render("SPACECRAFT MALFUNCTION!!!", True, RED)
             text_rect = text.get_rect(center=(self.screen_width / 2, self.screen_height / 3))
             display.blit(text, text_rect)
+        gravity_control_msg = self.font_freesans_bold.render("Gravity Control System: ", True, WHITE)
+        display.blit(gravity_control_msg, gravity_control_msg.get_rect(center=(170, 30)))
+        on, off = self.font_freesans_bold.render("ON", True, RED), self.font_freesans_bold.render("OFF", True, RED)
+        w, h = gravity_control_msg.get_rect().center
+        if self.spacecraft.counter_gravity:
+            display.blit(on, on.get_rect(center=(w+185, h+20)))
+        else:
+            display.blit(off, off.get_rect(center=(w+190, h+20)))
+
         self.anti_spacecraft.apply_force()
