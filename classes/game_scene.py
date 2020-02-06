@@ -27,6 +27,7 @@ class GameScene(SceneBase):
         self.terrain = self.random_terrain(self.space)
         self.borders()
         self.space.add(self.terrain)
+        self.background = pg.image.load("frames/backgr1.jpg")
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
@@ -163,7 +164,7 @@ class GameScene(SceneBase):
         # The game scene is just a blank blue screen
         display = screen.get_surface()
         screen.set_mode((self.screen_width, self.screen_height))
-        display.fill(BLUE)
+        display.blit(self.background, (0, 0))
 
         # Position the missile
         self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
@@ -196,5 +197,6 @@ class GameScene(SceneBase):
             display.blit(on, on.get_rect(center=(w+185, h+20)))
         else:
             display.blit(off, off.get_rect(center=(w+190, h+20)))
+
 
         self.anti_spacecraft.apply_force()
