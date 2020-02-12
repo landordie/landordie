@@ -4,7 +4,7 @@ Constants here
 import pygame as pg
 pg.font.init()
 
-DEFAULT_FONT = pg.font.SysFont("Freesans Bold", 30)
+DEFAULT_FONT = "PressStart2P.ttf"  # To instantiate a font use pygame.font.Font(DEFAULT_FONT, font size)
 # ------------------------COLORS
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
