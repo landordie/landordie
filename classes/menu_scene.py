@@ -6,7 +6,23 @@ from .splash_scene import SplashScene
 
 
 class MenuScene(SceneBase):
-    def __init__(self, os=''):
+
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        """ Static access method. """
+        if MenuScene.__instance == None:
+            MenuScene()
+        return MenuScene.__instance
+
+    def __init__(self, os=""):
+        """ Virtually private constructor. """
+        if MenuScene.__instance != None:
+            raise Exception("This class is a MenuScene!")
+        else:
+            MenuScene.__instance = self
+
         SceneBase.__init__(self)
         self.width = M_SCREEN_WIDTH
         self.height = M_SCREEN_HEIGHT
@@ -29,7 +45,7 @@ class MenuScene(SceneBase):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.menu_button_2.on_click(event):
                     from .options_scene import OptionsScene
-                    self.SwitchToScene(OptionsScene())
+                    self.SwitchToScene(OptionsScene.getInstance())
                 elif self.menu_button.on_click(event):  # start button
                     self.SwitchToScene(SplashScene(self.os))
                 elif self.menu_button_3.on_click(event):  # quit button

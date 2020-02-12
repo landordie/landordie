@@ -7,6 +7,7 @@ from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
 import constants
+from time import clock as game_clock
 
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
@@ -28,6 +29,7 @@ class GameScene(SceneBase):
         self.borders()
         self.space.add(self.terrain)
         self.background = pg.image.load("frames/backgr1.jpg")
+        self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
@@ -84,7 +86,7 @@ class GameScene(SceneBase):
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
 
-        if not self.spacecraft.crashed :
+        if not self.spacecraft.crashed:
             if keys[pygame.K_a]:
                 self.spacecraft.rotate("left")
             elif keys[pygame.K_d]:
@@ -95,12 +97,16 @@ class GameScene(SceneBase):
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                self.SwitchToScene(ResultScene(self.player1_pts,self.player2_pts))
+                self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.start_time = pygame.time.get_ticks()
+                if self.release_time <= 0:
+                    self.start_time = pygame.time.get_ticks()
+
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.spacecraft.gravity_control_system()
             elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                if self.release_time <= 0:
+                    self.release_time = 120
                 self.end_time = pygame.time.get_ticks()
                 self.anti_spacecraft.cannon_mt.rate = 0
 
@@ -161,17 +167,19 @@ class GameScene(SceneBase):
         self.space.add(border_left, border_right, border_top)
 
     def Render(self, screen):
+        self.release_time -= 1
         # The game scene is just a blank blue screen
         display = screen.get_surface()
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
-        # Position the missile
-        self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
-            self.anti_spacecraft.cannon_s.radius - 55, 0).rotated(self.anti_spacecraft.cannon_b.angle)
-        self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
-
-        if pygame.key.get_pressed()[pygame.K_SPACE]:
+        if pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time <= 0:
+            # self.release_time = game_clock()
+            # if self.release_time < game_clock():
+            # Position the missile
+            self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
+                self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
+            self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
             power = max(min(diff, 1000), 10)
@@ -186,7 +194,7 @@ class GameScene(SceneBase):
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
         if self.display_crash_text:
-            text = self.font_verily_mono.render("SPACECRAFT MALFUNCTION!!!", True, RED)
+            text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)
             text_rect = text.get_rect(center=(self.screen_width / 2, self.screen_height / 3))
             display.blit(text, text_rect)
         gravity_control_msg = self.font_freesans_bold.render("Gravity Control System: ", True, WHITE)

@@ -80,11 +80,11 @@ class SplashScene(SceneBase):
         screen.get_surface().blit(logo, (splash_x, splash_y))
 
         self.draw_text(screen, "Game Controls", (splash_x + (splash_w/1.5),
-                                                 splash_y * 1.7), self.font_arial_black_large, (140, 123, 192))
+                                                 splash_y * 1.7), self.font_header, (140, 123, 192))
         self.draw_text(screen, "Player 1: ", (splash_x + (splash_w/3.75),
-                                              splash_y + 100), self.font_verdana, (255, 255, 255))
+                                              splash_y + 100), self.font_playernum, (255, 255, 255))
         self.draw_text(screen, "Player 2: ", (splash_x + 535,
-                                              splash_y + 100), self.font_verdana, (255, 255, 255))
+                                              splash_y + 100), self.font_playernum, (255, 255, 255))
 
         # Display the controls for Player 1 (controlling the ship)
         # on the splash screen

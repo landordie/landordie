@@ -12,7 +12,7 @@ class Button:
     def __init__(self, rect, color, text):
         self.rect = pg.Rect(rect)
         self.color = color
-        self.font = pg.font.SysFont('freesansbold.ttf', 30)
+        self.font = pg.font.Font(DEFAULT_FONT, 15)
         self.text = self.font.render(text, True, BLACK)
         self._text = text
         self.hovered = False

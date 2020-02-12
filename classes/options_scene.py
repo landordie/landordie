@@ -7,7 +7,22 @@ import constants
 
 
 class OptionsScene(SceneBase):
+    __instance = None
+
+    @staticmethod
+    def getInstance():
+        """ Static access method. """
+        if OptionsScene.__instance == None:
+            OptionsScene()
+        return OptionsScene.__instance
+
     def __init__(self):
+        """ Virtually private constructor. """
+        if OptionsScene.__instance != None:
+            raise Exception("This class is a singleton!")
+        else:
+            OptionsScene.__instance = self
+
         SceneBase.__init__(self)
         self.width = M_SCREEN_WIDTH
         self.height = M_SCREEN_HEIGHT
@@ -57,7 +72,7 @@ class OptionsScene(SceneBase):
             # TODO : Fix error when trying to go back to MenuScene
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 # Pass input box texts
-                self.SwitchToScene(MenuScene(InputBox.boxes))
+                self.SwitchToScene(MenuScene.getInstance())
             """
             Handling changing of resolution
             """

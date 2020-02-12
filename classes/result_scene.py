@@ -30,7 +30,7 @@ class ResultScene(SceneBase):
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 from classes import MenuScene
-                self.SwitchToScene(MenuScene())
+                self.SwitchToScene(MenuScene.getInstance())
 
     def Update(self):
         pass
@@ -41,13 +41,15 @@ class ResultScene(SceneBase):
 
         self.draw_text(screen, "GAME RESULTS",
                        (self.screen_width / 2, self.screen_height / 5),
-                       self.font_arial_black_large, BLACK)
+                       self.press2s, BLACK)
 
         self.draw_text(screen, f"Player 1 Score = {self.player1_pts} points",
                        (self.screen_width / 2, self.screen_height / 2.5),
-                       self.font_arial_black, BLACK)
+                       self.press2s, BLACK)
 
         self.draw_text(screen, f"Player 2 Score = {self.player2_pts} points",
                        (self.screen_width / 2, self.screen_height / 1.5),
-                       self.font_arial_black, BLACK)
+                       self.press2s, BLACK)
+
         self.menu_button.update(screen.get_surface())
+

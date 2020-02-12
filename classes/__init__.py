@@ -6,3 +6,4 @@ from .spacecraft import Spacecraft
 from .anti_spacecraft import AntiSpaceCraft
 from .splash_scene import SplashScene
 from .scene_base import SceneBase
+from .options_scene import OptionsScene

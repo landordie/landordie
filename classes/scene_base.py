@@ -34,11 +34,12 @@ class SceneBase:
     def __init__(self):
         self.next = self
         # Fonts:
-        self.font_arial_black = pygame.font.SysFont('Arial Black', 18)
-        self.font_verdana = pygame.font.SysFont('Verdana', 35)
-        self.font_arial_black_large = pygame.font.SysFont('Arial Black', 50)
-        self.font_verily_mono = pygame.font.SysFont('Verily Serif Mono', 27)
-        self.font_freesans_bold = pygame.font.SysFont("Freesans Bold", 35)
+        self.font_medium = pygame.font.Font(DEFAULT_FONT, 18)
+        self.font_playernum = pygame.font.Font(DEFAULT_FONT, 17)
+        self.font_header = pygame.font.Font(DEFAULT_FONT, 50)
+        self.font_warning = pygame.font.Font(DEFAULT_FONT, 27)
+        self.font_freesans_bold = pygame.font.Font(DEFAULT_FONT, 15)
+        self.press2s = pygame.font.Font("PressStart2P.ttf", 14)
 
     @staticmethod
     def draw_text(screen, message, position, font, color=(0, 0, 0)):

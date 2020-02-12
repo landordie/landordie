@@ -10,7 +10,7 @@ class InputBox:
         self.rect = pg.Rect(x, y, w, h)
         self.color = RED
         self.text = text
-        self.txt_surface = DEFAULT_FONT.render(text, True, WHITE)
+        self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(text, True, WHITE)
         self.id_num = InputBox.no
 
         InputBox.no += 1
@@ -58,7 +58,7 @@ class InputBox:
                     InputBox.boxes[self.id_num] = self.text
                     self.active = False
                 # Re-render the text.
-                self.txt_surface = DEFAULT_FONT.render(self.text, True, WHITE)
+                self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(self.text, True, WHITE)
         # Change the current color of the input box.
         self.color = GREEN if self.active else RED
 
