@@ -12,13 +12,13 @@ class OptionsScene(SceneBase):
     @staticmethod
     def getInstance():
         """ Static access method. """
-        if OptionsScene.__instance == None:
+        if OptionsScene.__instance is None:
             OptionsScene()
         return OptionsScene.__instance
 
     def __init__(self):
         """ Virtually private constructor. """
-        if OptionsScene.__instance != None:
+        if OptionsScene.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
             OptionsScene.__instance = self
@@ -69,7 +69,7 @@ class OptionsScene(SceneBase):
                 self.Terminate()
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(GameScene())
-            # TODO : Fix error when trying to go back to MenuScene
+
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 # Pass input box texts
                 self.SwitchToScene(MenuScene.getInstance())

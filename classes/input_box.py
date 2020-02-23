@@ -42,15 +42,25 @@ class InputBox:
                     elif event.key == pg.K_RSHIFT:
                         self.text = 'RShift'
                     elif event.key == pg.K_LCTRL:
-                        self.text = 'Ctrl'
+                        self.text = 'LCtrl'
                     elif event.key == pg.K_RCTRL:
-                        self.text = 'Ctrl'
+                        self.text = 'RCtrl'
                     elif event.key == pg.K_SPACE:
                         self.text = 'Space'
                     elif event.key == pg.K_LALT:
-                        self.text = 'Alt'
+                        self.text = 'LAlt'
                     elif event.key == pg.K_RALT:
-                        self.text = 'Alt'
+                        self.text = 'RAlt'
+                    elif event.key == pg.K_RETURN:
+                        self.text = 'Enter'
+                    elif event.key == pg.K_TAB:
+                        self.text = 'Tab'
+                    elif event.key == pg.K_BACKSLASH:
+                        self.text = 'BSlash'
+                    elif event.key == pg.K_SLASH:
+                        self.text = 'Slash'
+                    elif event.key == pg.K_ASTERISK:
+                        self.text = 'Asterisk'
                     else:
                         self.text = event.unicode.upper()
 
