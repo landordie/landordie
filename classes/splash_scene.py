@@ -1,6 +1,7 @@
 from .scene_base import *
 from .game_scene import GameScene
 from .button import Button
+from .controls import Controls
 
 
 class SplashScene(SceneBase):
@@ -20,6 +21,8 @@ class SplashScene(SceneBase):
         self.player1_left, self.player1_right, self.player1_thrust = self.load_controls_images(1)
         self.player2_left, self.player2_right, self.player2_shoot, self.player2_cannon_left, self.player2_cannon_right \
             = self.load_controls_images(2)
+        # update controls
+        Controls.update(self.controls)
 
     # Unpacking the images required to display the controls in the splash screen
     # If an incorrect player ID is used, an error will be raised

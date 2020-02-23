@@ -2,15 +2,16 @@ import math
 import random
 import pymunk
 from pymunk import pygame_util, Vec2d
+from classes.landing_pad import LandingPad
 from classes.spacecraft import Spacecraft
 from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
 import constants
+from .controls import Controls
 from time import clock as game_clock
 
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
-
 
 class GameScene(SceneBase):
 
@@ -30,6 +31,8 @@ class GameScene(SceneBase):
         self.space.add(self.terrain)
         self.background = pg.image.load("frames/backgr1.jpg")
         self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
+        self.landing_pad = LandingPad()
+        self.ctrls = Controls.get_controls()
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
@@ -72,9 +75,9 @@ class GameScene(SceneBase):
 
         # Arrow keys movement
         keys = pygame.key.get_pressed()  # checking pressed keys
-        if keys[pygame.K_RIGHT]:
+        if keys[CONTROL_DICT[self.ctrls[5]]]:
             self.anti_spacecraft.force_right()
-        elif keys[pygame.K_LEFT]:
+        elif keys[CONTROL_DICT[self.ctrls[3]]]:
             self.anti_spacecraft.force_left()
         else:
             self.anti_spacecraft.force = DEFAULT_FORCE
@@ -98,31 +101,33 @@ class GameScene(SceneBase):
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                if self.release_time <= 0:
-                    self.start_time = pygame.time.get_ticks()
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.start_time = pygame.time.get_ticks()
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
                 self.spacecraft.gravity_control_system()
-            elif event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
-                if self.release_time <= 0:
+
+            if self.release_time <= 0:
+                if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
+                    self.end_time = pygame.time.get_ticks()
+                    self.anti_spacecraft.cannon_mt.rate = 0
+
+                    diff = self.end_time - self.start_time
+                    power = max(min(diff, 1000), 10)
+                    impulse = power * Vec2d(1, 0)
+                    impulse.rotate(self.anti_spacecraft.missile_body.angle)
                     self.release_time = 120
-                self.end_time = pygame.time.get_ticks()
-                self.anti_spacecraft.cannon_mt.rate = 0
 
-                diff = self.end_time - self.start_time
-                power = max(min(diff, 1000), 10)
-                impulse = power * Vec2d(1, 0)
-                impulse.rotate(self.anti_spacecraft.missile_body.angle)
+                    self.anti_spacecraft.missile_body.apply_impulse_at_world_point\
+                        (impulse, self.anti_spacecraft.missile_body.position)
 
-                self.anti_spacecraft.missile_body.apply_impulse_at_world_point\
-                    (impulse, self.anti_spacecraft.missile_body.position)
+                    self.space.add(self.anti_spacecraft.missile_body)
+                    self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
 
-                self.space.add(self.anti_spacecraft.missile_body)
-                self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
-
-                self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = self.anti_spacecraft.create_missile()
-                self.space.add(self.anti_spacecraft.missile_shape)
+                    self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
+                        self.anti_spacecraft.create_missile()
+                    self.space.add(self.anti_spacecraft.missile_shape)
 
             for missile in self.anti_spacecraft.flying_missiles:
                 drag_constant = 0.0002
@@ -167,15 +172,18 @@ class GameScene(SceneBase):
         self.space.add(border_left, border_right, border_top)
 
     def Render(self, screen):
-        self.release_time -= 1
-        # The game scene is just a blank blue screen
         display = screen.get_surface()
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
+        if self.release_time > 0:
+            self.release_time -= 1
+            self.start_time = pygame.time.get_ticks()
+            cooldown = max(min(self.release_time, 1000), 10) * 4
+
+            pygame.draw.line(display, pygame.color.THECOLORS["blue"], (70, 550), (70, 550 - cooldown), 10)
+
         if pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time <= 0:
-            # self.release_time = game_clock()
-            # if self.release_time < game_clock():
             # Position the missile
             self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
                 self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
@@ -185,6 +193,8 @@ class GameScene(SceneBase):
             power = max(min(diff, 1000), 10)
             h = power / 2
             pygame.draw.line(display, pygame.color.THECOLORS["red"], (30, 550), (30, 550 - h), 10)
+
+
 
         display.blit(self.spacecraft.rotatedImg, self.spacecraft.rect)
 
@@ -206,5 +216,5 @@ class GameScene(SceneBase):
         else:
             display.blit(off, off.get_rect(center=(w+190, h+20)))
 
-
+        display.blit(self.landing_pad.image, self.landing_pad.rect)
         self.anti_spacecraft.apply_force()
