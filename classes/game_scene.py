@@ -9,7 +9,7 @@ from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
 import constants
 from .controls import Controls
-from time import clock as game_clock
+from pygame.time import Clock as GameClock
 
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
@@ -57,19 +57,43 @@ class GameScene(SceneBase):
         # self.crash_handler.data["spacecraft_land"] = self.spacecraft.body
         # self.crash_handler.post_solve = self.post_solve_crashed
 
-    def post_solve_adjust_scores(self, arbiter, space, data):
+    def post_solve_adjust_scores(self, arbiter):
         if arbiter.total_impulse.length > 100:
             self.player1_pts += 10
+            self.spacecraft.receive_damage(20)
 
-    def post_solve_crashed(self, arbiter, space, data):
-        """ Set the spacecraft score to 50 only if it is a smooth landing. """
-        if self.spacecraft.body.velocity.length < 10 and not self.spacecraft.crashed:
-            self.player2_pts = 50
-            self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
-        # set spacecraft crashed attribute to True when it collides too fast
-        elif self.spacecraft.body.velocity.length > 100:
-            self.display_crash_text = True
-            self.spacecraft.crashed = True
+    # def post_solve_crashed(self, arbiter, space, data):
+    #     """ Set the spacecraft score to 50 only if it is a smooth landing. """
+    #     if self.spacecraft.body.velocity.length < 10 and not self.spacecraft.crashed:
+    #         self.player2_pts = 50
+    #         self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+    #     # set spacecraft crashed attribute to True when it collides too fast
+    #     elif self.spacecraft.body.velocity.length > 100:
+    #         self.display_crash_text = True
+    #         self.spacecraft.crashed = True
+
+    def pause_game(self, msg_type, screen):
+        """ The method pauses the game after the player crashes and displays a message, till a key is pressed """
+        msg = ''
+
+        if msg_type == 'landed':
+            msg = self.font_warning.render("Successful Landing!", False, (13, 109, 24))
+        elif msg_type == 'crashed':
+            msg = self.font_warning.render("You Have Crashed!", False, (255, 0, 6))
+
+        screen.blit(msg, (330, 375))
+
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    # Checks if the user wants to quit tha game by clicking on the "X" button
+                    return True
+                if event.type == pygame.KEYDOWN:
+                    # Checks if any key is pressed - Resumes the game
+                    return False
+
+            pygame.display.update()
+            GameClock().tick(FPS)
 
     def ProcessInput(self, events, pressed_keys):
 
@@ -194,11 +218,17 @@ class GameScene(SceneBase):
             h = power / 2
             pygame.draw.line(display, pygame.color.THECOLORS["red"], (30, 550), (30, 550 - h), 10)
 
-
-
+        display.blit(self.landing_pad.image, self.landing_pad.rect)
         display.blit(self.spacecraft.rotatedImg, self.spacecraft.rect)
 
         self.spacecraft.fall_down()
+        if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
+            if self.landing_pad.check_for_landing_attempt(self.spacecraft):
+                paused = self.pause_game('landed', display)
+                if paused:
+                    return
+                else:
+                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(display)
@@ -216,5 +246,5 @@ class GameScene(SceneBase):
         else:
             display.blit(off, off.get_rect(center=(w+190, h+20)))
 
-        display.blit(self.landing_pad.image, self.landing_pad.rect)
+
         self.anti_spacecraft.apply_force()

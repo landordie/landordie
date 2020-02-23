@@ -8,7 +8,7 @@ from random import randint, uniform
 
 def flipy(p):
     """Convert chipmunk coordinates to pygame coordinates."""
-    return Vec2d(p[0], -p[1]+600)
+    return Vec2d(p[0], -p[1] + 600)
 
 
 class Spacecraft(Sprite):
@@ -90,4 +90,6 @@ class Spacecraft(Sprite):
     def receive_damage(self, dmg):
         self.damage += dmg
 
-
+    def get_landing_condition(self):
+        return (self.damage < 100 and (-7 <= self.rotation_angle <= 7)
+                and (-5 < self.velocity_y < 5) and (-5 < self.velocity_x < 5))
