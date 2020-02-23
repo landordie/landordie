@@ -51,3 +51,13 @@ DEFAULT_MASS = 1
 DEFAULT_FRICTION = .5
 DEFAULT_CONTROLS = ['A', 'W', 'D', 'Left', 'Up', 'Right', 'Down', 'Space']
 
+CONTROL_DICT = {
+        'Z': pg.K_z,
+        'X': pg.K_x,
+        'C': pg.K_c,
+        'Up': pg.K_UP,
+        'Down': pg.K_DOWN,
+        'Space': pg.K_SPACE,
+        'Left': pg.K_LEFT,
+        'Right': pg.K_RIGHT
+}
