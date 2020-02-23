@@ -67,5 +67,6 @@ class Game:
             pygame.display.flip()
             clock.tick(fps)
 
-    # Initiate the program loop with the first scene
+
+# Initiate the program loop with the first scene
 myGame = Game()
