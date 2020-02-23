@@ -226,8 +226,9 @@ class GameScene(SceneBase):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
                 if paused:
-                    return
+                    self.Terminate()
                 else:
+                    self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
         self.space.step(1. / FPS)
