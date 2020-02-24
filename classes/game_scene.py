@@ -108,7 +108,7 @@ class GameScene(SceneBase):
 
         if keys[pygame.K_DOWN] and self.anti_spacecraft.cannon_b.angle < 0:
             self.anti_spacecraft.cannon_mt.rate = 2
-        elif keys[pygame.K_UP]:
+        elif keys[pygame.K_UP] and self.anti_spacecraft.cannon_b.angle >= -math.pi:
             self.anti_spacecraft.cannon_mt.rate = -2
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
@@ -173,13 +173,13 @@ class GameScene(SceneBase):
     def random_terrain(space):
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
-        points = [(i, random.randint(constants.G_SCREEN_WIDTH//20, constants.G_SCREEN_HEIGHT//10))
+        points = [(i, random.randint(constants.G_SCREEN_HEIGHT//45, constants.G_SCREEN_HEIGHT//7))
                   for i in range(0, constants.G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):
             floor = pymunk.Segment(space.static_body, (points[i - 1][0], points[i - 1][1]),
-                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS)
+                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS//3)
             floor.friction = TERRAIN_FRICTION
             floor.filter = pymunk.ShapeFilter(group=0)
             terrain.append(floor)
@@ -192,8 +192,10 @@ class GameScene(SceneBase):
                                                                                        self.screen_height), 10)
         border_top = pymunk.Segment(self.space.static_body, (0, self.screen_height), (self.screen_width,
                                                                                       self.screen_height), 10)
+        border_bottom = pymunk.Segment(self.space.static_body, (0, 0), (self.screen_width, 0), 75)
+        border_bottom.friction = TERRAIN_FRICTION
         border_top.collision_type = 4
-        self.space.add(border_left, border_right, border_top)
+        self.space.add(border_left, border_right, border_top, border_bottom)
 
     def Render(self, screen):
         display = screen.get_surface()
