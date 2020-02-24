@@ -3,7 +3,7 @@ import random
 import pymunk
 from pymunk import pygame_util, Vec2d
 from classes.landing_pad import LandingPad
-from classes.spacecraft import Spacecraft
+from classes.spacecraft import Spacecraft, flipy
 from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
@@ -26,9 +26,12 @@ class GameScene(SceneBase):
         self.screen_height = constants.G_SCREEN_HEIGHT
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
+
+        # Add the terrain
         self.terrain = self.random_terrain(self.space)
         self.borders()
         self.space.add(self.terrain)
+
         self.background = pg.image.load("frames/backgr1.jpg")
         self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
         self.landing_pad = LandingPad()
@@ -202,6 +205,9 @@ class GameScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
+        # Show the missile ############################################################
+        display.blit(self.anti_spacecraft.missile, self.anti_spacecraft.m_rect)
+
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
 
@@ -223,7 +229,14 @@ class GameScene(SceneBase):
             # Position the missile
             self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
                 self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
+
+            # TODO attach missile sprite
+            self.anti_spacecraft.m_rect = flipy(self.anti_spacecraft.cannon_b.position + Vec2d(
+                self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle))
+
+            # Pymunk missile
             self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
+
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
             power = max(min(diff, 750), 0)
