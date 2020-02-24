@@ -200,12 +200,22 @@ class GameScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
+        # Landing pad Sprite
+        display.blit(self.landing_pad.image, self.landing_pad.rect)
+
+        # Space craft Sprite
+        display.blit(self.spacecraft.rotatedImg, self.spacecraft.rect)
+
+        self.space.step(1. / FPS)
+        draw_options = pymunk.pygame_util.DrawOptions(display)
+        self.space.debug_draw(draw_options)
+
         if self.release_time > 0:
             self.release_time -= 1
             self.start_time = pygame.time.get_ticks()
-            cooldown = max(min(self.release_time, 1000), 10) * 4
+            cooldown = max(self.release_time, 0) * 1.5
 
-            pygame.draw.line(display, pygame.color.THECOLORS["blue"], (70, 550), (70, 550 - cooldown), 10)
+            pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
 
         if pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time <= 0:
             # Position the missile
@@ -214,12 +224,13 @@ class GameScene(SceneBase):
             self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
-            power = max(min(diff, 1000), 10)
-            h = power / 2
-            pygame.draw.line(display, pygame.color.THECOLORS["red"], (30, 550), (30, 550 - h), 10)
-
-        display.blit(self.landing_pad.image, self.landing_pad.rect)
-        display.blit(self.spacecraft.rotatedImg, self.spacecraft.rect)
+            power = max(min(diff, 750), 0)
+            h = power / 4
+            pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
+        
+        # Anti-Spacecraft fuel bar
+        fuel = max(self.anti_spacecraft.fuel, 0)
+        pygame.draw.line(display, GREEN, (850, 750), (851 + fuel / 3, 750), 10)  # FUEL
 
         self.spacecraft.fall_down()
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
@@ -231,13 +242,11 @@ class GameScene(SceneBase):
                     self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
-        self.space.step(1. / FPS)
-        draw_options = pymunk.pygame_util.DrawOptions(display)
-        self.space.debug_draw(draw_options)
         if self.display_crash_text:
             text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)
             text_rect = text.get_rect(center=(self.screen_width / 2, self.screen_height / 3))
             display.blit(text, text_rect)
+
         gravity_control_msg = self.font_freesans_bold.render("Gravity Control System: ", True, WHITE)
         display.blit(gravity_control_msg, gravity_control_msg.get_rect(center=(170, 30)))
         on, off = self.font_freesans_bold.render("ON", True, RED), self.font_freesans_bold.render("OFF", True, RED)
@@ -246,6 +255,5 @@ class GameScene(SceneBase):
             display.blit(on, on.get_rect(center=(w+185, h+20)))
         else:
             display.blit(off, off.get_rect(center=(w+190, h+20)))
-
 
         self.anti_spacecraft.apply_force()
