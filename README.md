@@ -1,2 +1,6 @@
 # landordie
-Land or die
+Land or Die
+
+A Python 2D game.
+
+
