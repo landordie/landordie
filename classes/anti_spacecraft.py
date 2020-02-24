@@ -9,6 +9,7 @@ class AntiSpaceCraft:
     sf = pymunk.ShapeFilter(group=1)
 
     def __init__(self, mass=DEFAULT_MASS, position=(G_SCREEN_WIDTH/2, G_SCREEN_HEIGHT/4)):
+        self._fuel = 500
         self.force = DEFAULT_FORCE
         self.wheels = []
         self.flying_missiles = []
@@ -82,7 +83,17 @@ class AntiSpaceCraft:
             wheel.apply_force_at_local_point(self.force, wheel.position)
 
     def force_right(self):
+        self.fuel -= 1
         self.force = (ANTI_SPACECRAFT_MOVE_FORCE, 0)
 
     def force_left(self):
+        self.fuel -= 1
         self.force = (-ANTI_SPACECRAFT_MOVE_FORCE, 0)
+
+    @property
+    def fuel(self):
+        return self._fuel
+
+    @fuel.setter
+    def fuel(self, f):
+        self._fuel = f
