@@ -256,4 +256,5 @@ class GameScene(SceneBase):
         else:
             display.blit(off, off.get_rect(center=(w+190, h+20)))
 
+        # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
