@@ -4,6 +4,7 @@ from pymunk import Vec2d
 import constants
 from .sprite_class import Sprite
 from random import randint, uniform
+import pymunk
 
 
 def flipy(p):
@@ -31,6 +32,15 @@ class Spacecraft(Sprite):
         self.damage = 0
         self.crashed = False
         self.counter_gravity = False
+
+        self.triangle = [(-23, 26), (23, 26), (0, -26)]
+        self.mass = 10
+        self.moment = pymunk.moment_for_poly(self.mass, self.triangle)
+        self.body = pymunk.Body(self.mass, self.moment)
+        self.shape = pymunk.Poly(self.body, self.triangle)
+        self.shape.friction = 0.5
+        self.body.position = 250, 500
+        self.body.angle = self.rotation_angle
 
     def fall_down(self):
         """ Method implements the effect of Mars'es gravitation on the lander """

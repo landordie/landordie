@@ -11,6 +11,7 @@ import constants
 from .controls import Controls
 from pygame.time import Clock as GameClock
 
+
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
@@ -54,7 +55,8 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
         self.spacecraft = Spacecraft(constants.G_SCREEN_WIDTH)
-        # self.space.add(self.spacecraft.body, self.spacecraft.shape)
+
+        self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
         # self.crash_handler = self.space.add_collision_handler(0, 3)
         # self.crash_handler.data["spacecraft_land"] = self.spacecraft.body
@@ -205,8 +207,7 @@ class GameScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
-        # Show the missile ############################################################
-        display.blit(self.anti_spacecraft.rotated_missile, self.anti_spacecraft.m_rect)
+        # Show the missile ###########################################################
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -231,8 +232,9 @@ class GameScene(SceneBase):
                 self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
 
             # TODO attach missile sprite
-            self.anti_spacecraft.m_rect = flipy(self.anti_spacecraft.cannon_b.position + Vec2d(
-                self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle))
+            # self.anti_spacecraft.m_rect = flipy(self.anti_spacecraft.cannon_b.position + Vec2d(
+            #     self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle))
+            self.anti_spacecraft.m_rect.center = flipy(self.anti_spacecraft.missile_body.position)
 
             # TODO fix rotation
             self.anti_spacecraft.rotated_missile = pg.transform.rotate(self.anti_spacecraft.missile, math.degrees(self.anti_spacecraft.cannon_b.angle))
@@ -240,6 +242,7 @@ class GameScene(SceneBase):
             # Pymunk missile
             self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
 
+            display.blit(self.anti_spacecraft.rotated_missile, self.anti_spacecraft.m_rect)
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
             power = max(min(diff, 750), 0)
@@ -255,9 +258,7 @@ class GameScene(SceneBase):
                          flipy((self.anti_spacecraft.chassis_b.position[0] - 79 + fuel / 3,
                                 self.anti_spacecraft.chassis_b.position[1] - 45)), 10)  # FUEL (green bar)
 
-
-
-        self.spacecraft.fall_down()
+        #self.spacecraft.fall_down()
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
@@ -266,6 +267,25 @@ class GameScene(SceneBase):
                 else:
                     self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+
+        # image draw
+        p = self.spacecraft.body.position
+        p = flipy(p)
+
+        # we need to rotate 180 degrees because of the y coordinate flip
+        self.spacecraft.rotation_angle = math.degrees(self.spacecraft.body.angle) + 180
+        rotated_logo_img = pygame.transform.rotate(self.spacecraft.image, self.spacecraft.rotation_angle)
+
+        offset = Vec2d(rotated_logo_img.get_size()) / 2.
+        p = p - offset
+
+        display.blit(rotated_logo_img, p)
+
+        # debug draw
+        ps = [p.rotated(self.spacecraft.body.angle) + self.spacecraft.body.position for p in self.spacecraft.shape.get_vertices()]
+        ps = [(p.x, (-p.y + 800)) for p in ps]
+        ps += [ps[0]]
+        pygame.draw.lines(display, RED, False, ps, 1)
 
         if self.display_crash_text:
             text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)

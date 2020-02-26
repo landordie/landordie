@@ -35,6 +35,7 @@ class AntiSpaceCraft:
         self.missile = pg.transform.flip(pg.image.load("frames/missile.gif"), True, False)
         self.rotated_missile = self.missile
         self.m_rect = self.missile.get_rect()
+
         #####################################
 
         self.missile_body, self.missile_shape = self.create_missile()
