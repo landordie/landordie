@@ -32,7 +32,8 @@ class AntiSpaceCraft:
                                                                ANTI_SPACECRAFT_CHASSIS[1]/2), ANTI_SPACECRAFT_CANNON)
 
         # TODO: attach missile sprite, make it rotate and check for collision
-        self.missile = pg.image.load("frames/missile.gif")
+        self.missile = pg.transform.flip(pg.image.load("frames/missile.gif"), True, False)
+        self.rotated_missile = self.missile
         self.m_rect = self.missile.get_rect()
         #####################################
 

@@ -8,7 +8,7 @@ from random import randint, uniform
 
 def flipy(p):
     """Convert chipmunk coordinates to pygame coordinates."""
-    return Vec2d(p[0], -p[1] + 600)
+    return Vec2d(p[0], -p[1] + 800)
 
 
 class Spacecraft(Sprite):

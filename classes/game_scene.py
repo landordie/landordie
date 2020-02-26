@@ -206,7 +206,7 @@ class GameScene(SceneBase):
         display.blit(self.background, (0, 0))
 
         # Show the missile ############################################################
-        display.blit(self.anti_spacecraft.missile, self.anti_spacecraft.m_rect)
+        display.blit(self.anti_spacecraft.rotated_missile, self.anti_spacecraft.m_rect)
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -234,6 +234,9 @@ class GameScene(SceneBase):
             self.anti_spacecraft.m_rect = flipy(self.anti_spacecraft.cannon_b.position + Vec2d(
                 self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle))
 
+            # TODO fix rotation
+            self.anti_spacecraft.rotated_missile = pg.transform.rotate(self.anti_spacecraft.missile, math.degrees(self.anti_spacecraft.cannon_b.angle))
+
             # Pymunk missile
             self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
 
@@ -245,7 +248,14 @@ class GameScene(SceneBase):
         
         # Anti-Spacecraft fuel bar
         fuel = max(self.anti_spacecraft.fuel, 0)
-        pygame.draw.line(display, GREEN, (850, 750), (851 + fuel / 3, 750), 10)  # FUEL
+        pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45))),
+                         flipy((self.anti_spacecraft.chassis_b.position[0] + 87,
+                                self.anti_spacecraft.chassis_b.position[1] - 45)), 10)  # Red bar underneath
+        pygame.draw.line(display, GREEN, flipy((self.anti_spacecraft.chassis_b.position - (80, 45))),
+                         flipy((self.anti_spacecraft.chassis_b.position[0] - 79 + fuel / 3,
+                                self.anti_spacecraft.chassis_b.position[1] - 45)), 10)  # FUEL (green bar)
+
+
 
         self.spacecraft.fall_down()
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
