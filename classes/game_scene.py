@@ -7,6 +7,7 @@ from classes.spacecraft import Spacecraft, flipy
 from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
+from .missile import Missile
 import constants
 from .controls import Controls
 from pygame.time import Clock as GameClock
@@ -17,6 +18,7 @@ from pygame.time import Clock as GameClock
 class GameScene(SceneBase):
 
     def __init__(self):
+
         SceneBase.__init__(self)
         self.player2_pts = 0
         self.display_crash_text = False
@@ -54,6 +56,8 @@ class GameScene(SceneBase):
 
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
+        # missile
+        self.missile = Missile()
         self.spacecraft = Spacecraft(constants.G_SCREEN_WIDTH)
 
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
@@ -207,14 +211,23 @@ class GameScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
-        # Show the missile ###########################################################
+        """
+        Missile sprite blit
+        """
+        m = flipy(self.anti_spacecraft.missile_body.position)
+
+        missile_img = pygame.transform.rotate(self.missile.image,
+                                                   math.degrees(self.anti_spacecraft.missile_body.angle))
+
+        offset = Vec2d(missile_img.get_size()) / 2.
+        m -= offset
+        display.blit(missile_img, m)
+
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
 
-        # Space craft Sprite
-        display.blit(self.spacecraft.rotatedImg, self.spacecraft.rect)
-
+        # Display pymunk bodies
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
@@ -231,25 +244,20 @@ class GameScene(SceneBase):
             self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
                 self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
 
-            # TODO attach missile sprite
-            # self.anti_spacecraft.m_rect = flipy(self.anti_spacecraft.cannon_b.position + Vec2d(
-            #     self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle))
-            self.anti_spacecraft.m_rect.center = flipy(self.anti_spacecraft.missile_body.position)
-
-            # TODO fix rotation
-            self.anti_spacecraft.rotated_missile = pg.transform.rotate(self.anti_spacecraft.missile, math.degrees(self.anti_spacecraft.cannon_b.angle))
-
             # Pymunk missile
             self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
 
-            display.blit(self.anti_spacecraft.rotated_missile, self.anti_spacecraft.m_rect)
+
+
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
             power = max(min(diff, 750), 0)
             h = power / 4
             pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
-        
+
+        ###########################
         # Anti-Spacecraft fuel bar
+        ##########################
         fuel = max(self.anti_spacecraft.fuel, 0)
         pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45))),
                          flipy((self.anti_spacecraft.chassis_b.position[0] + 87,
@@ -273,7 +281,7 @@ class GameScene(SceneBase):
         p = flipy(p)
 
         # we need to rotate 180 degrees because of the y coordinate flip
-        self.spacecraft.rotation_angle = math.degrees(self.spacecraft.body.angle) + 180
+        self.spacecraft.rotation_angle = math.degrees(self.spacecraft.body.angle)
         rotated_logo_img = pygame.transform.rotate(self.spacecraft.image, self.spacecraft.rotation_angle)
 
         offset = Vec2d(rotated_logo_img.get_size()) / 2.
@@ -281,11 +289,11 @@ class GameScene(SceneBase):
 
         display.blit(rotated_logo_img, p)
 
-        # debug draw
-        ps = [p.rotated(self.spacecraft.body.angle) + self.spacecraft.body.position for p in self.spacecraft.shape.get_vertices()]
-        ps = [(p.x, (-p.y + 800)) for p in ps]
-        ps += [ps[0]]
-        pygame.draw.lines(display, RED, False, ps, 1)
+        # JUST TO SHOW THE SIZE OF THE TRIANGLE
+        # ps = [p.rotated(self.spacecraft.body.angle) + self.spacecraft.body.position for p in self.spacecraft.shape.get_vertices()]
+        # ps = [(flipy(p)) for p in ps]
+        # ps += [ps[0]]
+        # pygame.draw.lines(display, RED, False, ps, 1)
 
         if self.display_crash_text:
             text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)

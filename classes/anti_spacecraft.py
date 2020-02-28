@@ -31,13 +31,6 @@ class AntiSpaceCraft:
         self.cannon_b, self.cannon_s = self.create_body(0.01, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/2, position[1] +
                                                                ANTI_SPACECRAFT_CHASSIS[1]/2), ANTI_SPACECRAFT_CANNON)
 
-        # TODO: attach missile sprite, make it rotate and check for collision
-        self.missile = pg.transform.flip(pg.image.load("frames/missile.gif"), True, False)
-        self.rotated_missile = self.missile
-        self.m_rect = self.missile.get_rect()
-
-        #####################################
-
         self.missile_body, self.missile_shape = self.create_missile()
 
         # Anti-spacecraft joints

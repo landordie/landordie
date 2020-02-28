@@ -16,7 +16,7 @@ class Spacecraft(Sprite):
     """ Changing the Sprite class to work for our solution - to create static objects(background, obstacles, etc.)"""
 
     def __init__(self, max_width):
-        super().__init__('frames/lander.png', 10, randint(0, 1123))  # call Sprite initializer
+        super().__init__('frames/lander.png')  # call Sprite initializer
         self.width = max_width
         # This variable holds the rotated image if the lander is being rotated or the original image by default
         self.rotatedImg = self.image
@@ -33,13 +33,13 @@ class Spacecraft(Sprite):
         self.crashed = False
         self.counter_gravity = False
 
-        self.triangle = [(-23, 26), (23, 26), (0, -26)]
-        self.mass = 10
+        self.triangle = [(-55, -30), (55, -30), (0, 50)]
+        self.mass = 1
         self.moment = pymunk.moment_for_poly(self.mass, self.triangle)
         self.body = pymunk.Body(self.mass, self.moment)
         self.shape = pymunk.Poly(self.body, self.triangle)
         self.shape.friction = 0.5
-        self.body.position = 250, 500
+        self.body.position = 600, 700
         self.body.angle = self.rotation_angle
 
     def fall_down(self):

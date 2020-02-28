@@ -6,5 +6,4 @@ from .sprite_class import Sprite
 class Missile(Sprite):
 
     def __init__(self):
-        pass
-        # self.misslee_pymunk =
+        super().__init__('frames/missile.gif')  # call Sprite initializer
