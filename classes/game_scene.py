@@ -124,13 +124,14 @@ class GameScene(SceneBase):
             self.anti_spacecraft.cannon_mt.rate = 0
 
         if not self.spacecraft.crashed:
+            # Rotate spacecraft (in radians)
             if keys[pygame.K_a]:
-                self.spacecraft.rotate("left")
-            elif keys[pygame.K_d]:
-                self.spacecraft.rotate("right")
-            elif keys[pygame.K_w]:
+                self.spacecraft.body.angle += math.radians(2)
+            if keys[pygame.K_d]:
+                self.spacecraft.body.angle -= math.radians(2)
+            if keys[pygame.K_w]:
+                self.spacecraft.apply_thrust()
                 self.spacecraft.active_engines = True
-                self.spacecraft.activate_engines()
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
@@ -140,8 +141,6 @@ class GameScene(SceneBase):
                 self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
                 self.start_time = pygame.time.get_ticks()
 
-            elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
-                self.spacecraft.gravity_control_system()
 
             if self.release_time <= 0:
                 if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
@@ -274,7 +273,7 @@ class GameScene(SceneBase):
         # Spacecraft health bar
         ##########################
         pygame.draw.line(display, WHITE, flipy((self.spacecraft.body.position - (80, 45))),
-                         flipy((self.spacecraft.body.position[0] + 87,
+                         flipy((self.spacecraft.body.position[0],
                                 self.spacecraft.body.position[1] - 45)), 10)  # Red bar underneath
         # Changes colors
         self.spacecraft.health_bar(display)

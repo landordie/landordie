@@ -44,6 +44,7 @@ class Spacecraft(Sprite):
         self.body.position = 600, 700
         self.body.angle = self.rotation_angle
 
+    # Change health bar color as the health drops
     def health_bar(self, display):
         if self.health >= 75:
             health_color = GREEN
@@ -54,55 +55,12 @@ class Spacecraft(Sprite):
 
         health = max(self.health, 0)
         pg.draw.line(display, health_color, flipy((self.body.position - (80, 45))),
-                         flipy((self.body.position[0] - 79 + health,
-                                self.body.position[1] - 45)), 10)  # FUEL (green bar)
+                         flipy((self.body.position[0] - 25 + health,
+                                self.body.position[1] - 45)), 10)  # Health bar
 
-
-
-    def fall_down(self):
-        """ Method implements the effect of Mars'es gravitation on the lander """
-
-        if not self.counter_gravity:
-            self.velocity_y += 0.03
-        else:
-            if self.velocity_y > 0:
-                self.velocity_y -= 0.03
-                if self.velocity_y < 0:
-                    self.velocity_y = 0
-
-        self.rect.bottom += self.velocity_y
-        self.rect.left += self.velocity_x
-
-        # check and control the behaviour of the lander according its position on the screen size
-        if self.rect.left < 0:
-            self.rect.left = 0
-            self.velocity_x = uniform(-1.0, 1.0)
-
-        if self.rect.right > self.width:
-            self.rect.right = self.width
-            self.velocity_x = uniform(-1.0, 1.0)
-
-        if self.rect.top < 0:
-            self.rect.top = 0
-            self.velocity_y = uniform(0.0, 1.0)
-
-    def rotate(self, direction=None):  # rotates ship to the left or right by 1 degree
-        if direction == "left":
-            self.rotation_angle += 1 % 360
-        elif direction == 'right':
-            self.rotation_angle -= 1 % 360
-        self.rotatedImg = pg.transform.rotate(self.image, self.rotation_angle)
-
-    def activate_engines(self):
-        """ This method is helps the ship to counter-react the gravitation effect of the planet """
-        self.velocity_y -= 0.33 * cos(radians(self.rotation_angle))
-        self.velocity_x += 0.33 * sin(radians(-self.rotation_angle))
-
-    def gravity_control_system(self):
-        self.counter_gravity = not self.counter_gravity
-
-    def get_altitude(self):  # calculates the current altitude of the ship
-        return 1000 - (self.rect.top * 1.436)
+    # Apply thrust force to the spacecraft (make it fly)
+    def apply_thrust(self):
+        self.body.apply_impulse_at_local_point((self.body.angle, 30), (0,0))
 
     def reset_stats(self):
         """ Method resets all the attributes of the lander to default """
