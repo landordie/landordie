@@ -58,6 +58,7 @@ class GameScene(SceneBase):
 
         # missile
         self.missile = Missile()
+
         self.spacecraft = Spacecraft(constants.G_SCREEN_WIDTH)
 
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
@@ -136,6 +137,7 @@ class GameScene(SceneBase):
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
                 self.start_time = pygame.time.get_ticks()
 
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_s:
@@ -152,16 +154,22 @@ class GameScene(SceneBase):
                     impulse.rotate(self.anti_spacecraft.missile_body.angle)
                     self.release_time = 120
 
-                    self.anti_spacecraft.missile_body.apply_impulse_at_world_point\
+                    # Apply force to the missile (launch the missile)
+                    self.anti_spacecraft.missile_body.apply_impulse_at_world_point \
                         (impulse, self.anti_spacecraft.missile_body.position)
 
+                    # Add the missile body to the space
                     self.space.add(self.anti_spacecraft.missile_body)
+
+                    # Add the missile body to the flying missiles
                     self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
 
+                    # Create new missile and add it to the space
                     self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
                         self.anti_spacecraft.create_missile()
                     self.space.add(self.anti_spacecraft.missile_shape)
 
+            # Apply gravitational effects to all the current flying missiles
             for missile in self.anti_spacecraft.flying_missiles:
                 drag_constant = 0.0002
 
@@ -182,13 +190,13 @@ class GameScene(SceneBase):
     def random_terrain(space):
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
-        points = [(i, random.randint(constants.G_SCREEN_HEIGHT//45, constants.G_SCREEN_HEIGHT//7))
+        points = [(i, random.randint(constants.G_SCREEN_HEIGHT // 45, constants.G_SCREEN_HEIGHT // 7))
                   for i in range(0, constants.G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):
             floor = pymunk.Segment(space.static_body, (points[i - 1][0], points[i - 1][1]),
-                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS//3)
+                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS // 3)
             floor.friction = TERRAIN_FRICTION
             floor.filter = pymunk.ShapeFilter(group=0)
             terrain.append(floor)
@@ -211,26 +219,24 @@ class GameScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
         display.blit(self.background, (0, 0))
 
-        """
-        Missile sprite blit
-        """
-        m = flipy(self.anti_spacecraft.missile_body.position)
-
-        missile_img = pygame.transform.rotate(self.missile.image,
-                                                   math.degrees(self.anti_spacecraft.missile_body.angle))
-
-        offset = Vec2d(missile_img.get_size()) / 2.
-        m -= offset
-        display.blit(missile_img, m)
-
-
-        # Landing pad Sprite
-        display.blit(self.landing_pad.image, self.landing_pad.rect)
-
         # Display pymunk bodies
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
+
+        """
+        Missile sprite blit
+        """
+        for missile in self.anti_spacecraft.all_missiles:
+            missile_img = pygame.transform.rotate(self.missile.image,
+                                                  math.degrees(missile.angle))
+            m = flipy(missile.position)
+            offset = Vec2d(missile_img.get_size()) / 2.
+            m -= offset
+            display.blit(missile_img, m)
+
+        # Landing pad Sprite
+        display.blit(self.landing_pad.image, self.landing_pad.rect)
 
         if self.release_time > 0:
             self.release_time -= 1
@@ -246,8 +252,6 @@ class GameScene(SceneBase):
 
             # Pymunk missile
             self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
-
-
 
             current_time = pygame.time.get_ticks()
             diff = current_time - self.start_time
@@ -266,7 +270,16 @@ class GameScene(SceneBase):
                          flipy((self.anti_spacecraft.chassis_b.position[0] - 79 + fuel / 3,
                                 self.anti_spacecraft.chassis_b.position[1] - 45)), 10)  # FUEL (green bar)
 
-        #self.spacecraft.fall_down()
+        ###########################
+        # Spacecraft health bar
+        ##########################
+        pygame.draw.line(display, WHITE, flipy((self.spacecraft.body.position - (80, 45))),
+                         flipy((self.spacecraft.body.position[0] + 87,
+                                self.spacecraft.body.position[1] - 45)), 10)  # Red bar underneath
+        # Changes colors
+        self.spacecraft.health_bar(display)
+
+        # self.spacecraft.fall_down()
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
@@ -305,9 +318,9 @@ class GameScene(SceneBase):
         on, off = self.font_freesans_bold.render("ON", True, RED), self.font_freesans_bold.render("OFF", True, RED)
         w, h = gravity_control_msg.get_rect().center
         if self.spacecraft.counter_gravity:
-            display.blit(on, on.get_rect(center=(w+185, h+20)))
+            display.blit(on, on.get_rect(center=(w + 185, h + 20)))
         else:
-            display.blit(off, off.get_rect(center=(w+190, h+20)))
+            display.blit(off, off.get_rect(center=(w + 190, h + 20)))
 
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()

@@ -1,7 +1,7 @@
 from math import sin, cos, radians
 import pygame as pg
 from pymunk import Vec2d
-import constants
+from constants import *
 from .sprite_class import Sprite
 from random import randint, uniform
 import pymunk
@@ -29,6 +29,8 @@ class Spacecraft(Sprite):
         self.velocity_x = uniform(-1.0, 1.0)
         self.velocity_y = uniform(0.0, 1.0)
         self.rotation_angle = 0
+        # Health bar
+        self.health = 100
         self.damage = 0
         self.crashed = False
         self.counter_gravity = False
@@ -41,6 +43,21 @@ class Spacecraft(Sprite):
         self.shape.friction = 0.5
         self.body.position = 600, 700
         self.body.angle = self.rotation_angle
+
+    def health_bar(self, display):
+        if self.health >= 75:
+            health_color = GREEN
+        elif self.health >= 50:
+            health_color = YELLOW
+        else:
+            health_color = RED
+
+        health = max(self.health, 0)
+        pg.draw.line(display, health_color, flipy((self.body.position - (80, 45))),
+                         flipy((self.body.position[0] - 79 + health,
+                                self.body.position[1] - 45)), 10)  # FUEL (green bar)
+
+
 
     def fall_down(self):
         """ Method implements the effect of Mars'es gravitation on the lander """
@@ -98,6 +115,8 @@ class Spacecraft(Sprite):
         self.damage = 0
 
     def receive_damage(self, dmg):
+        # Decrease health
+        self.health -= dmg
         self.damage += dmg
 
     def get_landing_condition(self):

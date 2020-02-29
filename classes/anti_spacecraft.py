@@ -12,6 +12,7 @@ class AntiSpaceCraft:
         self._fuel = 500
         self.force = DEFAULT_FORCE
         self.wheels = []
+        self.all_missiles = []
         self.flying_missiles = []
 
         # Anti-spacecraft wheels
