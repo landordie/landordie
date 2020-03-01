@@ -16,7 +16,6 @@ from pygame.time import Clock as GameClock
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
-
     def __init__(self):
 
         SceneBase.__init__(self)
@@ -30,6 +29,8 @@ class GameScene(SceneBase):
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
 
+        self.collision = False
+
         # Add the terrain
         # self.terrain = self.random_terrain(self.space)
         # self.borders()
@@ -42,9 +43,17 @@ class GameScene(SceneBase):
 
         # Anti-spacecraft
         self.anti_spacecraft = AntiSpaceCraft()
+        # Collision handler looks for shapes with collision type 2 and 3
+        # 2 -> spacecraft which is set further down in the constructor
+        # 3 -> missile which is set in the anti_spacecraft.create_missile() method
         self.handler = self.space.add_collision_handler(2, 3)
         self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
+        # We must set the 4 callbacks so the handler works properly
+        # Even though we're just using the .begin one
+        self.handler.begin = self.collision_begin
+        self.handler.pre_solve = self.collision_pre
         self.handler.post_solve = self.post_solve_adjust_scores
+        self.handler.separate = self.collision_separate
 
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
@@ -63,14 +72,30 @@ class GameScene(SceneBase):
 
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
-        # self.crash_handler = self.space.add_collision_handler(0, 3)
-        # self.crash_handler.data["spacecraft_land"] = self.spacecraft.body
-        # self.crash_handler.post_solve = self.post_solve_crashed
+        # Setting the spacecraft collision type so the collision handler can check for it
+        self.spacecraft.shape.collision_type = 2
 
-    def post_solve_adjust_scores(self, arbiter):
-        if arbiter.total_impulse.length > 100:
-            self.player1_pts += 10
-            self.spacecraft.receive_damage(20)
+    # The following 4 methods(callbacks) are required for the collision handler to work
+    # The only one we are using is the collision_being
+    # It happens at the exact moment a missile and the spacecraft collide
+    def post_solve_adjust_scores(self, arbiter, space, data):
+        pass
+
+    def collision_begin(self, arbiter, space, data):
+        self.spacecraft.receive_damage(20)
+        self.player2_pts += 10
+        self.collision = True
+        # TODO: Figure out why the missile is not in the space
+        # self.space._remove_body(self.anti_spacecraft.missile_body)
+        # self.space._remove_shape(self.anti_spacecraft.missile_shape)
+        return True
+
+    def collision_pre(self, arbiter, space, data):
+        return True
+
+
+    def collision_separate(self, arbiter, space, data):
+        pass
 
     # def post_solve_crashed(self, arbiter, space, data):
     #     """ Set the spacecraft score to 50 only if it is a smooth landing. """
@@ -144,6 +169,7 @@ class GameScene(SceneBase):
                 if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                     self.end_time = pygame.time.get_ticks()
                     self.anti_spacecraft.cannon_mt.rate = 0
+                    self.collision = False
 
                     diff = self.end_time - self.start_time
                     power = max(min(diff, 1000), 10)
@@ -183,7 +209,9 @@ class GameScene(SceneBase):
                 missile.angular_velocity *= 0.5
 
     def Update(self):
-        pass
+        if self.spacecraft.health == 0:
+            self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+
 
     @staticmethod
     def random_terrain(space):
@@ -225,6 +253,8 @@ class GameScene(SceneBase):
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
+        print(self.collision)
+
         """
         Missile sprite blit
         """
@@ -234,7 +264,10 @@ class GameScene(SceneBase):
             m = flipy(missile.position)
             offset = Vec2d(missile_img.get_size()) / 2.
             m -= offset
-            display.blit(missile_img, m)
+            if self.collision is False:
+                display.blit(missile_img, m)
+
+
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -322,3 +355,4 @@ class GameScene(SceneBase):
 
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
+
