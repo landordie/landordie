@@ -78,5 +78,5 @@ class Spacecraft(Sprite):
         self.damage += dmg
 
     def get_landing_condition(self):
-        return (self.damage < 100 and (-7 <= self.rotation_angle <= 7)
-                and (-5 < self.velocity_y < 5) and (-5 < self.velocity_x < 5))
+        return (self.damage < 100 and (-7 <= self.body.angle <= 7)
+                (-5 < self.body.velocity < 5))

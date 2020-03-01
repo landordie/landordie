@@ -31,9 +31,9 @@ class GameScene(SceneBase):
         self.space.gravity = EARTH_GRAVITY
 
         # Add the terrain
-        self.terrain = self.random_terrain(self.space)
-        self.borders()
-        self.space.add(self.terrain)
+        # self.terrain = self.random_terrain(self.space)
+        # self.borders()
+        # self.space.add(self.terrain)
 
         self.background = pg.image.load("frames/backgr1.jpg")
         self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
@@ -125,13 +125,12 @@ class GameScene(SceneBase):
 
         if not self.spacecraft.crashed:
             # Rotate spacecraft (in radians)
-            if keys[pygame.K_a]:
+            if keys[CONTROL_DICT[self.ctrls[0]]]:
                 self.spacecraft.body.angle += math.radians(2)
-            if keys[pygame.K_d]:
+            if keys[CONTROL_DICT[self.ctrls[2]]]:
                 self.spacecraft.body.angle -= math.radians(2)
-            if keys[pygame.K_w]:
+            if keys[CONTROL_DICT[self.ctrls[1]]]:
                 self.spacecraft.apply_thrust()
-                self.spacecraft.active_engines = True
 
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
@@ -140,7 +139,6 @@ class GameScene(SceneBase):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
                 self.start_time = pygame.time.get_ticks()
-
 
             if self.release_time <= 0:
                 if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
@@ -151,6 +149,8 @@ class GameScene(SceneBase):
                     power = max(min(diff, 1000), 10)
                     impulse = power * Vec2d(1, 0)
                     impulse.rotate(self.anti_spacecraft.missile_body.angle)
+
+                    # Reset cool down
                     self.release_time = 120
 
                     # Apply force to the missile (launch the missile)
@@ -198,6 +198,7 @@ class GameScene(SceneBase):
                                    (points[i][0], points[i][1]), TERRAIN_THICKNESS // 3)
             floor.friction = TERRAIN_FRICTION
             floor.filter = pymunk.ShapeFilter(group=0)
+            floor.color = pygame.color.THECOLORS["orangered3"]
             terrain.append(floor)
         return terrain
 
@@ -210,6 +211,7 @@ class GameScene(SceneBase):
                                                                                       self.screen_height), 10)
         border_bottom = pymunk.Segment(self.space.static_body, (0, 0), (self.screen_width, 0), 75)
         border_bottom.friction = TERRAIN_FRICTION
+        border_bottom.color = pygame.color.THECOLORS["orangered3"]
         border_top.collision_type = 4
         self.space.add(border_left, border_right, border_top, border_bottom)
 
@@ -295,19 +297,16 @@ class GameScene(SceneBase):
         # we need to rotate 180 degrees because of the y coordinate flip
         self.spacecraft.rotation_angle = math.degrees(self.spacecraft.body.angle)
         rotated_logo_img = pygame.transform.rotate(self.spacecraft.image, self.spacecraft.rotation_angle)
-
         offset = Vec2d(rotated_logo_img.get_size()) / 2.
         p = p - offset
 
-        display.blit(rotated_logo_img, p)
+        # HACKED THE SHIT OUT OF THIS
+        self.spacecraft.rect = rotated_logo_img.get_rect(left=p[0], top=p[1])
 
-        # JUST TO SHOW THE SIZE OF THE TRIANGLE
-        # ps = [p.rotated(self.spacecraft.body.angle) + self.spacecraft.body.position for p in self.spacecraft.shape.get_vertices()]
-        # ps = [(flipy(p)) for p in ps]
-        # ps += [ps[0]]
-        # pygame.draw.lines(display, RED, False, ps, 1)
+        display.blit(rotated_logo_img, self.spacecraft.rect)
 
-        if self.display_crash_text:
+        if pg.sprite.collide_rect(self.landing_pad, self.spacecraft):
+            print(pg.sprite.collide_rect(self.spacecraft, self.landing_pad))
             text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)
             text_rect = text.get_rect(center=(self.screen_width / 2, self.screen_height / 3))
             display.blit(text, text_rect)
