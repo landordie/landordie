@@ -19,6 +19,7 @@ class GameScene(SceneBase):
     def __init__(self):
 
         SceneBase.__init__(self)
+        self.prev = None
         self.player2_pts = 0
         self.display_crash_text = False
         self.player1_pts = 0
@@ -32,9 +33,9 @@ class GameScene(SceneBase):
         self.collision = False
 
         # Add the terrain
-        # self.terrain = self.random_terrain(self.space)
-        # self.borders()
-        # self.space.add(self.terrain)
+        self.terrain = self.random_terrain(self.space)
+        self.borders()
+        self.space.add(self.terrain)
 
         self.background = pg.image.load("frames/backgr1.jpg")
         self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
@@ -47,7 +48,8 @@ class GameScene(SceneBase):
         # 2 -> spacecraft which is set further down in the constructor
         # 3 -> missile which is set in the anti_spacecraft.create_missile() method
         self.handler = self.space.add_collision_handler(2, 3)
-        self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
+
+        #self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
         # We must set the 4 callbacks so the handler works properly
         # Even though we're just using the .begin one
         self.handler.begin = self.collision_begin
@@ -59,7 +61,6 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
         self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
-        self.space.add(self.anti_spacecraft.missile_shape)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
 
@@ -85,9 +86,9 @@ class GameScene(SceneBase):
         self.spacecraft.receive_damage(20)
         self.player2_pts += 10
         self.collision = True
-        # TODO: Figure out why the missile is not in the space
-        # self.space._remove_body(self.anti_spacecraft.missile_body)
-        # self.space._remove_shape(self.anti_spacecraft.missile_shape)
+        # TODO: Make the missiles disappear when they hit sth
+        self.space.remove(self.anti_spacecraft.missile_body)
+        self.space.remove(self.anti_spacecraft.missile_shape)
         return True
 
     def collision_pre(self, arbiter, space, data):
@@ -162,14 +163,20 @@ class GameScene(SceneBase):
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
+                self.collision = False
+
+                # Create new missile and add it to the space
+                self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
+                    self.anti_spacecraft.create_missile()
+                self.space.add(self.anti_spacecraft.missile_shape)
+
+                # self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
                 self.start_time = pygame.time.get_ticks()
 
             if self.release_time <= 0:
                 if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                     self.end_time = pygame.time.get_ticks()
                     self.anti_spacecraft.cannon_mt.rate = 0
-                    self.collision = False
 
                     diff = self.end_time - self.start_time
                     power = max(min(diff, 1000), 10)
@@ -188,11 +195,6 @@ class GameScene(SceneBase):
 
                     # Add the missile body to the flying missiles
                     self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
-
-                    # Create new missile and add it to the space
-                    self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
-                        self.anti_spacecraft.create_missile()
-                    self.space.add(self.anti_spacecraft.missile_shape)
 
             # Apply gravitational effects to all the current flying missiles
             for missile in self.anti_spacecraft.flying_missiles:
@@ -253,18 +255,18 @@ class GameScene(SceneBase):
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
-        print(self.collision)
+        #print(self.collision)
 
         """
         Missile sprite blit
         """
-        for missile in self.anti_spacecraft.all_missiles:
+        if self.anti_spacecraft.missile_shape:
             missile_img = pygame.transform.rotate(self.missile.image,
-                                                  math.degrees(missile.angle))
-            m = flipy(missile.position)
+                                                  math.degrees(self.anti_spacecraft.missile_body.angle))
+            m = flipy(self.anti_spacecraft.missile_body.position)
             offset = Vec2d(missile_img.get_size()) / 2.
             m -= offset
-            if self.collision is False:
+            if not self.collision:
                 display.blit(missile_img, m)
 
 
@@ -339,7 +341,9 @@ class GameScene(SceneBase):
         display.blit(rotated_logo_img, self.spacecraft.rect)
 
         if pg.sprite.collide_rect(self.landing_pad, self.spacecraft):
-            print(pg.sprite.collide_rect(self.spacecraft, self.landing_pad))
+            # print(pg.sprite.collide_rect(self.spacecraft, self.landing_pad))
+            if abs(self.spacecraft.body.velocity[1]) > 300:  # Y-axis velocity
+                self.spacecraft.receive_damage(20)
             text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)
             text_rect = text.get_rect(center=(self.screen_width / 2, self.screen_height / 3))
             display.blit(text, text_rect)

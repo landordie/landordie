@@ -12,7 +12,7 @@ class AntiSpaceCraft:
         self._fuel = 500
         self.force = DEFAULT_FORCE
         self.wheels = []
-        self.all_missiles = []
+        # self.all_missiles = []
         self.flying_missiles = []
 
         # Anti-spacecraft wheels
@@ -32,7 +32,7 @@ class AntiSpaceCraft:
         self.cannon_b, self.cannon_s = self.create_body(0.01, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/2, position[1] +
                                                                ANTI_SPACECRAFT_CHASSIS[1]/2), ANTI_SPACECRAFT_CANNON)
 
-        self.missile_body, self.missile_shape = self.create_missile()
+        self.missile_body, self.missile_shape = None, None
 
         # Anti-spacecraft joints
         # TODO: Use for-loop (?)

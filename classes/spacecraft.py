@@ -36,7 +36,7 @@ class Spacecraft(Sprite):
         self.counter_gravity = False
 
         self.triangle = [(-55, -30), (55, -30), (0, 50)]
-        self.mass = 1
+        self.mass = 0.5
         self.moment = pymunk.moment_for_poly(self.mass, self.triangle)
         self.body = pymunk.Body(self.mass, self.moment)
         self.shape = pymunk.Poly(self.body, self.triangle)
