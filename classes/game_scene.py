@@ -32,9 +32,9 @@ class GameScene(SceneBase):
         self.collision = False
 
         # Add the terrain
-        # self.terrain = self.random_terrain(self.space)
-        # self.borders()
-        # self.space.add(self.terrain)
+        self.terrain = self.random_terrain(self.space)
+        self.borders()
+        self.space.add(self.terrain)
 
         self.background = pg.image.load("frames/backgr1.jpg")
         self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
@@ -76,7 +76,7 @@ class GameScene(SceneBase):
         self.spacecraft.shape.collision_type = 2
 
     # The following 4 methods(callbacks) are required for the collision handler to work
-    # The only one we are using is the collision_being
+    # The only one we are using is the collision_begin
     # It happens at the exact moment a missile and the spacecraft collide
     def post_solve_adjust_scores(self, arbiter, space, data):
         pass
@@ -86,13 +86,11 @@ class GameScene(SceneBase):
         self.player2_pts += 10
         self.collision = True
         # TODO: Figure out why the missile is not in the space
-        # self.space._remove_body(self.anti_spacecraft.missile_body)
-        # self.space._remove_shape(self.anti_spacecraft.missile_shape)
+        self.space.remove(self.anti_spacecraft.missile_shape, self.anti_spacecraft.missile_body)
         return True
 
     def collision_pre(self, arbiter, space, data):
         return True
-
 
     def collision_separate(self, arbiter, space, data):
         pass
@@ -267,8 +265,6 @@ class GameScene(SceneBase):
             if self.collision is False:
                 display.blit(missile_img, m)
 
-
-
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
 
@@ -313,7 +309,6 @@ class GameScene(SceneBase):
         # Changes colors
         self.spacecraft.health_bar(display)
 
-        # self.spacecraft.fall_down()
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
