@@ -75,7 +75,7 @@ class AntiSpaceCraft:
         missile_shape.collision_type = 2
         missile_shape.filter = AntiSpaceCraft.sf
         # Setting the missile collision type so the handler can look for it and handle it
-        missile_shape.collision_type = 3
+        # missile_shape.collision_type = 3
         return missile_body, missile_shape
 
     def is_collided_with(self, sprite):

@@ -3,7 +3,7 @@ import random
 import pymunk
 from pymunk import pygame_util, Vec2d
 from classes.landing_pad import LandingPad
-from classes.spacecraft import Spacecraft, flipy
+from classes.spacecraft import Spacecraft
 from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
@@ -88,6 +88,7 @@ class GameScene(SceneBase):
     # The only one we are using is the collision_begin
     # It happens at the exact moment a missile and the spacecraft collide
     def post_solve_adjust_scores(self, arbiter, space, data):
+        print("hola")
         pass
 
     def wall_collision_begin(self, arbiter, space, data):
@@ -101,6 +102,7 @@ class GameScene(SceneBase):
         self.spacecraft.receive_damage(20)
         self.player2_pts += 10
         self.collision = True
+        print(True)
 
         # TODO: Make the missiles disappear when they hit sth
         self.space.remove(self.anti_spacecraft.missile_body)
@@ -109,9 +111,11 @@ class GameScene(SceneBase):
         return True
 
     def collision_pre(self, arbiter, space, data):
+        print("pres")
         return True
 
     def collision_separate(self, arbiter, space, data):
+        print("separ")
         pass
 
     # def post_solve_crashed(self, arbiter, space, data):
@@ -210,6 +214,7 @@ class GameScene(SceneBase):
                     self.space.add(self.anti_spacecraft.missile_body)
 
                     # Add the missile body to the flying missiles
+                    self.anti_spacecraft.missile_shape.collision_type = 3
                     self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
 
             # Apply gravitational effects to all the current flying missiles
@@ -282,19 +287,14 @@ class GameScene(SceneBase):
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
-        #print(self.collision)
-
         """
         Missile sprite blit
         """
         if self.anti_spacecraft.missile_shape:
-            missile_img = pygame.transform.rotate(self.missile.image,
-                                                  math.degrees(self.anti_spacecraft.missile_body.angle))
-            m = flipy(self.anti_spacecraft.missile_body.position)
-            offset = Vec2d(missile_img.get_size()) / 2.
-            m -= offset
+            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body)
             if not self.collision:
                 display.blit(missile_img, m)
+        #w
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -349,15 +349,7 @@ class GameScene(SceneBase):
                     self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
-        # image draw
-        p = self.spacecraft.body.position
-        p = flipy(p)
-
-        # we need to rotate 180 degrees because of the y coordinate flip
-        self.spacecraft.rotation_angle = math.degrees(self.spacecraft.body.angle)
-        rotated_logo_img = pygame.transform.rotate(self.spacecraft.image, self.spacecraft.rotation_angle)
-        offset = Vec2d(rotated_logo_img.get_size()) / 2.
-        p = p - offset
+        p, rotated_logo_img = self.spacecraft.get_attachment_coordinates(self.spacecraft.body)
 
         # HACKED THE SHIT OUT OF THIS
         self.spacecraft.rect = rotated_logo_img.get_rect(left=p[0], top=p[1])
@@ -365,7 +357,6 @@ class GameScene(SceneBase):
         display.blit(rotated_logo_img, self.spacecraft.rect)
 
         if pg.sprite.collide_rect(self.landing_pad, self.spacecraft):
-            # print(pg.sprite.collide_rect(self.spacecraft, self.landing_pad))
             if abs(self.spacecraft.body.velocity[1]) > 300:  # Y-axis velocity
                 self.spacecraft.receive_damage(20)
             text = self.font_warning.render("SPACECRAFT MALFUNCTION!!!", True, RED)

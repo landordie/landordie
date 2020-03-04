@@ -2,6 +2,8 @@
 Constants here
 """
 import pygame as pg
+from pymunk import Vec2d
+
 pg.font.init()
 
 DEFAULT_FONT = "PressStart2P.ttf"  # To instantiate a font use pygame.font.Font(DEFAULT_FONT, font size)
@@ -116,3 +118,8 @@ CONTROL_DICT = {
         'Tab': pg.K_TAB,
         'Enter': pg.K_RETURN
 }
+
+
+def flipy(p):
+    """Convert chipmunk coordinates to pygame coordinates."""
+    return Vec2d(p[0], -p[1] + 800)

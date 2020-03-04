@@ -8,7 +8,6 @@
 from classes.scene_base import *
 from classes import *
 
-
 class Game:
     def __init__(self):
         self.menu = MenuScene()
