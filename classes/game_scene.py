@@ -16,6 +16,9 @@ from pygame.time import Clock as GameClock
 # (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
+
+    border_sf = pymunk.ShapeFilter(group=2)
+
     def __init__(self):
 
         SceneBase.__init__(self)
@@ -47,15 +50,21 @@ class GameScene(SceneBase):
         # Collision handler looks for shapes with collision type 2 and 3
         # 2 -> spacecraft which is set further down in the constructor
         # 3 -> missile which is set in the anti_spacecraft.create_missile() method
+        # 4 -> wall segments
         self.handler = self.space.add_collision_handler(2, 3)
+        self.wall_handler = self.space.add_collision_handler(4, 3)
 
-        #self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
+        # self.handler.data["flying_missiles"] = self.anti_spacecraft.flying_missiles
         # We must set the 4 callbacks so the handler works properly
         # Even though we're just using the .begin one
+        self.wall_handler.begin = self.wall_collision_begin
         self.handler.begin = self.collision_begin
         self.handler.pre_solve = self.collision_pre
         self.handler.post_solve = self.post_solve_adjust_scores
         self.handler.separate = self.collision_separate
+        self.wall_handler.pre_solve = self.collision_pre
+        self.wall_handler.post_solve = self.post_solve_adjust_scores
+        self.wall_handler.separate = self.collision_separate
 
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
@@ -63,7 +72,6 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
-
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
         # missile
@@ -82,18 +90,22 @@ class GameScene(SceneBase):
     def post_solve_adjust_scores(self, arbiter, space, data):
         pass
 
+    def wall_collision_begin(self, arbiter, space, data):
+        self.space.remove(self.anti_spacecraft.missile_body)
+        self.space.remove(self.anti_spacecraft.missile_shape)
+        self.collision = True
+
+        return True
+
     def collision_begin(self, arbiter, space, data):
         self.spacecraft.receive_damage(20)
         self.player2_pts += 10
         self.collision = True
-<<<<<<< HEAD
-        # TODO: Figure out why the missile is not in the space
-        self.space.remove(self.anti_spacecraft.missile_shape, self.anti_spacecraft.missile_body)
-=======
+
         # TODO: Make the missiles disappear when they hit sth
         self.space.remove(self.anti_spacecraft.missile_body)
         self.space.remove(self.anti_spacecraft.missile_shape)
->>>>>>> 9e4025b99f625b269a011528c9bf4611f16486c1
+
         return True
 
     def collision_pre(self, arbiter, space, data):
@@ -167,15 +179,15 @@ class GameScene(SceneBase):
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                self.collision = False
 
                 # Create new missile and add it to the space
                 self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
-                    self.anti_spacecraft.create_missile()
+                    self.anti_spacecraft.create_missile((-1000, -1232))
                 self.space.add(self.anti_spacecraft.missile_shape)
 
                 # self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
                 self.start_time = pygame.time.get_ticks()
+                self.collision = False
 
             if self.release_time <= 0:
                 if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
@@ -233,6 +245,8 @@ class GameScene(SceneBase):
             floor.friction = TERRAIN_FRICTION
             floor.filter = pymunk.ShapeFilter(group=0)
             floor.color = pygame.color.THECOLORS["orangered3"]
+            floor.collision_type = 4
+            floor.filter = GameScene.border_sf
             terrain.append(floor)
         return terrain
 
@@ -246,7 +260,16 @@ class GameScene(SceneBase):
         border_bottom = pymunk.Segment(self.space.static_body, (0, 0), (self.screen_width, 0), 75)
         border_bottom.friction = TERRAIN_FRICTION
         border_bottom.color = pygame.color.THECOLORS["orangered3"]
+
+        border_top.filter = GameScene.border_sf
+        border_bottom.filter = GameScene.border_sf
+        border_right.filter = GameScene.border_sf
+        border_left.filter = GameScene.border_sf
+
         border_top.collision_type = 4
+        border_left.collision_type = 4
+        border_right.collision_type = 4
+        border_bottom.collision_type = 4
         self.space.add(border_left, border_right, border_top, border_bottom)
 
     def Render(self, screen):
@@ -283,7 +306,7 @@ class GameScene(SceneBase):
 
             pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
 
-        if pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time <= 0:
+        if pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time <= 0 and self.anti_spacecraft.missile_body:
             # Position the missile
             self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
                 self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)

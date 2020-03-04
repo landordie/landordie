@@ -63,11 +63,12 @@ class AntiSpaceCraft:
         return body, shape
 
     @staticmethod
-    def create_missile():
+    def create_missile(position):
         vs = [(-30, 0), (0, 3), (10, 0), (0, -3)]
         mass = 0.5
         moment = pymunk.moment_for_poly(mass, vs)
         missile_body = pymunk.Body(mass, moment)
+        missile_body.position = position
 
         missile_shape = pymunk.Poly(missile_body, vs)
         missile_shape.friction = .5
