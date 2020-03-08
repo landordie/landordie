@@ -16,6 +16,8 @@ class Button:
         self.text = self.font.render(text, True, BLACK)
         self._text = text
         self.hovered = False
+        self.image = pg.image.load("frames/Table_01.png")
+
 
     def change_color(self):
         """
@@ -50,7 +52,8 @@ class Button:
         self.check_hover()
         if self.hovered:
             surface.fill(WHITE, self.rect)
-        surface.fill(self.color, self.rect.inflate(-4, -4))
+        # surface.fill(self.color, self.rect.inflate(-4, -4))
+        surface.blit(self.image, (self.rect.x, self.rect.y))
 
         text_width, text_height = self.wh_text()
         surface.blit(self.text, (self.rect.centerx - (text_width / 2), self.rect.centery - (text_height / 2)))

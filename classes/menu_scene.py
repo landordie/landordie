@@ -3,7 +3,7 @@ from .button import Button
 from .game_scene import GameScene
 from .scene_base import *
 from .splash_scene import SplashScene
-
+import pygame as pg
 
 class MenuScene(SceneBase):
 
@@ -35,6 +35,10 @@ class MenuScene(SceneBase):
         self.menu_button_3 = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.25, BUTTON_WIDTH,
                                      BUTTON_HEIGHT), RED, 'Quit')
         self.os = os
+        # self.display = pg.display
+
+        self.background = None
+        self.x = 0
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -58,10 +62,17 @@ class MenuScene(SceneBase):
     # (!) Add them here, in this method
     def Render(self, screen):
 
-        game_title = load_images("frames/big")
-        title_surfaces = game_title.values()
+        # game_title = load_images("frames/big")
+        # title_surfaces = game_title.values()
 
-        screen.get_surface().fill(BLACK)
+        # TODO: Write test to make sure self.background is not NONE
+        # Background parallax effect
+        image_width = self.background.get_rect().width
+        rel_x = self.x % image_width
+        screen.get_surface().blit(self.background, (rel_x - image_width, 0))
+        if rel_x < M_SCREEN_WIDTH:
+            screen.get_surface().blit(self.background, (rel_x, 0))
+        self.x -= 1
 
         # Update buttons
         self.menu_button.update(screen.get_surface())
@@ -69,4 +80,4 @@ class MenuScene(SceneBase):
         self.menu_button_3.update(screen.get_surface())
 
         # Update title
-        title_update(title_surfaces, screen)
+        # title_update(title_surfaces, screen)
