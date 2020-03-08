@@ -8,7 +8,7 @@ import pymunk
 class AntiSpaceCraft:
     sf = pymunk.ShapeFilter(group=1)
 
-    def __init__(self, mass=DEFAULT_MASS, position=(G_SCREEN_WIDTH/2, G_SCREEN_HEIGHT/4)):
+    def __init__(self, mass=DEFAULT_MASS, position=(DEFAULT_WIDTH/2, DEFAULT_HEIGHT/4)):
         self._fuel = 500
         self.force = DEFAULT_FORCE
         self.wheels = []

@@ -31,6 +31,9 @@ def display_text(screen, text, font, size):
 
 
 class SceneBase:
+    screen_width = DEFAULT_WIDTH
+    screen_height = DEFAULT_HEIGHT
+
     def __init__(self):
         self.next = self
         # Fonts:
@@ -40,6 +43,7 @@ class SceneBase:
         self.font_warning = pygame.font.Font(DEFAULT_FONT, 27)
         self.font_freesans_bold = pygame.font.Font(DEFAULT_FONT, 15)
         self.press2s = pygame.font.Font("PressStart2P.ttf", 14)
+
 
     @staticmethod
     def draw_text(screen, message, position, font, color=(0, 0, 0)):

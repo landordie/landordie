@@ -13,7 +13,7 @@ from .controls import Controls
 from pygame.time import Clock as GameClock
 
 
-# (!) Note (!) : Every time we use G_SCREEN_HEIGHT and G_SCREEN_WIDTH we have to type "constants." before so it works
+# (!) Note (!) : Every time we use self.screen_height and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
 
@@ -28,8 +28,6 @@ class GameScene(SceneBase):
         self.player1_pts = 0
         self.end_time = 0
         self.start_time = 0
-        self.screen_width = constants.G_SCREEN_WIDTH
-        self.screen_height = constants.G_SCREEN_HEIGHT
         self.space = pymunk.Space()
         self.space.gravity = EARTH_GRAVITY
 
@@ -77,7 +75,7 @@ class GameScene(SceneBase):
         # missile
         self.missile = Missile()
 
-        self.spacecraft = Spacecraft(constants.G_SCREEN_WIDTH)
+        self.spacecraft = Spacecraft(self.screen_width)
 
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
@@ -118,16 +116,6 @@ class GameScene(SceneBase):
         print("separ")
         pass
 
-    # def post_solve_crashed(self, arbiter, space, data):
-    #     """ Set the spacecraft score to 50 only if it is a smooth landing. """
-    #     if self.spacecraft.body.velocity.length < 10 and not self.spacecraft.crashed:
-    #         self.player2_pts = 50
-    #         self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
-    #     # set spacecraft crashed attribute to True when it collides too fast
-    #     elif self.spacecraft.body.velocity.length > 100:
-    #         self.display_crash_text = True
-    #         self.spacecraft.crashed = True
-
     def pause_game(self, msg_type, screen):
         """ The method pauses the game after the player crashes and displays a message, till a key is pressed """
         msg = ''
@@ -162,9 +150,9 @@ class GameScene(SceneBase):
         else:
             self.anti_spacecraft.force = DEFAULT_FORCE
 
-        if keys[pygame.K_DOWN] and self.anti_spacecraft.cannon_b.angle < 0:
+        if keys[CONTROL_DICT[self.ctrls[6]]] and self.anti_spacecraft.cannon_b.angle < 0:
             self.anti_spacecraft.cannon_mt.rate = 2
-        elif keys[pygame.K_UP] and self.anti_spacecraft.cannon_b.angle >= -math.pi:
+        elif keys[CONTROL_DICT[self.ctrls[4]]] and self.anti_spacecraft.cannon_b.angle >= -math.pi:
             self.anti_spacecraft.cannon_mt.rate = -2
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
@@ -182,7 +170,7 @@ class GameScene(SceneBase):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE and self.release_time <= 0   :
 
                 # Create new missile and add it to the space
                 self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
@@ -235,13 +223,11 @@ class GameScene(SceneBase):
         if self.spacecraft.health == 0:
             self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
-
-    @staticmethod
-    def random_terrain(space):
+    def random_terrain(self, space):
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
-        points = [(i, random.randint(constants.G_SCREEN_HEIGHT // 45, constants.G_SCREEN_HEIGHT // 7))
-                  for i in range(0, constants.G_SCREEN_WIDTH + SEGMENT_LENGTH, SEGMENT_LENGTH)]
+        points = [(i, random.randint(self.screen_width // 45, self.screen_height // 7))
+                  for i in range(0, self.screen_width + SEGMENT_LENGTH, SEGMENT_LENGTH)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):
@@ -291,10 +277,9 @@ class GameScene(SceneBase):
         Missile sprite blit
         """
         if self.anti_spacecraft.missile_shape:
-            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body)
+            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body, self.screen_height)
             if not self.collision:
                 display.blit(missile_img, m)
-        #w
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -324,21 +309,21 @@ class GameScene(SceneBase):
         # Anti-Spacecraft fuel bar
         ##########################
         fuel = max(self.anti_spacecraft.fuel, 0)
-        pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45))),
+        pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
                          flipy((self.anti_spacecraft.chassis_b.position[0] + 87,
-                                self.anti_spacecraft.chassis_b.position[1] - 45)), 10)  # Red bar underneath
-        pygame.draw.line(display, GREEN, flipy((self.anti_spacecraft.chassis_b.position - (80, 45))),
+                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height), 10)  # Red bar underneath
+        pygame.draw.line(display, GREEN, flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
                          flipy((self.anti_spacecraft.chassis_b.position[0] - 79 + fuel / 3,
-                                self.anti_spacecraft.chassis_b.position[1] - 45)), 10)  # FUEL (green bar)
+                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height), 10)  # FUEL (green bar)
 
         ###########################
         # Spacecraft health bar
         ##########################
-        pygame.draw.line(display, WHITE, flipy((self.spacecraft.body.position - (80, 45))),
+        pygame.draw.line(display, WHITE, flipy((self.spacecraft.body.position - (80, 45)), self.screen_height),
                          flipy((self.spacecraft.body.position[0],
-                                self.spacecraft.body.position[1] - 45)), 10)  # Red bar underneath
+                                self.spacecraft.body.position[1] - 45), self.screen_height), 10)  # Red bar underneath
         # Changes colors
-        self.spacecraft.health_bar(display)
+        self.spacecraft.health_bar(display, self.screen_height)
 
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
@@ -349,7 +334,7 @@ class GameScene(SceneBase):
                     self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
-        p, rotated_logo_img = self.spacecraft.get_attachment_coordinates(self.spacecraft.body)
+        p, rotated_logo_img = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
 
         # HACKED THE SHIT OUT OF THIS
         self.spacecraft.rect = rotated_logo_img.get_rect(left=p[0], top=p[1])
@@ -374,4 +359,3 @@ class GameScene(SceneBase):
 
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
-

@@ -7,8 +7,6 @@ from .button import *
 class ResultScene(SceneBase):
     def __init__(self, player1_pts, player2_pts):
         SceneBase.__init__(self)
-        self.screen_width = R_SCREEN_WIDTH
-        self.screen_height = R_SCREEN_HEIGHT
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
         self.store_result(player1_pts, player2_pts)

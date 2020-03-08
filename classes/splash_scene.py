@@ -5,14 +5,12 @@ from .controls import Controls
 
 
 class SplashScene(SceneBase):
-    def __init__(self, box_texts):
+    def __init__(self, box_texts=None):
         SceneBase.__init__(self)
-        self.width = S_SCREEN_WIDTH
-        self.height = S_SCREEN_HEIGHT
 
         # Continue button
-        self.splash_button = Button((self.width / 2 - (BUTTON_WIDTH / 2),
-                                     self.height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
+        self.splash_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2),
+                                     self.screen_height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
         if not box_texts:
             self.controls = DEFAULT_CONTROLS
@@ -64,10 +62,10 @@ class SplashScene(SceneBase):
         pass
 
     def Render(self, screen):
-        screen.set_mode((S_SCREEN_WIDTH, S_SCREEN_HEIGHT))
+        screen.set_mode((self.screen_width, self.screen_height))
         splash_w, splash_h = 700, 630
-        splash_x, splash_y = (self.width/2) - \
-            (splash_w/2), (self.height/2) - (splash_h/2)
+        splash_x, splash_y = (self.screen_width/2) - \
+            (splash_w/2), (self.screen_height/2) - (splash_h/2)
 
         controls_background = pygame.Surface(
             (splash_w, splash_h)).convert_alpha()

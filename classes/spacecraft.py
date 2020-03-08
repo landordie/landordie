@@ -39,7 +39,7 @@ class Spacecraft(Sprite):
         self.thrust_activated = Sprite("frames/ogan2.png")
 
     # Change health bar color as the health drops
-    def health_bar(self, display):
+    def health_bar(self, display, height):
         if self.health >= 75:
             health_color = GREEN
         elif self.health >= 50:
@@ -48,9 +48,9 @@ class Spacecraft(Sprite):
             health_color = RED
 
         health = max(self.health, 0)
-        pg.draw.line(display, health_color, flipy((self.body.position - (80, 45))),
+        pg.draw.line(display, health_color, flipy((self.body.position - (80, 45)), height),
                          flipy((self.body.position[0] - 25 + health,
-                                self.body.position[1] - 45)), 10)  # Health bar
+                                self.body.position[1] - 45), height), 10)  # Health bar
 
     # Apply thrust force to the spacecraft (make it fly)
     def apply_thrust(self):

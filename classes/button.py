@@ -18,7 +18,6 @@ class Button:
         self.hovered = False
         self.image = pg.image.load("frames/Table_01.png")
 
-
     def change_color(self):
         """
         Not used yet
@@ -49,9 +48,9 @@ class Button:
         """
         Update needs to be called every frame in the main loop.
         """
-        self.check_hover()
-        if self.hovered:
-            surface.fill(WHITE, self.rect)
+        # self.check_hover()
+        # if self.hovered:
+        #     surface.fill(WHITE, self.rect)
         # surface.fill(self.color, self.rect.inflate(-4, -4))
         surface.blit(self.image, (self.rect.x, self.rect.y))
 

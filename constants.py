@@ -21,17 +21,8 @@ BUTTON_WIDTH = 220
 BUTTON_HEIGHT = 60
 
 # ------------------------SCENE SIZES
-M_SCREEN_WIDTH = 800
-M_SCREEN_HEIGHT = 600
-
-G_SCREEN_WIDTH = 1200
-G_SCREEN_HEIGHT = 800
-
-S_SCREEN_WIDTH = 1280
-S_SCREEN_HEIGHT = 720
-
-R_SCREEN_WIDTH = 1200
-R_SCREEN_HEIGHT = 800
+DEFAULT_WIDTH = 1200
+DEFAULT_HEIGHT = 800
 
 # ------------------------SOUNDS
 HOVER_SOUND = "blipshort1.wav"
@@ -120,6 +111,6 @@ CONTROL_DICT = {
 }
 
 
-def flipy(p):
+def flipy(p, h):
     """Convert chipmunk coordinates to pygame coordinates."""
-    return Vec2d(p[0], -p[1] + 800)
+    return Vec2d(p[0], -p[1] + h)

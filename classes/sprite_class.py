@@ -12,10 +12,10 @@ class Sprite(pygame.sprite.Sprite):
         self.image = pygame.image.load(image_file)
         self.rect = self.image.get_rect()
 
-    def get_attachment_coordinates(self, pymunk_body):
+    def get_attachment_coordinates(self, pymunk_body, height):
         rotated_img = pygame.transform.rotate(self.image,
                                               degrees(pymunk_body.angle))
-        position = flipy(pymunk_body.position)
+        position = flipy(pymunk_body.position, height)
         offset = Vec2d(rotated_img.get_size()) / 2.
         position -= offset
         return position, rotated_img
