@@ -29,9 +29,9 @@ class OptionsScene(SceneBase):
             (self.screen_width * 0.75 - (BUTTON_WIDTH / 2), self.screen_height * 0.75, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW,
             'Main Menu')
 
-        self._res2 = Button((self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.25, BUTTON_WIDTH, BUTTON_HEIGHT),
+        self._res2 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.40, BUTTON_WIDTH, BUTTON_HEIGHT),
                             GREEN, "1280x720")
-        self._res3 = Button((self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.35, BUTTON_WIDTH, BUTTON_HEIGHT),
+        self._res3 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.55, BUTTON_WIDTH, BUTTON_HEIGHT),
                             GREEN, "1440x900")
 
         self.input_box1 = InputBox(self.screen_width / 1.6, self.screen_height / 5, 100, 35, 'A')
@@ -70,9 +70,11 @@ class OptionsScene(SceneBase):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self._res2.on_click(event):
                 _res = self._res2._text.split("x")
                 SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
+                self.update_all()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self._res3.on_click(event):
                 _res = self._res3._text.split("x")
                 SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
+                self.update_all()
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 # Pass input box texts
@@ -110,3 +112,9 @@ class OptionsScene(SceneBase):
         self.input_box6.update()
         self.input_box7.update()
         self.input_box8.update()
+
+    def update_all(self):
+        self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.75 - (BUTTON_WIDTH / 2), self.screen_height * 0.75
+
+        self._res2.rect.x, self._res2.rect.y = self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.40
+        self._res3.rect.x, self._res3.rect.y = self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.55

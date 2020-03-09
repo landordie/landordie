@@ -74,14 +74,7 @@ class MenuScene(SceneBase):
         self.menu_button_2.update(screen.get_surface())
         self.menu_button_3.update(screen.get_surface())
 
-        # Update title
-        # title_update(title_surfaces, screen)
-
     def update_all(self):
         self.menu_button.rect.x,  self.menu_button.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2
-        self.menu_button_2 = Button(
-            (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53, BUTTON_WIDTH,
-             BUTTON_HEIGHT), GREEN, 'Options')
-        self.menu_button_3 = Button(
-            (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.25, BUTTON_WIDTH,
-             BUTTON_HEIGHT), RED, 'Quit')
+        self.menu_button_2.rect.x,  self.menu_button_2.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53
+        self.menu_button_3.rect.x , self.menu_button_3.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.25
