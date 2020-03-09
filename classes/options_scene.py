@@ -34,15 +34,15 @@ class OptionsScene(SceneBase):
         self._res3 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.55, BUTTON_WIDTH, BUTTON_HEIGHT),
                             GREEN, "1440x900")
 
-        self.input_box1 = InputBox(self.screen_width / 1.6, self.screen_height / 5, 100, 35, 'A')
-        self.input_box2 = InputBox(self.screen_width / 1.37, self.screen_height / 9, 100, 35, 'W')
-        self.input_box3 = InputBox(self.screen_width / 1.2, self.screen_height / 5, 100, 35, 'D')
+        self.input_box1 = InputBox(self.screen_width / 1.6, self.screen_height / 5, 'A')
+        self.input_box2 = InputBox(self.screen_width / 1.37, self.screen_height / 9, 'W')
+        self.input_box3 = InputBox(self.screen_width / 1.2, self.screen_height / 5, 'D')
 
-        self.input_box4 = InputBox(self.screen_width / 1.6, self.screen_height / 2, 100, 35, 'Left')
-        self.input_box5 = InputBox(self.screen_width / 1.37, self.screen_height / 2.75, 100, 35, 'Up')
-        self.input_box6 = InputBox(self.screen_width / 1.2, self.screen_height / 2, 100, 35, 'Right')
-        self.input_box7 = InputBox(self.screen_width / 1.37, self.screen_height / 2, 100, 35, 'Down')
-        self.input_box8 = InputBox(self.screen_width / 1.1, self.screen_height / 2.5, 100, 35, 'Space')
+        self.input_box4 = InputBox(self.screen_width / 1.6, self.screen_height / 2, 'Left')
+        self.input_box5 = InputBox(self.screen_width / 1.37, self.screen_height / 2.75, 'Up')
+        self.input_box6 = InputBox(self.screen_width / 1.2, self.screen_height / 2, 'Right')
+        self.input_box7 = InputBox(self.screen_width / 1.37, self.screen_height / 2, 'Down')
+        self.input_box8 = InputBox(self.screen_width / 1.1, self.screen_height / 2.5, 'Space')
 
         self.input_boxes = [self.input_box1, self.input_box2,self.input_box3, self.input_box4, self.input_box5,
                             self.input_box6, self.input_box7, self.input_box8]
@@ -118,3 +118,6 @@ class OptionsScene(SceneBase):
 
         self._res2.rect.x, self._res2.rect.y = self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.40
         self._res3.rect.x, self._res3.rect.y = self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.55
+
+        # for input_box in self.input_boxes:
+        #     input_box.respond_to_resolution(self.screen_width, self.screen_height)
