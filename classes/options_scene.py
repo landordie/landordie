@@ -23,6 +23,8 @@ class OptionsScene(SceneBase):
             OptionsScene.__instance = self
 
         SceneBase.__init__(self)
+        self.background = pygame.image.load("frames/BG.png")
+        self.x = 0
         self.input_boxes = []
 
         self.menu_button = Button(
@@ -30,20 +32,19 @@ class OptionsScene(SceneBase):
             'Main Menu')
 
         self._res2 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.40, BUTTON_WIDTH, BUTTON_HEIGHT),
-                            GREEN, "1280x720")
+                            GREEN, "1280x800")
         self._res3 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.55, BUTTON_WIDTH, BUTTON_HEIGHT),
                             GREEN, "1440x900")
 
-        self.input_box1 = InputBox(self.screen_width / 1.6, self.screen_height / 5, 'A')
-        self.input_box2 = InputBox(self.screen_width / 1.37, self.screen_height / 9, 'W')
-        self.input_box3 = InputBox(self.screen_width / 1.2, self.screen_height / 5, 'D')
+        self.input_box1 = InputBox(self.screen_width / 2.8, self.screen_height / 5, 'A')
+        self.input_box2 = InputBox(self.screen_width / 1.95, self.screen_height / 9, 'W')
+        self.input_box3 = InputBox(self.screen_width / 1.5, self.screen_height / 5, 'D')
 
-        self.input_box4 = InputBox(self.screen_width / 1.6, self.screen_height / 2, 'Left')
-        self.input_box5 = InputBox(self.screen_width / 1.37, self.screen_height / 2.75, 'Up')
-        self.input_box6 = InputBox(self.screen_width / 1.2, self.screen_height / 2, 'Right')
-        self.input_box7 = InputBox(self.screen_width / 1.37, self.screen_height / 2, 'Down')
-        self.input_box8 = InputBox(self.screen_width / 1.1, self.screen_height / 2.5, 'Space')
-
+        self.input_box4 = InputBox(self.screen_width / 2.8, self.screen_height / 2, 'Left')
+        self.input_box5 = InputBox(self.screen_width / 1.95, self.screen_height / 2.75, 'Up')
+        self.input_box6 = InputBox(self.screen_width / 1.5, self.screen_height / 2, 'Right')
+        self.input_box7 = InputBox(self.screen_width / 1.95, self.screen_height / 2, 'Down')
+        self.input_box8 = InputBox(self.screen_width / 1.3, self.screen_height / 2.5, 'Space')
         self.input_boxes = [self.input_box1, self.input_box2,self.input_box3, self.input_box4, self.input_box5,
                             self.input_box6, self.input_box7, self.input_box8]
 
@@ -87,7 +88,14 @@ class OptionsScene(SceneBase):
 
     def Render(self, screen):
         screen.set_mode((self.screen_width, self.screen_height))
-        screen.get_surface().fill(BLACK)
+
+        # Background parallax effect
+        image_width = self.background.get_rect().width
+        rel_x = self.x % image_width
+        screen.get_surface().blit(self.background, (rel_x - image_width, 0))
+        if rel_x < self.screen_width:
+            screen.get_surface().blit(self.background, (rel_x, 0))
+        self.x -= 1
 
         self.menu_button.update(screen.get_surface())
         self._res2.update(screen.get_surface())
@@ -116,8 +124,11 @@ class OptionsScene(SceneBase):
     def update_all(self):
         self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.75 - (BUTTON_WIDTH / 2), self.screen_height * 0.75
 
-        self._res2.rect.x, self._res2.rect.y = self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.40
-        self._res3.rect.x, self._res3.rect.y = self.screen_width * 0.25 - (BUTTON_WIDTH / 2), self.screen_height * 0.55
+        self._res2.rect.x, self._res2.rect.y = self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.40
+        self._res3.rect.x, self._res3.rect.y = self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.55
 
-        # for input_box in self.input_boxes:
-        #     input_box.respond_to_resolution(self.screen_width, self.screen_height)
+        position_fractions = [[2.8, 1.95, 1.5, 2.8, 1.95, 1.5, 1.95, 1.3], [5, 9, 5, 2, 2.75, 2, 2, 2.5]]
+        i = 0
+        for input_box in self.input_boxes:
+            input_box.respond_to_resolution(self.screen_width / position_fractions[0][i], self.screen_height / position_fractions[1][i])
+            i += 1

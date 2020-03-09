@@ -13,13 +13,13 @@ class MenuScene(SceneBase):
     @staticmethod
     def getInstance():
         """ Static access method. """
-        if MenuScene.__instance == None:
+        if MenuScene.__instance is None:
             MenuScene()
         return MenuScene.__instance
 
     def __init__(self, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         """ Virtually private constructor. """
-        if MenuScene.__instance != None:
+        if MenuScene.__instance is not None:
             raise Exception("This class is a MenuScene!")
         else:
             MenuScene.__instance = self

@@ -6,7 +6,7 @@ class InputBox:
     boxes = DEFAULT_CONTROLS
     no = 0
 
-    def __init__(self, x, y, w=100, h=35, text=''):
+    def __init__(self, x, y, text='', w=100, h=35):
         self.rect = pg.Rect(x, y, w, h)
         self.color = RED
         self.text = text

@@ -2,8 +2,6 @@
 Button Class
 """
 import random
-
-import pygame as pg
 from constants import *
 
 
@@ -56,4 +54,4 @@ class Button:
             surface.blit(self.image, (self.rect.x, self.rect.y))
 
         text_width, text_height = self.wh_text()
-        surface.blit(self.text, (self.rect.centerx - (text_width / 2), self.rect.centery))
+        surface.blit(self.text, (self.rect.centerx - (text_width / 2), self.rect.centery + 5))

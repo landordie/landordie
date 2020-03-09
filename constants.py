@@ -14,6 +14,10 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+LIGHT_GREY = (192, 192, 192)
+DARK_GREY = (128, 128, 128)
+MAGENTA = (255, 0, 255)
+CYAN = (0, 255, 255)
 BLACK_HIGHLIGHT = (0, 0, 0, 150)
 
 # ------------------------BUTTON SIZE
@@ -21,7 +25,7 @@ BUTTON_WIDTH = 220
 BUTTON_HEIGHT = 60
 
 # ------------------------SCENE SIZES
-DEFAULT_WIDTH = 1200
+DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 800
 
 # ------------------------SOUNDS
