@@ -25,7 +25,6 @@ class Spacecraft(Sprite):
         self.health = 100
         self.damage = 0
         self.crashed = False
-        self.counter_gravity = False
 
         self.triangle = [(-40, -20), (-10, -20), (-10, -30),  (10, -30), (10, -20), (40, -20), (0, 50)]
         self.mass = 1

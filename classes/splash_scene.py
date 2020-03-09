@@ -9,20 +9,20 @@ class SplashScene(SceneBase):
     def __init__(self, box_texts=None):
         SceneBase.__init__(self)
 
-        # Continue button
-        self.splash_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2),
-                                     self.screen_height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
-
         self.star_field = StarField(self.screen_width, self.screen_height)
-        self.splash_w, self.splash_h = 700, 630
+        self.splash_w, self.splash_h = self.screen_width / 1.4, self.screen_height / 1.3
         self.splash_x, self.splash_y = (self.screen_width / 2) - \
                              (self.splash_w / 2), (self.screen_height / 2) - (self.splash_h / 2)
 
         self.controls_background = pygame.Surface(
             (self.splash_w, self.splash_h)).convert_alpha()
         self.controls_background.fill(BLACK_HIGHLIGHT)
-        self.logo = pygame.image.load('frames/Landordie.png')
         self.background = pygame.image.load('frames/splash_BG.jpg')
+        """ https://images.wallpaperscraft.com/image/texture_surface_dark_128260_1920x1080.jpg """
+
+        # Continue button
+        self.splash_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2),
+                                     self.splash_h, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
         if not box_texts:
             self.controls = DEFAULT_CONTROLS
@@ -81,10 +81,9 @@ class SplashScene(SceneBase):
 
         screen.get_surface().blit(self.controls_background,
                                   (self.splash_x, self.splash_y, self.splash_w, self.splash_h))
-        screen.get_surface().blit(self.logo, (self.splash_x, self.splash_y))
 
-        self.draw_text(screen, "Game Controls", (self.splash_x + (self.splash_w/1.5),
-                                                 self.splash_y * 1.7), self.font_header, (140, 123, 192))
+        self.draw_text(screen, "Game Controls", (self.splash_x + self.splash_w / 2,
+                                                 self.splash_y * 1.5), self.font_header, (140, 123, 192))
         self.draw_text(screen, "Player 1: ", (self.splash_x + (self.splash_w/3.75),
                                               self.splash_y + 100), self.font_playernum, (255, 255, 255))
         self.draw_text(screen, "Player 2: ", (self.splash_x + 535,
