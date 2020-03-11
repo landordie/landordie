@@ -2,6 +2,7 @@ from classes import MenuScene
 from classes.input_box import InputBox
 from .game_scene import *
 from .button import Button
+import pygame
 
 
 class OptionsScene(SceneBase):
@@ -28,24 +29,39 @@ class OptionsScene(SceneBase):
         self.input_boxes = []
 
         self.menu_button = Button(
-            (self.screen_width * 0.75 - (BUTTON_WIDTH / 2), self.screen_height * 0.75, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW,
+            (self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.85, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW,
             'Main Menu')
 
-        self._res2 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.40, BUTTON_WIDTH, BUTTON_HEIGHT),
-                            GREEN, "1280x800")
-        self._res3 = Button((self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.55, BUTTON_WIDTH, BUTTON_HEIGHT),
-                            GREEN, "1440x900")
+        """Containers"""
+        self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 3
+        self.res_cont_x, self.res_cont_y = (self.screen_width / 2) - (self.res_cont_w * 2.26), (self.screen_height / 2) - (self.res_cont_h / 2.35)
+        self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
+        self.res_cont.fill(BLACK_HIGHLIGHT2)
 
-        self.input_box1 = InputBox(self.screen_width / 2.8, self.screen_height / 5, 'A')
-        self.input_box2 = InputBox(self.screen_width / 1.95, self.screen_height / 9, 'W')
-        self.input_box3 = InputBox(self.screen_width / 1.5, self.screen_height / 5, 'D')
+        self.button_cont_w, self.button_cont_h = self.screen_width / 3, self.screen_height / 1.5
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2), (self.screen_height / 5)
+        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+        self.button_cont.fill(BLACK_HIGHLIGHT2)
 
-        self.input_box4 = InputBox(self.screen_width / 2.8, self.screen_height / 2, 'Left')
-        self.input_box5 = InputBox(self.screen_width / 1.95, self.screen_height / 2.75, 'Up')
-        self.input_box6 = InputBox(self.screen_width / 1.5, self.screen_height / 2, 'Right')
-        self.input_box7 = InputBox(self.screen_width / 1.95, self.screen_height / 2, 'Down')
-        self.input_box8 = InputBox(self.screen_width / 1.3, self.screen_height / 2.5, 'Space')
-        self.input_boxes = [self.input_box1, self.input_box2,self.input_box3, self.input_box4, self.input_box5,
+        # TODO: Make the position of buttons be relative to container and not screen width/height
+
+        self._res2 = Button(
+            (self.res_cont_x * 1.35, self.res_cont_y * 1.1, BUTTON_WIDTH, BUTTON_HEIGHT),
+            GREEN, "1280x800")
+        self._res3 = Button(
+            (self.res_cont_x * 1.35, self.res_cont_y * 1.5, BUTTON_WIDTH, BUTTON_HEIGHT),
+            GREEN, "1440x900")
+
+        self.input_box1 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.35, 'A')
+        self.input_box2 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.60, 'W')
+        self.input_box3 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.85, 'D')
+
+        self.input_box4 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 2.75, 'Left')
+        self.input_box5 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3, 'Up')
+        self.input_box6 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3.25, 'Right')
+        self.input_box7 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3.5, 'Down')
+        self.input_box8 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3.75, 'Space')
+        self.input_boxes = [self.input_box1, self.input_box2, self.input_box3, self.input_box4, self.input_box5,
                             self.input_box6, self.input_box7, self.input_box8]
 
     def ProcessInput(self, events, pressed_keys):
@@ -89,6 +105,7 @@ class OptionsScene(SceneBase):
     def Render(self, screen):
         screen.set_mode((self.screen_width, self.screen_height))
 
+
         # Background parallax effect
         image_width = self.background.get_rect().width
         rel_x = self.x % image_width
@@ -96,6 +113,36 @@ class OptionsScene(SceneBase):
         if rel_x < self.screen_width:
             screen.get_surface().blit(self.background, (rel_x, 0))
         self.x -= 1
+
+        """Drawing the containers and displaying info text"""
+        screen.get_surface().blit(self.res_cont, (self.res_cont_x, self.res_cont_y, self.res_cont_w, self.res_cont_h))
+        self.draw_text(screen, "Resolution", (self.res_cont_x + self.res_cont_w / 2, self.res_cont_y / 1.1), self.font_medium, WHITE)
+
+        screen.get_surface().blit(self.button_cont, (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
+        self.draw_text(screen, "Controls", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y / 1.1),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Spacecraft", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 1.2),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Anti-Spacecraft", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 2.6),
+                       self.font_medium, WHITE)
+
+        self.draw_text(screen, "Thrust", (self.input_box1.rect.x * 0.8, self.input_box2.rect.y * 1.08), self.font_medium, WHITE)
+        self.draw_text(screen, "Rotate Left", (self.input_box1.rect.x * 0.8, self.input_box1.rect.y * 1.08),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Rotate Right", (self.input_box1.rect.x * 0.8, self.input_box3.rect.y * 1.08),
+                       self.font_medium, WHITE)
+
+        self.draw_text(screen, "Move Left", (self.input_box4.rect.x * 0.85, self.input_box4.rect.y * 1.04),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Cannon Right", (self.input_box5.rect.x * 0.85, self.input_box5.rect.y * 1.04),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Move Right", (self.input_box6.rect.x * 0.85, self.input_box6.rect.y * 1.04),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Cannon Left", (self.input_box7.rect.x * 0.85, self.input_box7.rect.y * 1.04),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Shoot", (self.input_box8.rect.x * 0.85, self.input_box8.rect.y * 1.04),
+                       self.font_medium, WHITE)
+
 
         self.menu_button.update(screen.get_surface())
         self._res2.update(screen.get_surface())
@@ -121,14 +168,27 @@ class OptionsScene(SceneBase):
         self.input_box7.update()
         self.input_box8.update()
 
+
+    """Reposition all buttons/containers when changing resolutions"""
     def update_all(self):
-        self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.75 - (BUTTON_WIDTH / 2), self.screen_height * 0.75
+        # The button that returns to Main Menu
+        self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.85
 
-        self._res2.rect.x, self._res2.rect.y = self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.40
-        self._res3.rect.x, self._res3.rect.y = self.screen_width * 0.15 - (BUTTON_WIDTH / 2), self.screen_height * 0.55
+        # The two containers
+        self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 2.5
+        self.res_cont_x, self.res_cont_y = (self.screen_width / 2) - (self.res_cont_w * 2.26), \
+                                           (self.screen_height / 2) - (self.res_cont_h / 2.35)
 
-        position_fractions = [[2.8, 1.95, 1.5, 2.8, 1.95, 1.5, 1.95, 1.3], [5, 9, 5, 2, 2.75, 2, 2, 2.5]]
+        self.button_cont_w, self.button_cont_h = self.screen_width / 3, self.screen_height / 1.25
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2), (self.screen_height / 5)
+
+        # The two buttons for resolutions
+        self._res2.rect.x, self._res2.rect.y = self.res_cont_x * 1.35, self.res_cont_y * 1.1
+        self._res3.rect.x, self._res3.rect.y = self.res_cont_x * 1.35, self.res_cont_y * 1.5
+
+        position_fractions = [[1.5, 1.5, 1.5,1.45, 1.45, 1.45, 1.45, 1.45], [1.35, 1.60, 1.85, 2.75, 3, 3.25, 3.50, 3.75]]
         i = 0
         for input_box in self.input_boxes:
-            input_box.respond_to_resolution(self.screen_width / position_fractions[0][i], self.screen_height / position_fractions[1][i])
+            input_box.respond_to_resolution(self.button_cont_x * position_fractions[0][i], self.button_cont_y * position_fractions[1][i])
+            print("i -> " + str(i) + " " + str(position_fractions[0][i]))
             i += 1
