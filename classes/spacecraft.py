@@ -2,6 +2,7 @@ from constants import *
 from .sprite_class import Sprite
 from random import randint, uniform
 import pymunk
+from math import degrees
 
 
 class Spacecraft(Sprite):
@@ -26,7 +27,7 @@ class Spacecraft(Sprite):
         self.damage = 0
         self.crashed = False
 
-        self.triangle = [(-40, -20), (-10, -20), (-10, -30),  (10, -30), (10, -20), (40, -20), (0, 50)]
+        self.triangle = [(-30, -25), (-10, -25), (10, -25), (30, -25), (0, 35)]
         self.mass = 1
         self.moment = pymunk.moment_for_poly(self.mass, self.triangle)
         self.body = pymunk.Body(self.mass, self.moment)
@@ -43,12 +44,14 @@ class Spacecraft(Sprite):
             health_color = GREEN
         elif self.health >= 50:
             health_color = YELLOW
+        elif self.health == 0:
+            health_color = WHITE
         else:
             health_color = RED
 
         health = max(self.health, 0)
         pg.draw.line(display, health_color, flipy((self.body.position - (80, 45)), height),
-                         flipy((self.body.position[0] - 25 + health,
+                         flipy((self.body.position[0] + 75 - self.damage,
                                 self.body.position[1] - 45), height), 10)  # Health bar
 
     # Apply thrust force to the spacecraft (make it fly)
@@ -68,8 +71,8 @@ class Spacecraft(Sprite):
     def receive_damage(self, dmg):
         # Decrease health
         self.health -= dmg
-        self.damage += dmg
+        self.damage += dmg * 1.5
 
     def get_landing_condition(self):
-        return (self.damage < 100 and (-7 <= self.body.angle <= 7) and
-                (-5 < self.body.velocity.y < 5))
+        return (self.damage < 100 and (-10 <= degrees(self.body.angle) <= 10) and
+                (abs(self.body.velocity.y) < 300))
