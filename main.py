@@ -11,7 +11,6 @@ from classes import *
 class Game:
     def __init__(self):
         self.menu = MenuScene()
-        self.options = OptionsScene()
         self.run_game(60, self.menu)
 
     def run_game(self, fps, starting_scene):
@@ -21,7 +20,7 @@ class Game:
         screen = pygame.display
         clock = pygame.time.Clock()
 
-        self.menu.background = pygame.image.load("frames/BG.png ")
+        self.menu.background = pygame.image.load("frames/BG.png")
 
         # Set the active scene
         active_scene = starting_scene
