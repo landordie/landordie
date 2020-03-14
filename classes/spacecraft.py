@@ -28,7 +28,7 @@ class Spacecraft(Sprite):
         self.crashed = False
 
         self.triangle = [(-30, -25), (-10, -25), (10, -25), (30, -25), (0, 35)]
-        self.mass = 1
+        self.mass = 0.6
         self.moment = pymunk.moment_for_poly(self.mass, self.triangle)
         self.body = pymunk.Body(self.mass, self.moment)
         self.shape = pymunk.Poly(self.body, self.triangle)
@@ -56,7 +56,7 @@ class Spacecraft(Sprite):
 
     # Apply thrust force to the spacecraft (make it fly)
     def apply_thrust(self):
-        self.body.apply_impulse_at_local_point((self.body.angle, 30), (0, 0))
+        self.body.apply_impulse_at_local_point((self.body.angle, 20), (0, 0))
 
     def reset_stats(self):
         """ Method resets all the attributes of the lander to default """

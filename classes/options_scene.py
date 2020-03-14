@@ -69,15 +69,8 @@ class OptionsScene(SceneBase):
     def ProcessInput(self, events, pressed_keys):
         for event in events:
 
-            self.input_box1.handle_event(event)  # input box event handler
-            self.input_box2.handle_event(event)
-            self.input_box3.handle_event(event)
-
-            self.input_box4.handle_event(event)  # input box event handler
-            self.input_box5.handle_event(event)
-            self.input_box6.handle_event(event)
-            self.input_box7.handle_event(event)  # input box event handler
-            self.input_box8.handle_event(event)
+            for input_box in self.input_boxes:
+                input_box.handle_event(event)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
@@ -152,25 +145,9 @@ class OptionsScene(SceneBase):
         self._res2.update(screen.get_surface())
         self._res3.update(screen.get_surface())
 
-        self.input_box1.draw(screen.get_surface())
-        self.input_box2.draw(screen.get_surface())
-        self.input_box3.draw(screen.get_surface())
-
-        self.input_box4.draw(screen.get_surface())
-        self.input_box5.draw(screen.get_surface())
-        self.input_box6.draw(screen.get_surface())
-        self.input_box7.draw(screen.get_surface())
-        self.input_box8.draw(screen.get_surface())
-
-        self.input_box1.update()
-        self.input_box2.update()
-        self.input_box3.update()
-
-        self.input_box4.update()
-        self.input_box5.update()
-        self.input_box6.update()
-        self.input_box7.update()
-        self.input_box8.update()
+        for input_box in self.input_boxes:
+            input_box.draw(screen.get_surface())
+            input_box.update()
 
     def update_all(self):
         """Reposition all buttons/containers when changing resolutions"""

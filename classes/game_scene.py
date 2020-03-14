@@ -8,7 +8,6 @@ from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
 from .missile import Missile
-import constants
 from .controls import Controls
 from pygame.time import Clock as GameClock
 from .star_field import StarField
@@ -217,16 +216,6 @@ class GameScene(SceneBase):
         p, sc_sprite = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
-
-        p, rotated_cannon_img = self.anti_spacecraft.cannon_sprite.get_attachment_coordinates(self.anti_spacecraft.cannon_b, self.screen_height)
-        if 0 < abs(math.degrees(self.anti_spacecraft.cannon_b.angle)) < 144:
-            # Helps adjusting the alignment b/w cannon body and cannon sprite
-            p[0] += 5
-        if 145 < abs(math.degrees(self.anti_spacecraft.cannon_b.angle)) < 184:
-            # Helps adjusting the alignment b/w cannon body and cannon sprite
-            p[0] += 7
-        self.anti_spacecraft.cannon_sprite.rect = rotated_cannon_img.get_rect(left=p[0], top=p[1])
-        display.blit(rotated_cannon_img, self.anti_spacecraft.cannon_sprite.rect)
 
         p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
         self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1]-15)
