@@ -125,10 +125,10 @@ class OptionsScene(SceneBase):
         self.draw_text(screen, "Controls", (self.button_cont_x + self.button_cont_w // 2, self.button_cont_y // 1.1),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Spacecraft", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 1.2),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Anti-Spacecraft",
                        (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 2.6),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
 
         self.draw_text(screen, "Thrust", (self.input_box1.rect.x * 0.8, self.input_box2.rect.y * 1.08),
                        self.font_medium, WHITE)
@@ -189,7 +189,6 @@ class OptionsScene(SceneBase):
         # The two buttons for resolutions
         self._res2.rect.x, self._res2.rect.y = self.res_cont_w / 3, self.res_cont_h / .85
         self._res3.rect.x, self._res3.rect.y = self.res_cont_w / 3, self.res_cont_h / .62
-        print(self.res_cont_w)
         self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
 
         position_fractions = [[1.5, 1.5, 1.5, 1.45, 1.45, 1.45, 1.45, 1.45],
@@ -198,5 +197,4 @@ class OptionsScene(SceneBase):
         for input_box in self.input_boxes:
             input_box.respond_to_resolution(self.button_cont_x * position_fractions[0][i],
                                             self.button_cont_y * position_fractions[1][i])
-            print("i -> " + str(i) + " " + str(position_fractions[0][i]))
             i += 1
