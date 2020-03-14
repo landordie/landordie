@@ -105,7 +105,6 @@ class GameScene(SceneBase):
                         self.anti_spacecraft.create_missile((-1000, -1232))
                     self.space.add(self.anti_spacecraft.missile_shape)
 
-                    # self.anti_spacecraft.all_missiles.append(self.anti_spacecraft.missile_body)
                     self.start_time = pygame.time.get_ticks()
                     self.collision = False
                     self.check = False
@@ -218,6 +217,20 @@ class GameScene(SceneBase):
         self.spacecraft.rect = rotated_logo_img.get_rect(left=p[0], top=p[1])
         display.blit(rotated_logo_img, self.spacecraft.rect)
 
+        p, rotated_cannon_img = self.anti_spacecraft.cannon_sprite.get_attachment_coordinates(self.anti_spacecraft.cannon_b, self.screen_height)
+        if 0 < abs(math.degrees(self.anti_spacecraft.cannon_b.angle)) < 144:
+            # Helps adjusting the alignment b/w cannon body and cannon sprite
+            p[0] += 5
+        if 145 < abs(math.degrees(self.anti_spacecraft.cannon_b.angle)) < 184:
+            # Helps adjusting the alignment b/w cannon body and cannon sprite
+            p[0] += 7
+        self.anti_spacecraft.cannon_sprite.rect = rotated_cannon_img.get_rect(left=p[0], top=p[1])
+        display.blit(rotated_cannon_img, self.anti_spacecraft.cannon_sprite.rect)
+
+        p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
+        self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1]-15)
+        display.blit(rotated_body_img, self.anti_spacecraft.body_sprite.rect)
+
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
 
@@ -296,14 +309,18 @@ class GameScene(SceneBase):
         if msg_type == 'landed':
             msg = self.font_warning.render("Successful Landing!", False, (13, 109, 24))
         elif msg_type == 'crashed':
-            msg = self.font_warning.render("You Have Crashed!", False, (255, 0, 6))
+            msg = self.font_warning.render("The spacecraft has crashed!", False, (255, 0, 6))
         elif msg_type == 'no HP':
-            msg = self.font_warning.render("You Have No HP left!", False, (255, 0, 6))
+            msg = self.font_warning.render("The spacecraft has been destroyed (0 HP left)", False, (255, 0, 6))
 
         msg_rect = msg.get_rect()
         msg_rect.center = ((self.screen_width/2), (self.screen_height/2.3))
+        instructions = self.font_warning.render("Game ended. Press ENTER to see results.", False, CYAN)
+        instructions_rect = instructions.get_rect()
+        instructions_rect.center = ((self.screen_width/2), (self.screen_height/2))
 
         screen.blit(msg, msg_rect)
+        screen.blit(instructions, instructions_rect)
 
         while True:
             for event in pygame.event.get():

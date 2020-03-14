@@ -3,6 +3,7 @@ AntiSpaceCraft class
 """
 from constants import *
 import pymunk
+from .sprite_class import Sprite
 
 
 class AntiSpaceCraft:
@@ -21,18 +22,22 @@ class AntiSpaceCraft:
 
         self.wheel2_b, self.wheel2_s = self.create_body(mass, (position[0] + ANTI_SPACECRAFT_CHASSIS[0]/1.5,
                                                                        position[1]), ANTI_SPACECRAFT_WHEEL_SIZE)
-
+        # TODO: The color of the wheels must be adjusted
+        # self.wheel1_s.color, self.wheel2_s.color = ((54, 53, 51), (54, 53, 51))
         self.wheels.extend((self.wheel1_b, self.wheel2_b))
 
         # Anti-spacecraft chassis
         self.chassis_b, self.chassis_s = self.create_body(mass/5, position, ANTI_SPACECRAFT_CHASSIS)
-        self.chassis_s.color = 255, 155, 0
+        self.chassis_s.color = 128, 128, 128
 
         # Create cannon
         self.cannon_b, self.cannon_s = self.create_body(0.01, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/2, position[1] +
                                                                ANTI_SPACECRAFT_CHASSIS[1]/2), ANTI_SPACECRAFT_CANNON)
+        self.cannon_s.color = (128, 128, 128)
 
         self.missile_body, self.missile_shape = None, None
+        self.body_sprite = Sprite("frames/tanker.png")
+        self.cannon_sprite = Sprite("frames/cannon.png")
 
         # Anti-spacecraft joints
         # TODO: Use for-loop (?)
