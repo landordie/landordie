@@ -157,11 +157,6 @@ class GameScene(SceneBase):
         display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)
 
-        # Display pymunk bodies
-        self.space.step(1. / FPS)
-        draw_options = pymunk.pygame_util.DrawOptions(display)
-        self.space.debug_draw(draw_options)
-
         """
         Missile sprite blit
         """
@@ -169,6 +164,11 @@ class GameScene(SceneBase):
             m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body, self.screen_height)
             if not self.collision:
                 display.blit(missile_img, m)
+
+        # Display pymunk bodies
+        self.space.step(1. / FPS)
+        draw_options = pymunk.pygame_util.DrawOptions(display)
+        self.space.debug_draw(draw_options)
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -214,9 +214,10 @@ class GameScene(SceneBase):
         # Changes colors
         self.spacecraft.health_bar(display, self.screen_height)
 
-        p, rotated_logo_img = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
-        self.spacecraft.rect = rotated_logo_img.get_rect(left=p[0], top=p[1])
-        display.blit(rotated_logo_img, self.spacecraft.rect)
+        # Attach the spacecraft sprite to the pymunk shape
+        p, sc_sprite = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
+        self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
+        display.blit(sc_sprite, self.spacecraft.rect)
 
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
@@ -318,15 +319,19 @@ class GameScene(SceneBase):
             GameClock().tick(FPS)
 
     def random_terrain(self):
+        """
+        Create a random terrain from pymunk Segments
+        :return: random terrain
+        """
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
-        points = [(i, random.randint(self.screen_width // 45, self.screen_height // 7))
+        points = [(i, random.randint(self.screen_height // 20, self.screen_height // 7))
                   for i in range(0, self.screen_width + SEGMENT_LENGTH, SEGMENT_LENGTH)]
 
         # Loop to add the segments to the space
         for i in range(1, len(points)):
             floor = pymunk.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
-                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS // 3)
+                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS)
             floor.friction = TERRAIN_FRICTION
             floor.filter = pymunk.ShapeFilter(group=0)
             floor.collision_type = 4
