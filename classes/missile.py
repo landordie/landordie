@@ -1,4 +1,3 @@
-import pygame
 from .sprite_class import Sprite
 
 

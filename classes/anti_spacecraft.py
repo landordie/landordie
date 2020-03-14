@@ -8,7 +8,7 @@ import pymunk
 class AntiSpaceCraft:
     sf = pymunk.ShapeFilter(group=1)
 
-    def __init__(self, mass=DEFAULT_MASS, position=(G_SCREEN_WIDTH/2, G_SCREEN_HEIGHT/4)):
+    def __init__(self, mass=DEFAULT_MASS, position=(DEFAULT_WIDTH/2, DEFAULT_HEIGHT/4)):
         self._fuel = 500
         self.force = DEFAULT_FORCE
         self.wheels = []
@@ -63,18 +63,19 @@ class AntiSpaceCraft:
         return body, shape
 
     @staticmethod
-    def create_missile():
+    def create_missile(position):
         vs = [(-30, 0), (0, 3), (10, 0), (0, -3)]
         mass = 0.5
         moment = pymunk.moment_for_poly(mass, vs)
         missile_body = pymunk.Body(mass, moment)
+        missile_body.position = position
 
         missile_shape = pymunk.Poly(missile_body, vs)
         missile_shape.friction = .5
         missile_shape.collision_type = 2
         missile_shape.filter = AntiSpaceCraft.sf
         # Setting the missile collision type so the handler can look for it and handle it
-        missile_shape.collision_type = 3
+        # missile_shape.collision_type = 3
         return missile_body, missile_shape
 
     def is_collided_with(self, sprite):

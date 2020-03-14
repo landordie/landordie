@@ -2,8 +2,6 @@
 Button Class
 """
 import random
-
-import pygame as pg
 from constants import *
 
 
@@ -13,9 +11,11 @@ class Button:
         self.rect = pg.Rect(rect)
         self.color = color
         self.font = pg.font.Font(DEFAULT_FONT, 15)
-        self.text = self.font.render(text, True, BLACK)
+        self.text = self.font.render(text, True, WHITE)
         self._text = text
         self.hovered = False
+        self.image = pg.image.load("frames/Table_01.png")
+        self.active_image = pg.image.load("frames/Table_01_active.png")
 
     def change_color(self):
         """
@@ -49,8 +49,9 @@ class Button:
         """
         self.check_hover()
         if self.hovered:
-            surface.fill(WHITE, self.rect)
-        surface.fill(self.color, self.rect.inflate(-4, -4))
+            surface.blit(self.active_image, (self.rect.x, self.rect.y))
+        else:
+            surface.blit(self.image, (self.rect.x, self.rect.y))
 
         text_width, text_height = self.wh_text()
-        surface.blit(self.text, (self.rect.centerx - (text_width / 2), self.rect.centery - (text_height / 2)))
+        surface.blit(self.text, (self.rect.centerx - (text_width / 2), self.rect.centery + 5))

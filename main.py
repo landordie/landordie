@@ -8,21 +8,19 @@
 from classes.scene_base import *
 from classes import *
 
-
 class Game:
     def __init__(self):
         self.menu = MenuScene()
-        self.game = GameScene()
-        self.options = OptionsScene()
-        self.run_game(self.menu.width, self.menu.height, 60, self.menu)
+        self.run_game(60, self.menu)
 
-    def run_game(self, width, height, fps, starting_scene):
+    def run_game(self, fps, starting_scene):
         """Function to run the program"""
         # Initialize pygame objects
         pygame.init()
         screen = pygame.display
-        screen.set_mode((width, height))
         clock = pygame.time.Clock()
+
+        self.menu.background = pygame.image.load("frames/BG.png")
 
         # Set the active scene
         active_scene = starting_scene

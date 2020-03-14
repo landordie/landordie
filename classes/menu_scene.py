@@ -3,6 +3,7 @@ from .button import Button
 from .game_scene import GameScene
 from .scene_base import *
 from .splash_scene import SplashScene
+from .input_box import InputBox
 
 
 class MenuScene(SceneBase):
@@ -12,29 +13,29 @@ class MenuScene(SceneBase):
     @staticmethod
     def getInstance():
         """ Static access method. """
-        if MenuScene.__instance == None:
+        if MenuScene.__instance is None:
             MenuScene()
         return MenuScene.__instance
 
-    def __init__(self, os=""):
+    def __init__(self, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         """ Virtually private constructor. """
-        if MenuScene.__instance != None:
+        if MenuScene.__instance is not None:
             raise Exception("This class is a MenuScene!")
         else:
             MenuScene.__instance = self
 
         SceneBase.__init__(self)
-        self.width = M_SCREEN_WIDTH
-        self.height = M_SCREEN_HEIGHT
 
         # Start and Quit buttons
-        self.menu_button = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 2, BUTTON_WIDTH, BUTTON_HEIGHT),
+        self.menu_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2, BUTTON_WIDTH, BUTTON_HEIGHT),
                                   YELLOW, 'Start')
-        self.menu_button_2 = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.53, BUTTON_WIDTH,
+        self.menu_button_2 = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53, BUTTON_WIDTH,
                                      BUTTON_HEIGHT), GREEN, 'Options')
-        self.menu_button_3 = Button((self.width / 2 - (BUTTON_WIDTH / 2), self.height / 1.25, BUTTON_WIDTH,
+        self.menu_button_3 = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.25, BUTTON_WIDTH,
                                      BUTTON_HEIGHT), RED, 'Quit')
-        self.os = os
+
+        self.background = None
+        self.x = 0
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -47,7 +48,7 @@ class MenuScene(SceneBase):
                     from .options_scene import OptionsScene
                     self.SwitchToScene(OptionsScene.getInstance())
                 elif self.menu_button.on_click(event):  # start button
-                    self.SwitchToScene(SplashScene(self.os))
+                    self.SwitchToScene(SplashScene(InputBox.boxes))
                 elif self.menu_button_3.on_click(event):  # quit button
                     self.Terminate()
 
@@ -57,16 +58,23 @@ class MenuScene(SceneBase):
     # (!) When adding buttons to the start screen
     # (!) Add them here, in this method
     def Render(self, screen):
+        screen.set_mode((self.screen_width, self.screen_height))
 
-        game_title = load_images("frames/big")
-        title_surfaces = game_title.values()
-
-        screen.get_surface().fill(BLACK)
+        # TODO: Write test to make sure self.background is not NONE
+        # Background parallax effect
+        image_width = self.background.get_rect().width
+        rel_x = self.x % image_width
+        screen.get_surface().blit(self.background, (rel_x - image_width, 0))
+        if rel_x < self.screen_width:
+            screen.get_surface().blit(self.background, (rel_x, 0))
+        self.x -= 1
 
         # Update buttons
         self.menu_button.update(screen.get_surface())
         self.menu_button_2.update(screen.get_surface())
         self.menu_button_3.update(screen.get_surface())
 
-        # Update title
-        title_update(title_surfaces, screen)
+    def update_all(self):
+        self.menu_button.rect.x,  self.menu_button.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2
+        self.menu_button_2.rect.x,  self.menu_button_2.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53
+        self.menu_button_3.rect.x , self.menu_button_3.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.25

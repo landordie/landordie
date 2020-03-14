@@ -6,7 +6,7 @@ class InputBox:
     boxes = DEFAULT_CONTROLS
     no = 0
 
-    def __init__(self, x, y, w, h, text=''):
+    def __init__(self, x, y, text='', w=100, h=35):
         self.rect = pg.Rect(x, y, w, h)
         self.color = RED
         self.text = text
@@ -82,3 +82,7 @@ class InputBox:
         screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
         pg.draw.rect(screen, self.color, self.rect, 3)
+
+    def respond_to_resolution(self, new_x, new_y):
+        self.rect.x = new_x
+        self.rect.y = new_y

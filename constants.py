@@ -2,6 +2,8 @@
 Constants here
 """
 import pygame as pg
+from pymunk import Vec2d
+
 pg.font.init()
 
 DEFAULT_FONT = "PressStart2P.ttf"  # To instantiate a font use pygame.font.Font(DEFAULT_FONT, font size)
@@ -12,24 +14,21 @@ GREEN = (0, 255, 0)
 RED = (255, 0, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
+LIGHT_GREY = (192, 192, 192)
+DARK_GREY = (128, 128, 128)
+MAGENTA = (255, 0, 255)
+CYAN = (0, 255, 255)
 BLACK_HIGHLIGHT = (0, 0, 0, 150)
+BLACK_HIGHLIGHT2 = (0, 0, 0, 200)
+WHITE_HIGHLIGHT = (255, 255, 255, 150)
 
 # ------------------------BUTTON SIZE
 BUTTON_WIDTH = 220
 BUTTON_HEIGHT = 60
 
 # ------------------------SCENE SIZES
-M_SCREEN_WIDTH = 800
-M_SCREEN_HEIGHT = 600
-
-G_SCREEN_WIDTH = 1200
-G_SCREEN_HEIGHT = 800
-
-S_SCREEN_WIDTH = 1280
-S_SCREEN_HEIGHT = 720
-
-R_SCREEN_WIDTH = 1200
-R_SCREEN_HEIGHT = 800
+DEFAULT_WIDTH = 1280
+DEFAULT_HEIGHT = 800
 
 # ------------------------SOUNDS
 HOVER_SOUND = "blipshort1.wav"
@@ -116,3 +115,8 @@ CONTROL_DICT = {
         'Tab': pg.K_TAB,
         'Enter': pg.K_RETURN
 }
+
+
+def flipy(p, h):
+    """Convert chipmunk coordinates to pygame coordinates."""
+    return Vec2d(p[0], -p[1] + h)
