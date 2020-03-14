@@ -97,6 +97,9 @@ class GameScene(SceneBase):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
+            if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[1]]:
+                self.spacecraft.image = self.spacecraft.normal
+
             if self.release_time <= 0:
                 if pygame.key.get_pressed()[pygame.K_SPACE] and self.check:
                     # Create new missile and add it to the space
@@ -155,11 +158,6 @@ class GameScene(SceneBase):
         display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)
 
-        # Display pymunk bodies
-        self.space.step(1. / FPS)
-        draw_options = pymunk.pygame_util.DrawOptions(display)
-        self.space.debug_draw(draw_options)
-
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
 
@@ -183,6 +181,11 @@ class GameScene(SceneBase):
                 power = max(min(diff, 750), 0)
                 h = power / 4
                 pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
+
+        # Display pymunk bodies
+        self.space.step(1. / FPS)
+        draw_options = pymunk.pygame_util.DrawOptions(display)
+        self.space.debug_draw(draw_options)
 
         """
         Missile sprite blit
@@ -216,6 +219,22 @@ class GameScene(SceneBase):
         p, sc_sprite = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
+
+
+        # # print(math.degrees(self.spacecraft.body.angle))
+        # if self.spacecraft.engines_activated:
+        #     p, thrust_sprite = self.spacecraft.thrust.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
+        #     self.spacecraft.thrust.rect = thrust_sprite.get_rect(left=p[0] + math.degrees(self.spacecraft.body.angle) * 0.33, top=p[1] + math.degrees(self.spacecraft.body.angle) * 0.66)
+        #     display.blit(thrust_sprite, self.spacecraft.thrust.rect)
+
+        p, rotated_cannon_img = self.anti_spacecraft.cannon_sprite.get_attachment_coordinates(self.anti_spacecraft.cannon_b, self.screen_height)
+        angle = abs(math.degrees(self.anti_spacecraft.cannon_b.angle))
+        if 0 < angle < 144:
+            p[0] += 5
+        elif 144 < angle < 184:
+            p[0] += 7
+        self.anti_spacecraft.cannon_sprite.rect = rotated_cannon_img.get_rect(left=p[0], top=p[1])
+        display.blit(rotated_cannon_img, self.anti_spacecraft.cannon_sprite.rect)
 
         p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
         self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1]-15)

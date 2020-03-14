@@ -10,18 +10,17 @@ class Spacecraft(Sprite):
 
     def __init__(self, max_width):
         super().__init__('frames/lander.gif')  # call Sprite initializer
+        self.engines_activated = False
         self.width = max_width
         # This variable holds the rotated image if the lander is being rotated or the original image by default
-        self.rotatedImg = self.image
+        self.normal = self.image
+        self.activated_img = pg.image.load("frames/lander_active.png")
         # This method takes the actual size of the image ignoring its transparent parts
-        self.mask = pg.mask.from_surface(self.rotatedImg)
+        self.mask = pg.mask.from_surface(self.image)
 
         """Initializing lander's attributes: 
             the default angle, its lives, the current altitude after spawn, 
             the damage percentage and setting random velocities for the lander moving on x and y"""
-        self.velocity_x = uniform(-1.0, 1.0)
-        self.velocity_y = uniform(0.0, 1.0)
-        self.rotation_angle = 0
         # Health bar
         self.health = 100
         self.damage = 0
@@ -33,10 +32,8 @@ class Spacecraft(Sprite):
         self.body = pymunk.Body(self.mass, self.moment)
         self.shape = pymunk.Poly(self.body, self.triangle)
         self.shape.friction = 0.5
+        self.shape.color = BLACK_INVISIBLE
         self.body.position = 600, 700
-        self.body.angle = self.rotation_angle
-        self.thrust = Sprite("frames/ogan.png")
-        self.thrust_activated = Sprite("frames/ogan2.png")
 
     # Change health bar color as the health drops
     def health_bar(self, display, height):
@@ -57,15 +54,12 @@ class Spacecraft(Sprite):
     # Apply thrust force to the spacecraft (make it fly)
     def apply_thrust(self):
         self.body.apply_impulse_at_local_point((self.body.angle, 20), (0, 0))
+        self.image = self.activated_img
 
     def reset_stats(self):
         """ Method resets all the attributes of the lander to default """
         self.rect.left = randint(0, 1200 - self.rect.width)  # spawns the ship on a different place on the top
         self.rect.top = 0
-        self.velocity_y = uniform(0.0, 1.0)
-        self.velocity_x = uniform(-0.1, 1.0)
-        self.rotatedImg = self.image
-        self.rotation_angle = 0
         self.damage = 0
 
     def receive_damage(self, dmg):
