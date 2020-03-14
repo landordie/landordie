@@ -83,45 +83,45 @@ class SplashScene(SceneBase):
                                   (self.splash_x, self.splash_y, self.splash_w, self.splash_h))
 
         self.draw_text(screen, "Game Controls", (self.splash_x + self.splash_w / 2,
-                                                 self.splash_y * 1.5), self.font_header, (140, 123, 192))
-        self.draw_text(screen, "Player 1: ", (self.splash_x + (self.splash_w/3.75),
-                                              self.splash_y + 100), self.font_playernum, (255, 255, 255))
-        self.draw_text(screen, "Player 2: ", (self.splash_x + 535,
-                                              self.splash_y + 100), self.font_playernum, (255, 255, 255))
+                                                 self.splash_y * 1.5), self.font_header, LIGHT_PURPLE)
+        self.draw_text(screen, "Spacecraft: ", (self.splash_x * 2,
+                                              self.splash_y + 100), self.font_playernum, WHITE)
+        self.draw_text(screen, "Anti-spacecraft: ", (self.splash_x * 5,
+                                              self.splash_y + 100), self.font_playernum, WHITE)
 
         # Display the controls for Player 1 (controlling the ship)
         # on the splash screen
 
-        screen.get_surface().blit(self.player1_thrust, (self.splash_x + 125, self.splash_y + 150))
-        self.draw_text(screen, "Thruster On", (self.splash_x + 175,
-                                               self.splash_y + 150), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player1_thrust, (self.splash_x * 2, self.splash_y + 150))
+        self.draw_text(screen, "Thruster On", (self.splash_x * 1.5,
+                                               self.splash_y + 200), self.font_freesans_bold, WHITE)
 
-        screen.get_surface().blit(self.player1_left, (self.splash_x + 50, self.splash_y + 250))
-        self.draw_text(screen, "Rotate Left", (self.splash_x + 95,
-                                               self.splash_y + 250), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player1_left, (self.splash_x * 2, self.splash_y + 250))
+        self.draw_text(screen, "Rotate Left", (self.splash_x * 1.5,
+                                               self.splash_y + 300), self.font_freesans_bold, WHITE)
 
-        screen.get_surface().blit(self.player1_right, (self.splash_x + 200, self.splash_y + 250))
-        self.draw_text(screen, "Rotate Right", (self.splash_x + 255,
-                                                self.splash_y + 250), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player1_right, (self.splash_x * 2, self.splash_y + 350))
+        self.draw_text(screen, "Rotate Right", (self.splash_x * 1.5,
+                                                self.splash_y + 400), self.font_freesans_bold, WHITE)
 
         # Display the controls for Player 2 (controlling the tank)
         # on the splash screen
 
-        screen.get_surface().blit(self.player2_cannon_right, (self.splash_x + 475, self.splash_y + 150))
-        self.draw_text(screen, "Cannon Right", (self.splash_x + 525,
-                                                self.splash_y + 150), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_cannon_left, (self.splash_x + 475, self.splash_y + 350))
-        self.draw_text(screen, "Cannon Left", (self.splash_x + 525,
-                                                self.splash_y + 350), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_left, (self.splash_x + 375, self.splash_y + 250))
-        self.draw_text(screen, "Move Left", (self.splash_x + 420,
-                                             self.splash_y + 250), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_right, (self.splash_x + 575, self.splash_y + 250))
-        self.draw_text(screen, "Move Right", (self.splash_x + 625,
-                                              self.splash_y + 250), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_shoot, (self.splash_x + 475, self.splash_y + 450))
-        self.draw_text(screen, "Shoot", (self.splash_x + 525,
-                                         self.splash_y + 460), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player2_cannon_right, (self.splash_x * 5, self.splash_y + 125))
+        self.draw_text(screen, "Cannon Right", (self.splash_x * 4.5,
+                                                self.splash_y + 175), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player2_cannon_left, (self.splash_x * 5, self.splash_y + 200))
+        self.draw_text(screen, "Cannon Left", (self.splash_x * 4.5,
+                                                self.splash_y + 250), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player2_left, (self.splash_x * 5, self.splash_y + 350)) # 350
+        self.draw_text(screen, "Move Left", (self.splash_x * 4.5,
+                                             self.splash_y + 400), self.font_freesans_bold, WHITE) # 400
+        screen.get_surface().blit(self.player2_right, (self.splash_x * 5, self.splash_y + 275))
+        self.draw_text(screen, "Move Right", (self.splash_x * 4.5,
+                                              self.splash_y + 325), self.font_freesans_bold, WHITE)
+        screen.get_surface().blit(self.player2_shoot, (self.splash_x * 5, self.splash_y + 425))
+        self.draw_text(screen, "Shoot", (self.splash_x * 4.5,
+                                         self.splash_y + 475), self.font_freesans_bold, WHITE)
 
         self.splash_button.update(screen.get_surface())
         pygame.display.update()
