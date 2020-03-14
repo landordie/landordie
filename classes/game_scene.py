@@ -156,14 +156,6 @@ class GameScene(SceneBase):
         display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)
 
-        """
-        Missile sprite blit
-        """
-        if self.anti_spacecraft.missile_shape:
-            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body, self.screen_height)
-            if not self.collision:
-                display.blit(missile_img, m)
-
         # Display pymunk bodies
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(display)
@@ -192,6 +184,14 @@ class GameScene(SceneBase):
                 power = max(min(diff, 750), 0)
                 h = power / 4
                 pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
+
+        """
+        Missile sprite blit
+        """
+        if self.anti_spacecraft.missile_shape:
+            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body, self.screen_height)
+            if not self.collision:
+                display.blit(missile_img, m)
 
         ###########################
         # Anti-Spacecraft fuel bar
