@@ -25,6 +25,8 @@ class Spacecraft(Sprite):
         self.health = 100
         self.damage = 0
         self.crashed = False
+        self.terrain_collision_cooldown = 0
+        self.terrain_collision = True
 
         self.triangle = [(-30, -25), (-10, -25), (10, -25), (30, -25), (0, 35)]
         self.mass = 0.6
@@ -41,12 +43,11 @@ class Spacecraft(Sprite):
             health_color = GREEN
         elif self.health >= 50:
             health_color = YELLOW
-        elif self.health == 0:
+        elif self.health <= 0:
             health_color = WHITE
         else:
             health_color = RED
 
-        health = max(self.health, 0)
         pg.draw.line(display, health_color, flipy((self.body.position - (80, 45)), height),
                          flipy((self.body.position[0] + 75 - self.damage,
                                 self.body.position[1] - 45), height), 10)  # Health bar

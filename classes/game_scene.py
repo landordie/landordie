@@ -52,6 +52,7 @@ class GameScene(SceneBase):
         # 4 -> wall segments
         self.handler = self.space.add_collision_handler(2, 3)
         self.wall_handler = self.space.add_collision_handler(4, 3)
+        self.spacecraft_handler = self.space.add_collision_handler(4, 2)
 
         # We must set the 4 callbacks so the handler works properly
         # Even though we're just using the .begin one
@@ -220,21 +221,17 @@ class GameScene(SceneBase):
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
 
-        # p, rotated_cannon_img = self.anti_spacecraft.cannon_sprite.get_attachment_coordinates(self.anti_spacecraft.cannon_b, self.screen_height)
-        # angle = abs(math.degrees(self.anti_spacecraft.cannon_b.angle))
-        # if 0 < angle < 144:
-        #     p[0] += 5
-        # elif 144 < angle < 184:
-        #     p[0] += 7
-        # self.anti_spacecraft.cannon_sprite.rect = rotated_cannon_img.get_rect(left=p[0], top=p[1])
-        # display.blit(rotated_cannon_img, self.anti_spacecraft.cannon_sprite.rect)
-
         p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
         self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1]-15)
         display.blit(rotated_body_img, self.anti_spacecraft.body_sprite.rect)
 
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
+
+        self.spacecraft.terrain_collision_cooldown += 1
+        if self.spacecraft.terrain_collision_cooldown > 150:
+            self.spacecraft.terrain_collision = True
+            self.spacecraft.terrain_collision_cooldown = 0
 
         if self.spacecraft.health == 0:
             paused = self.pause_game('no HP', display)
@@ -252,19 +249,6 @@ class GameScene(SceneBase):
                     self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
-    # The following 4 methods(callbacks) are required for the collision handler to work
-    # The only one we are using is the collision_begin
-    # It happens at the exact moment a missile and the spacecraft collide
-    def post_solve_adjust_scores(self, arbiter, space, data):
-        pass
-
-    def wall_collision_begin(self, arbiter, space, data):
-        self.space.remove(self.anti_spacecraft.missile_body)
-        self.space.remove(self.anti_spacecraft.missile_shape)
-        self.collision = True
-
-        return True
-
     def add_objects_to_space(self):
         # Anti-spacecraft Parts (represent the whole vehicle)
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
@@ -281,12 +265,38 @@ class GameScene(SceneBase):
     def start_collision_handlers(self):
         self.wall_handler.begin = self.wall_collision_begin
         self.handler.begin = self.collision_begin
+        self.spacecraft_handler.begin = self.collision_with_terrain
+
         self.handler.pre_solve = self.collision_pre
         self.handler.post_solve = self.post_solve_adjust_scores
         self.handler.separate = self.collision_separate
         self.wall_handler.pre_solve = self.collision_pre
         self.wall_handler.post_solve = self.post_solve_adjust_scores
         self.wall_handler.separate = self.collision_separate
+        self.spacecraft_handler.pre_solve = self.collision_pre
+        self.spacecraft_handler.post_solve = self.post_solve_adjust_scores
+        self.spacecraft_handler.separate = self.collision_separate
+
+    # The following 4 methods(callbacks) are required for the collision handler to work
+    # The only one we are using is the collision_begin
+    # It happens at the exact moment a missile and the spacecraft collide
+    def post_solve_adjust_scores(self, arbiter, space, data):
+        pass
+
+    def wall_collision_begin(self, arbiter, space, data):
+        self.space.remove(self.anti_spacecraft.missile_body)
+        self.space.remove(self.anti_spacecraft.missile_shape)
+        self.collision = True
+
+        return True
+
+    def collision_with_terrain(self, arbiter, space, data):
+        print("collision")
+        if self.spacecraft.terrain_collision:
+            self.spacecraft.receive_damage(25)
+            print("here")
+        self.spacecraft.terrain_collision = False
+        return True
 
     def collision_begin(self, arbiter, space, data):
         self.spacecraft.receive_damage(20)
