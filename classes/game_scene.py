@@ -256,10 +256,12 @@ class GameScene(SceneBase):
         # Anti-spacecraft Parts (represent the whole vehicle)
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
+        # self.space.add(self.anti_spacecraft.wheel3_b, self.anti_spacecraft.wheel3_s)
         self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
+                     # self.anti_spacecraft.pin9, self.anti_spacecraft.pin10)
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
         # Spacecraft object

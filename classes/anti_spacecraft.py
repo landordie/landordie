@@ -22,9 +22,11 @@ class AntiSpaceCraft:
 
         self.wheel2_b, self.wheel2_s = self.create_body(mass, (position[0] + ANTI_SPACECRAFT_CHASSIS[0]/1.5,
                                                                        position[1]), ANTI_SPACECRAFT_WHEEL_SIZE)
-        # TODO: The color of the wheels must be adjusted
-        # self.wheel1_s.color, self.wheel2_s.color = ((54, 53, 51), (54, 53, 51))
-        self.wheels.extend((self.wheel1_b, self.wheel2_b))
+
+       # self.wheel3_b, self.wheel3_s = self.create_body(mass, (position[0] - ANTI_SPACECRAFT_CHASSIS[0]/15,
+                                                                       #position[1]), ANTI_SPACECRAFT_WHEEL_SIZE)
+
+        self.wheels.extend((self.wheel1_b, self.wheel2_b))#, self.wheel3_b))
 
         # Anti-spacecraft chassis
         self.chassis_b, self.chassis_s = self.create_body(mass/5, position, ANTI_SPACECRAFT_CHASSIS)
@@ -49,6 +51,8 @@ class AntiSpaceCraft:
         self.pin6 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
         self.pin7 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
         self.pin8 = pymunk.PinJoint(self.cannon_b, self.chassis_b, (ANTI_SPACECRAFT_CANNON[0]/2, 0), (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        #self.pin9 = pymunk.PinJoint(self.wheel3_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
+        #self.pin10 = pymunk.PinJoint(self.wheel3_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1]))
         self.cannon_mt = pymunk.SimpleMotor(self.cannon_b, self.chassis_b, 0)
         self.cannon_mt.collide_bodies = False
 
