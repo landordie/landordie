@@ -7,7 +7,7 @@ class LandingPad(Sprite):
     def __init__(self, width, height):
         super().__init__('frames/landing_pad.png')
         self.rect.top = random.randint(height // 1.7, height // 1.5)
-        self.rect.left = random.randint(100, width)
+        self.rect.right = random.randint(155, width)
         self.mask = pygame.mask.from_surface(self.image)
 
     def check_for_landing_attempt(self, spacecraft):

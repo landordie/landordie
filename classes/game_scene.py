@@ -31,6 +31,9 @@ class GameScene(SceneBase):
         self.terrain = self.random_terrain()
         self.space.add(self.terrain)
         self.landing_pad = LandingPad(self.screen_width - 100, self.screen_height)
+        self.pymunk_landing_pad = pymunk.Segment(self.space.static_body, flipy((self.landing_pad.rect.left + 14,
+            self.landing_pad.rect.top + 16), self.screen_height), flipy((self.landing_pad.rect.right - 14,
+            self.landing_pad.rect.top + 16), self.screen_height), 5)
         self.ctrls = Controls.get_controls()
 
         self.star_field = StarField(self.screen_width, self.screen_height)
@@ -159,9 +162,6 @@ class GameScene(SceneBase):
         display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)
 
-        # Landing pad Sprite
-        display.blit(self.landing_pad.image, self.landing_pad.rect)
-
         if self.release_time > 0:
             self.release_time -= 1
             self.start_time = pygame.time.get_ticks()
@@ -196,6 +196,9 @@ class GameScene(SceneBase):
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
+        # Landing pad Sprite
+        display.blit(self.landing_pad.image, self.landing_pad.rect)
+
         ###########################
         # Anti-Spacecraft fuel bar
         ##########################
@@ -229,7 +232,7 @@ class GameScene(SceneBase):
         self.anti_spacecraft.apply_force()
 
         self.spacecraft.terrain_collision_cooldown += 1
-        if self.spacecraft.terrain_collision_cooldown > 150:
+        if self.spacecraft.terrain_collision_cooldown > 120:
             self.spacecraft.terrain_collision = True
             self.spacecraft.terrain_collision_cooldown = 0
 
@@ -262,6 +265,8 @@ class GameScene(SceneBase):
         # Spacecraft object
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
+        self.space.add(self.pymunk_landing_pad)
+
     def start_collision_handlers(self):
         self.wall_handler.begin = self.wall_collision_begin
         self.handler.begin = self.collision_begin
@@ -291,10 +296,8 @@ class GameScene(SceneBase):
         return True
 
     def collision_with_terrain(self, arbiter, space, data):
-        print("collision")
         if self.spacecraft.terrain_collision:
             self.spacecraft.receive_damage(25)
-            print("here")
         self.spacecraft.terrain_collision = False
         return True
 
