@@ -233,7 +233,7 @@ class GameScene(SceneBase):
             self.spacecraft.terrain_collision = True
             self.spacecraft.terrain_collision_cooldown = 0
 
-        if self.spacecraft.health == 0:
+        if self.spacecraft.health <= 0:
             paused = self.pause_game('no HP', display)
             if paused:
                 self.Terminate()
