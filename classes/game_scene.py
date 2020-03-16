@@ -182,11 +182,6 @@ class GameScene(SceneBase):
                 h = power / 4
                 pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
 
-        # Display pymunk bodies
-        self.space.step(1. / FPS)
-        draw_options = pymunk.pygame_util.DrawOptions(display)
-        self.space.debug_draw(draw_options)
-
         """
         Missile sprite blit
         """
@@ -194,6 +189,11 @@ class GameScene(SceneBase):
             m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body, self.screen_height)
             if not self.collision:
                 display.blit(missile_img, m)
+
+        # Display pymunk bodies
+        self.space.step(1. / FPS)
+        draw_options = pymunk.pygame_util.DrawOptions(display)
+        self.space.debug_draw(draw_options)
 
         ###########################
         # Anti-Spacecraft fuel bar
@@ -220,21 +220,14 @@ class GameScene(SceneBase):
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
 
-
-        # # print(math.degrees(self.spacecraft.body.angle))
-        # if self.spacecraft.engines_activated:
-        #     p, thrust_sprite = self.spacecraft.thrust.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
-        #     self.spacecraft.thrust.rect = thrust_sprite.get_rect(left=p[0] + math.degrees(self.spacecraft.body.angle) * 0.33, top=p[1] + math.degrees(self.spacecraft.body.angle) * 0.66)
-        #     display.blit(thrust_sprite, self.spacecraft.thrust.rect)
-
-        p, rotated_cannon_img = self.anti_spacecraft.cannon_sprite.get_attachment_coordinates(self.anti_spacecraft.cannon_b, self.screen_height)
-        angle = abs(math.degrees(self.anti_spacecraft.cannon_b.angle))
-        if 0 < angle < 144:
-            p[0] += 5
-        elif 144 < angle < 184:
-            p[0] += 7
-        self.anti_spacecraft.cannon_sprite.rect = rotated_cannon_img.get_rect(left=p[0], top=p[1])
-        display.blit(rotated_cannon_img, self.anti_spacecraft.cannon_sprite.rect)
+        # p, rotated_cannon_img = self.anti_spacecraft.cannon_sprite.get_attachment_coordinates(self.anti_spacecraft.cannon_b, self.screen_height)
+        # angle = abs(math.degrees(self.anti_spacecraft.cannon_b.angle))
+        # if 0 < angle < 144:
+        #     p[0] += 5
+        # elif 144 < angle < 184:
+        #     p[0] += 7
+        # self.anti_spacecraft.cannon_sprite.rect = rotated_cannon_img.get_rect(left=p[0], top=p[1])
+        # display.blit(rotated_cannon_img, self.anti_spacecraft.cannon_sprite.rect)
 
         p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
         self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1]-15)
