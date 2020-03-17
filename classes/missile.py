@@ -10,7 +10,6 @@ from constants import MISSILE_DRAG_CONSTANT
 from .sprite_class import Sprite
 
 
-# TODO implement this if necessary
 class Missile(Sprite):
 
     def __init__(self):
