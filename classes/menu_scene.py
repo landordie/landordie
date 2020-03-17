@@ -35,6 +35,8 @@ class MenuScene(SceneBase):
                                      BUTTON_HEIGHT), RED, 'Quit')
 
         self.background = None
+        self.
+        self.logos = [pygame.image.load(x) for x in ]
         self.x = 0
 
     def ProcessInput(self, events, pressed_keys):
