@@ -20,6 +20,7 @@ class GameScene(SceneBase):
     border_sf = pymunk.ShapeFilter(group=2)
 
     def __init__(self):
+        # TODO: !!! EXPLAIN ALL THE TODO's in this file in the report !!!
         """This constructor method initializes the Game Scene class. It is responsible for controlling the gameplay.
         Here all the game objects are initialized and used in one combined environment:
             * the first part is the pygame environment where all the sprites(images) are managed. This environment
@@ -88,8 +89,10 @@ class GameScene(SceneBase):
         self.check = True
         self.collision = False
 
-    """ The next sequence of 5 methods are inherited from Scene Base and have their own implementation in each scene.
-        Therefore, the purpose of each of them is explained in the SceneBase class. """
+    # TODO: !!! THIS IS IMPORTANT, TOO !!!
+    """ The next sequence of 5 methods (ProcessInput(), Update(), Render(), SwitchToScene(), Terminate()) are inherited 
+        from Scene Base and have their own implementation in each scene. Therefore, the purpose of each of them is 
+        explained in the SceneBase class. """
 
     def ProcessInput(self, events, pressed_keys):
 
@@ -180,11 +183,13 @@ class GameScene(SceneBase):
 
                     # Add the missile body to the flying missiles
                     self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
+            # ------------------------------------------End of block ---------------------------------------------------
 
             # Apply gravitational effects to all the current flying missiles
             for missile in self.anti_spacecraft.flying_missiles:
-                drag_constant = 0.0002
+                drag_constant = 0.0002  # Use air friction (drag)
 
+                # Simulate a falling effect, slowly turning the angle of the rocket down
                 pointing_direction = Vec2d(1, 0).rotated(missile.angle)
                 flight_direction = Vec2d(missile.velocity)
                 flight_speed = flight_direction.normalize_return_length()
@@ -199,36 +204,47 @@ class GameScene(SceneBase):
         pass
 
     def Render(self, screen):
-        display = screen.get_surface()
-        screen.set_mode((self.screen_width, self.screen_height))
-        display.blit(self.background, (0, 0))
-        self.star_field.draw_stars(display)
+        # A screen (Pygame surface object or the environment) is passed to the method from its predecessor scene)
+        display = screen.get_surface()  # Convert the screen into display
+        screen.set_mode((self.screen_width, self.screen_height))  # Set the resolution of the screen
+        display.blit(self.background, (0, 0))  # Position the background on the display (0, 0) is the position from
+        # which the image has to start. It is positioned based on top-left corner of the image and 0,0 is top-left
+        # corner of Pygame coordinate system
+        self.star_field.draw_stars(display)  # Complement the background with some falling star effects
 
+        # -------------------------------------------Start of block-----------------------------------------------------
+        # This block renders the missiles on the screen. While there is a cooldown active (the if statement),
+        # a blue line is drawn on the screen which shows the remaining cooldown time
         if self.release_time > 0:
             self.release_time -= 1
             self.start_time = pygame.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
 
             pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
+        # When the cooldown is not active and a shooting key is pressed, the missile is being positioned relative to
+        # the position of the cannon and a red line is drawn on the screen that indicates the strength of the impulse
         else:
             if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]] and self.anti_spacecraft.missile_body:
-                # Position the missile
+                # Position the missile relative to the current cannon position
                 self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
                     self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
 
-                # Pymunk missile
+                # Adjust the Pymunk missile's rotation angle to be exactly the same the cannons
                 self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
 
+                # Display the red line on the screen, which increases with the time the shooting key is pressed
                 current_time = pygame.time.get_ticks()
                 diff = current_time - self.start_time
                 power = max(min(diff, 750), 0)
                 h = power / 4
                 pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
 
-        """
-        Missile sprite blit
-        """
+        # This piece of code is displaying the pygame sprite (the image) for the missile
         if self.anti_spacecraft.missile_shape:
+            # TODO: Make sure to explain this in report
+            # The method get_attachment_coordinates() determines the exact position the pygame object must be placed at
+            # It converts pymunk coordinates into pygame ones and also ensures that the image of the missile is rotated
+            # in the same angle as its pymunk body. The angles in pymunk are in radians in pygame in degrees.
             m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body,
                                                                      self.screen_height)
             if not self.collision:
