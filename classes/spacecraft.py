@@ -50,9 +50,14 @@ class Spacecraft(Sprite):
         else:
             health_color = RED
 
+        # White bar underneath to make the health drop visible
+        pg.draw.line(display, WHITE, flipy((self.body.position - (80, 45)), height),
+                     flipy((self.body.position[0] + 75,
+                            self.body.position[1] - 45), height), 10)
+        # Actual health bar
         pg.draw.line(display, health_color, flipy((self.body.position - (80, 45)), height),
-                         flipy((self.body.position[0] + 75 - self.damage,
-                                self.body.position[1] - 45), height), 10)  # Health bar
+                     flipy((self.body.position[0] + 75 - self.damage,
+                            self.body.position[1] - 45), height), 10)
 
     # Apply thrust force to the spacecraft (make it fly)
     def apply_thrust(self):

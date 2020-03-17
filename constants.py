@@ -53,6 +53,7 @@ DEFAULT_MASS = 1
 DEFAULT_FRICTION = .5
 DEFAULT_CONTROLS = ['A', 'W', 'D', 'Left', 'Up', 'Right', 'Down', 'Space']
 
+MISSILE_DRAG_CONSTANT = 0.0002
 CONTROL_DICT = {
         'Q': pg.K_q,
         'W': pg.K_w,

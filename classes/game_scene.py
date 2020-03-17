@@ -51,7 +51,6 @@ class GameScene(SceneBase):
         self.ctrls = Controls.get_controls()
 
         self.star_field = StarField(self.screen_width, self.screen_height)
-        self.missile = Missile()  # Missile object
         self.background = pg.image.load("frames/splash_BG.jpg")
         self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
 
@@ -80,7 +79,6 @@ class GameScene(SceneBase):
         self.end_time = 0
         self.start_time = 0
         self.check = True
-        self.collision = False
 
     def ProcessInput(self, events, pressed_keys):
 
@@ -119,50 +117,30 @@ class GameScene(SceneBase):
             if self.release_time <= 0:
                 if pygame.key.get_pressed()[pygame.K_SPACE] and self.check:
                     # Create new missile and add it to the space
-                    self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
-                        self.anti_spacecraft.create_missile((-1000, -1232))
-                    self.space.add(self.anti_spacecraft.missile_shape)
+                    self.anti_spacecraft.missile.create((-1000, -1232))
+                    self.space.add(self.anti_spacecraft.missile.shape)
 
                     self.start_time = pygame.time.get_ticks()
-                    self.collision = False
+                    self.anti_spacecraft.missile.launched = False
+                    self.anti_spacecraft.missile.collided = False
                     self.check = False
 
                 if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                     self.end_time = pygame.time.get_ticks()
-                    self.anti_spacecraft.cannon_mt.rate = 0
-
                     diff = self.end_time - self.start_time
-                    power = max(min(diff, 1000), 10)
-                    impulse = power * Vec2d(1, 0)
-                    impulse.rotate(self.anti_spacecraft.missile_body.angle)
+
+                    self.anti_spacecraft.missile.launch(diff)
+
+                    # Add the missile body to the space
+                    self.space.add(self.anti_spacecraft.missile.body)
 
                     # Reset cool down
                     self.release_time = 120
                     self.check = True
 
-                    # Apply force to the missile (launch the missile)
-                    self.anti_spacecraft.missile_body.apply_impulse_at_world_point \
-                        (impulse, self.anti_spacecraft.missile_body.position)
-
-                    # Add the missile body to the space
-                    self.space.add(self.anti_spacecraft.missile_body)
-
-                    # Add the missile body to the flying missiles
-                    self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
-
-            # Apply gravitational effects to all the current flying missiles
-            for missile in self.anti_spacecraft.flying_missiles:
-                drag_constant = 0.0002
-
-                pointing_direction = Vec2d(1, 0).rotated(missile.angle)
-                flight_direction = Vec2d(missile.velocity)
-                flight_speed = flight_direction.normalize_return_length()
-                dot = flight_direction.dot(pointing_direction)
-
-                drag_force_magnitude = (1 - abs(dot)) * flight_speed ** 2 * drag_constant * missile.mass
-                missile.apply_impulse_at_world_point(drag_force_magnitude * -flight_direction, missile.position)
-
-                missile.angular_velocity *= 0.5
+            # Apply gravitational effects to the flying missile
+            if self.anti_spacecraft.missile.body:
+                self.anti_spacecraft.missile.apply_gravity()
 
     def Update(self):
         pass
@@ -173,6 +151,11 @@ class GameScene(SceneBase):
         display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)
 
+        # Display pymunk bodies
+        self.space.step(1. / FPS)
+        draw_options = pymunk.pygame_util.DrawOptions(display)
+        self.space.debug_draw(draw_options)
+
         if self.release_time > 0:
             self.release_time -= 1
             self.start_time = pygame.time.get_ticks()
@@ -180,13 +163,10 @@ class GameScene(SceneBase):
 
             pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
         else:
-            if pygame.key.get_pressed()[pygame.K_SPACE] and self.anti_spacecraft.missile_body:
-                # Position the missile
-                self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
-                    self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
+            if pygame.key.get_pressed()[pygame.K_SPACE] and self.anti_spacecraft.missile.body:
 
-                # Pymunk missile
-                self.anti_spacecraft.missile_body.angle = self.anti_spacecraft.cannon_b.angle + math.pi
+                self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
+                                                                self.anti_spacecraft.cannon_s)
 
                 current_time = pygame.time.get_ticks()
                 diff = current_time - self.start_time
@@ -197,16 +177,12 @@ class GameScene(SceneBase):
         """
         Missile sprite blit
         """
-        if self.anti_spacecraft.missile_shape:
-            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body,
+        if self.anti_spacecraft.missile.shape:
+            m, missile_img = self.anti_spacecraft.missile.get_attachment_coordinates(self.anti_spacecraft.missile.body,
                                                                      self.screen_height)
-            if not self.collision:
-                display.blit(missile_img, m)
-
-        # Display pymunk bodies
-        self.space.step(1. / FPS)
-        draw_options = pymunk.pygame_util.DrawOptions(display)
-        self.space.debug_draw(draw_options)
+            self.anti_spacecraft.missile.rect = missile_img.get_rect(left=m[0], top=m[1])
+            if self.anti_spacecraft.missile.ready_to_blit():
+                display.blit(missile_img, self.anti_spacecraft.missile.rect)
 
         # Landing pad Sprite
         display.blit(self.landing_pad.image, self.landing_pad.rect)
@@ -214,24 +190,11 @@ class GameScene(SceneBase):
         ###########################
         # Anti-Spacecraft fuel bar
         ##########################
-        fuel = max(self.anti_spacecraft.fuel, 0)
-        pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
-                         flipy((self.anti_spacecraft.chassis_b.position[0] + 87,
-                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height),
-                         10)  # Red bar underneath
-        pygame.draw.line(display, GREEN,
-                         flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
-                         flipy((self.anti_spacecraft.chassis_b.position[0] - 79 + fuel / 3,
-                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height),
-                         10)  # FUEL (green bar)
+        self.anti_spacecraft.fuel_bar(display, self.screen_height)
 
         ###########################
         # Spacecraft health bar
         ##########################
-        pygame.draw.line(display, WHITE, flipy((self.spacecraft.body.position - (80, 45)), self.screen_height),
-                         flipy((self.spacecraft.body.position[0] + 75,
-                                self.spacecraft.body.position[1] - 45), self.screen_height), 10)  # Red bar underneath
-        # Changes colors
         self.spacecraft.health_bar(display, self.screen_height)
 
         # Attach the spacecraft sprite to the pymunk shape
@@ -313,10 +276,9 @@ class GameScene(SceneBase):
     """
 
     def missile_terrain_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time > 0:
-            self.space.remove(self.anti_spacecraft.missile_body)
-            self.space.remove(self.anti_spacecraft.missile_shape)
-            self.collision = True
+        self.space.remove(self.anti_spacecraft.missile.body)
+        self.space.remove(self.anti_spacecraft.missile.shape)
+        self.anti_spacecraft.missile.collided = True
 
         return True
 
@@ -327,13 +289,12 @@ class GameScene(SceneBase):
         return True
 
     def missile_spacecraft_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[pygame.K_SPACE]:
-            self.spacecraft.receive_damage(20)
-            self.player2_pts += 10
-            self.collision = True
+        self.spacecraft.receive_damage(20)
+        self.player2_pts += 10
+        self.anti_spacecraft.missile.collided = True
 
-            self.space.remove(self.anti_spacecraft.missile_body)
-            self.space.remove(self.anti_spacecraft.missile_shape)
+        self.space.remove(self.anti_spacecraft.missile.body)
+        self.space.remove(self.anti_spacecraft.missile.shape)
 
         return True
 
