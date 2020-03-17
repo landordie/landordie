@@ -287,9 +287,13 @@ class GameScene(SceneBase):
         self.spacecraft_and_terrain_handler.post_solve = self.collision_post_solve
         self.spacecraft_and_terrain_handler.separate = self.collision_separate
 
-    # The followinwg 4 methods(callbacks) are required for the collision handler to work
-    # The only one we are using is the collision_begin
-    # It happens at the exact moment a missile and the spacecraft collide
+    # The following 4 methods(callbacks) are required for each collision handler to work
+    # The only one we are using is the one checking for the beginning of the collision
+    # That is why we have implemented 3 collision handler begin methods. To check between:
+    #   1 - Missile and Terrain
+    #   2 - Spacecraft and Missile
+    #   3 - Spacecraft and Terrain
+    # Each 'contact handler' (collision_begin method) is responsible for
 
     def missile_terrain_collision_begin(self, arbiter, space, data):
         if not pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time > 0:
@@ -301,7 +305,7 @@ class GameScene(SceneBase):
 
     def spacecraft_terrain_collision_begin(self, arbiter, space, data):
         if self.spacecraft.terrain_collision:
-            self.spacecraft.receive_damage(25)
+            self.spacecraft.receive_damage(20)
         self.spacecraft.terrain_collision = False
         return True
 
