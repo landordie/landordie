@@ -118,28 +118,28 @@ class OptionsScene(SceneBase):
         self.draw_text(screen, "Controls", (self.button_cont_x + self.button_cont_w // 2, self.button_cont_y // 1.1),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Spacecraft", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 1.2),
-                       self.font_medium, LIGHT_GREY)
+                       self.font_medium, WHITE)
         self.draw_text(screen, "Anti-Spacecraft",
                        (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 2.6),
-                       self.font_medium, LIGHT_GREY)
+                       self.font_medium, WHITE)
 
         self.draw_text(screen, "Thrust", (self.input_box1.rect.x * 0.8, self.input_box2.rect.y * 1.08),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Rotate Left", (self.input_box1.rect.x * 0.8, self.input_box1.rect.y * 1.08),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Rotate Right", (self.input_box1.rect.x * 0.8, self.input_box3.rect.y * 1.08),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
 
         self.draw_text(screen, "Move Left", (self.input_box4.rect.x * 0.85, self.input_box4.rect.y * 1.04),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Cannon Right", (self.input_box5.rect.x * 0.85, self.input_box5.rect.y * 1.04),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Move Right", (self.input_box6.rect.x * 0.85, self.input_box6.rect.y * 1.04),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Cannon Left", (self.input_box7.rect.x * 0.85, self.input_box7.rect.y * 1.04),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
         self.draw_text(screen, "Shoot", (self.input_box8.rect.x * 0.85, self.input_box8.rect.y * 1.04),
-                       self.font_medium, WHITE)
+                       self.font_medium, LIGHT_GREY)
 
         self.menu_button.update(screen.get_surface())
         self._res2.update(screen.get_surface())

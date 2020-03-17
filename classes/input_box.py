@@ -70,7 +70,7 @@ class InputBox:
                 # Re-render the text.
                 self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(self.text, True, WHITE)
         # Change the current color of the input box.
-        self.color = GREEN if self.active else RED
+        self.color = CYAN if self.active else BRIGHT_PURPLE
 
     def update(self):
         # Resize the box if the text is too long.
