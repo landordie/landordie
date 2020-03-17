@@ -247,20 +247,21 @@ class GameScene(SceneBase):
             # in the same angle as its pymunk body. The angles in pymunk are in radians in pygame in degrees.
             m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body,
                                                                      self.screen_height)
+            # If there isn't a collision display the image on screen
             if not self.collision:
                 display.blit(missile_img, m)
+        # --------------------------------------------End of block -----------------------------------------------------
 
-        # Display pymunk bodies
+        # These three statements are responsible for updating the pymunk space on each frame
+        # They also stabilise the connection b/w pygame and pymunk objects on the screen
         self.space.step(1. / FPS)
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
-        # Landing pad Sprite
+        # Show the Landing pad Sprite on screen
         display.blit(self.landing_pad.image, self.landing_pad.rect)
 
-        ###########################
-        # Anti-Spacecraft fuel bar
-        ##########################
+        # Display the Anti-Spacecraft fuel bar - the part that has been consumed turns red; initially it is green.
         fuel = max(self.anti_spacecraft.fuel, 0)
         pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
                          flipy((self.anti_spacecraft.chassis_b.position[0] + 87,
@@ -272,13 +273,11 @@ class GameScene(SceneBase):
                                 self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height),
                          10)  # FUEL (green bar)
 
-        ###########################
-        # Spacecraft health bar
-        ##########################
+        # Spacecraft health bar - it is green, and as the health of the craft drops its colour changes to yellow and red
         pygame.draw.line(display, WHITE, flipy((self.spacecraft.body.position - (80, 45)), self.screen_height),
                          flipy((self.spacecraft.body.position[0] + 75,
                                 self.spacecraft.body.position[1] - 45), self.screen_height), 10)  # Red bar underneath
-        # Changes colors
+        # Changes the colors of the health bar
         self.spacecraft.health_bar(display, self.screen_height)
 
         # Attach the spacecraft sprite to the pymunk shape
@@ -286,6 +285,7 @@ class GameScene(SceneBase):
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
 
+        # Attach the sprite of the anti-spacecraft to its pymunk body object
         p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(
             self.anti_spacecraft.chassis_b, self.screen_height)
         self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1] - 15)
@@ -294,6 +294,8 @@ class GameScene(SceneBase):
         # Move the Anti-Spacecraft if buttons pressed
         self.anti_spacecraft.apply_force()
 
+        # Introduce a cooldown function for the collision between the terrain and the spacecraft
+        # Every 2 seconds a collision
         self.spacecraft.terrain_collision_cooldown += 1
         if self.spacecraft.terrain_collision_cooldown > 120:
             self.spacecraft.terrain_collision = True
