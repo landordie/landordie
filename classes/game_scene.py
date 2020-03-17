@@ -13,8 +13,6 @@ from pygame.time import Clock as GameClock
 from .star_field import StarField
 
 
-# (!) Note (!) : Every time we use self.screen_height and G_SCREEN_WIDTH we have to type "constants." before so it works
-
 class GameScene(SceneBase):
     # Creates pymunk shape filter object which enables objects to pass through each other, do not collide
     border_sf = pymunk.ShapeFilter(group=2)
@@ -295,12 +293,15 @@ class GameScene(SceneBase):
         self.anti_spacecraft.apply_force()
 
         # Introduce a cooldown function for the collision between the terrain and the spacecraft
-        # Every 2 seconds a collision
+        # Before a collision occurs this doesn't do anything
+        # After a collision with the terrain, a new one can occur after minimum 2 seconds (120 Frames)
+        # This ensures that the spacecraft doesn't take additional damage while standing on the ground for some time
         self.spacecraft.terrain_collision_cooldown += 1
         if self.spacecraft.terrain_collision_cooldown > 120:
             self.spacecraft.terrain_collision = True
             self.spacecraft.terrain_collision_cooldown = 0
 
+        # If the spacecraft has no health left, pause the game and display a notification
         if self.spacecraft.health <= 0:
             paused = self.pause_game('no HP', display)
             if paused:
@@ -308,6 +309,8 @@ class GameScene(SceneBase):
             else:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
+        # If a landing attempt is performed and the conditions passes (e.g velocity is not too high, the position is
+        # correct, the angle of rotation is not too big, etc.) increment the score of the craft player and stop game
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
@@ -316,8 +319,12 @@ class GameScene(SceneBase):
                 else:
                     self.player1_pts += 50
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+# ======================================================================================================================
 
-    def add_objects_to_space(self):
+    """ All these methods below are helpers which are used for simplifying the above code."""
+    def add_objects_to_space(self):  # This adds all the components of the anti-spacecraft (cannon, wheels, chassis,
+        # pin-joints), the spacecraft body and shape and the landing pad body to the Pymunk space
+
         # Anti-spacecraft Parts (represent the whole vehicle)
         self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
         self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
@@ -336,6 +343,8 @@ class GameScene(SceneBase):
         self.space.add(self.pymunk_landing_pad)
 
     def start_collision_handlers(self):
+        # This method initializes all the collision handlers between different Pymunk objects
+        # An explanation is given below this method
         self.missile_and_terrain.begin = self.missile_terrain_collision_begin
         self.missile_and_spacecraft_handler.begin = self.missile_spacecraft_collision_begin
         self.spacecraft_and_terrain_handler.begin = self.spacecraft_terrain_collision_begin
@@ -362,6 +371,8 @@ class GameScene(SceneBase):
     The rest are not doing anything so we can use the same ones for all handlers
     """
 
+    # When a missile collides with the terrain it disappears except in the cases where the missile is still in the
+    # cannon of the anti-spacecraft (not active missile)
     def missile_terrain_collision_begin(self, arbiter, space, data):
         if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]] and self.release_time > 0:
             self.space.remove(self.anti_spacecraft.missile_body)
@@ -370,12 +381,16 @@ class GameScene(SceneBase):
 
         return True
 
+    # When a collision b/w terrain and spacecraft occurs and there is no cooldown for the collision detector,
+    # spacecraft takes 20 damage
     def spacecraft_terrain_collision_begin(self, arbiter, space, data):
         if self.spacecraft.terrain_collision:
             self.spacecraft.receive_damage(20)
-        self.spacecraft.terrain_collision = False
+        self.spacecraft.terrain_collision = False  # The control variable is reset
         return True
 
+    # When a missile collides with the spacecraft it disappears, deals damage to the craft and increments player 1's
+    # score, except in the cases where the missile is still in the cannon of the anti-spacecraft (not active missile)
     def missile_spacecraft_collision_begin(self, arbiter, space, data):
         if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]]:
             self.spacecraft.receive_damage(20)
@@ -397,7 +412,8 @@ class GameScene(SceneBase):
         pass
 
     def pause_game(self, msg_type, screen):
-        """ The method pauses the game after the player crashes and displays a message, till a key is pressed """
+        """ The method pauses the game after the player crashes, lands correctly or has no HP left and displays a
+        message, till the Return key is pressed """
         msg = ''
 
         if msg_type == 'landed':
@@ -407,16 +423,20 @@ class GameScene(SceneBase):
         elif msg_type == 'no HP':
             msg = self.font_warning.render("The spacecraft has been destroyed (0 HP left)", False, (255, 0, 6))
 
+        # TODO: !!!EXPLAIN THE SCREEN HEIGHT AND WIDTH GLOBALITY (they are general for all and controlled by one)
+        # Here the message position is adjusted, relative to the screen height and width
         msg_rect = msg.get_rect()
         msg_rect.center = ((self.screen_width / 2), (self.screen_height / 2.3))
         instructions = self.font_warning.render("Game ended. Press ENTER to see results.", False, CYAN)
         instructions_rect = instructions.get_rect()
         instructions_rect.center = ((self.screen_width / 2), (self.screen_height / 2))
 
+        # Display the message
         screen.blit(msg, msg_rect)
         screen.blit(instructions, instructions_rect)
 
         while True:
+            # Enter an infinite loop which can be interrupted by quitting or pressing Return key on keyboard
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     # Checks if the user wants to quit tha game by clicking on the "X" button
@@ -430,8 +450,7 @@ class GameScene(SceneBase):
 
     def random_terrain(self):
         """
-        Create a random terrain from pymunk Segments
-        :return: random terrain
+        Create a random terrain from a sequence of linked pymunk segment objects.
         """
         # Tuples of points where new segment will be added to form the terrain
         terrain = []
@@ -450,7 +469,7 @@ class GameScene(SceneBase):
         self.space.add(terrain)
 
     def borders(self):
-        # Screen borders
+        # This method creates the borders of the screen.
         border_left = pymunk.Segment(self.space.static_body, (0, 0), (0, self.screen_height), 10)
         border_right = pymunk.Segment(self.space.static_body, (self.screen_width, 0), (self.screen_width,
                                                                                        self.screen_height), 10)
@@ -460,13 +479,20 @@ class GameScene(SceneBase):
         border_bottom.friction = TERRAIN_FRICTION
         border_bottom.color = DARK_GREY
 
+        # Add all borders to the same group, to enable overlapping in the corners
         border_top.filter = GameScene.border_sf
         border_bottom.filter = GameScene.border_sf
         border_right.filter = GameScene.border_sf
         border_left.filter = GameScene.border_sf
 
+        # Set the collision types so that the collision handlers check for them
         border_top.collision_type = 4
         border_left.collision_type = 4
         border_right.collision_type = 4
         border_bottom.collision_type = 4
+
+        # Add all to the space
         self.space.add(border_left, border_right, border_top, border_bottom)
+
+
+"""End of file"""
