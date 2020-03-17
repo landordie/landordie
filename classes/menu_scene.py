@@ -35,8 +35,9 @@ class MenuScene(SceneBase):
                                      BUTTON_HEIGHT), RED, 'Quit')
 
         self.background = None
-        self.
-        self.logos = [pygame.image.load(x) for x in ]
+        self.logos = [pygame.image.load("frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]
+        self.logo_counter = 1
+        self.current_logo = self.logos[0]
         self.x = 0
 
     def ProcessInput(self, events, pressed_keys):
@@ -71,10 +72,21 @@ class MenuScene(SceneBase):
             screen.get_surface().blit(self.background, (rel_x, 0))
         self.x -= 1
 
+        self.control_logo()
+        screen.get_surface().blit(self.current_logo, ((self.screen_width / 2 - self.current_logo.get_size()[0] / 2),
+                                                      (self.screen_height/4 - self.current_logo.get_size()[1] / 2)))
         # Update buttons
         self.menu_button.update(screen.get_surface())
         self.menu_button_2.update(screen.get_surface())
         self.menu_button_3.update(screen.get_surface())
+
+    def control_logo(self):
+        self.logo_counter += 1
+        if self.logo_counter == 10000:
+            self.logo_counter = 0
+
+        if self.logo_counter % 5 == 0:
+            self.current_logo = self.logos[(self.logos.index(self.current_logo)+1) % 22]
 
     def update_all(self):
         self.menu_button.rect.x,  self.menu_button.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2
