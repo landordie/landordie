@@ -93,7 +93,7 @@ class GameScene(SceneBase):
 
     def ProcessInput(self, events, pressed_keys):
 
-        # --------------------------------------------------------------------------------------------------------------
+        # -------------------------------------------Start of block-----------------------------------------------------
         # This block responds to the user input for controlling the vehicles. A dictionary (CONTROL_DICT) located in
         # constants.py is used to provide changeability of the default controls. It  maps all the available pygame.KEY
         # objects to Strings (the key names), so when user changes a control in the OptionsScene the game updates
@@ -125,40 +125,53 @@ class GameScene(SceneBase):
                 self.spacecraft.body.angle -= math.radians(2)
             if keys[CONTROL_DICT[self.ctrls[1]]]:
                 self.spacecraft.apply_thrust()
-        # End of block -------------------------------------------------------------------------------------------------
-        
+        # ---------------------------------------------End of block ----------------------------------------------------
+
+        # The following for-loop checks each event that has been passed to the ProcessInput method
         for event in events:
+            # TODO: Remove if in final code
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
+            # This stop displaying the thrust once the key responsible for activating spacecraft engines is released
             if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[1]]:
                 self.spacecraft.image = self.spacecraft.normal
 
+            # -----------------------------------------Start of block---------------------------------------------------
+            # The following block is responsible for shooting missiles from the anti-spacecraft vehicle
+            # If the cooldown is 0 (Player 1 hasn't shot in the last 2 seconds)
+                # Check if the shooting button is pressed and initialize the mechanism
             if self.release_time <= 0:
-                if pygame.key.get_pressed()[pygame.K_SPACE] and self.check:
-                    # Create new missile and add it to the space
+                if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]] and self.check:
+                    # Create new Pymunk missile and add its shape to the space, body will be added later
                     self.anti_spacecraft.missile_body, self.anti_spacecraft.missile_shape = \
-                        self.anti_spacecraft.create_missile((-1000, -1232))
+                        self.anti_spacecraft.create_missile((-1000, -1232))  # It has to be created away from the space
+                    # so that it doesn't collide with anything. It will be positioned in the Render method
                     self.space.add(self.anti_spacecraft.missile_shape)
 
+                    # This variable records when the shooting button is pressed
+                    # (it will be used to calculate the strength of the impulse that shoots the bullet)
                     self.start_time = pygame.time.get_ticks()
                     self.collision = False
                     self.check = False
 
-                if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
-                    self.end_time = pygame.time.get_ticks()
-                    self.anti_spacecraft.cannon_mt.rate = 0
+                # If the shooting key is released calculate the impulse, stop the cannon from moving (stabilize it) and
+                # add the pymunk body of the missile to the space
+                if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[1]]:
+                    self.end_time = pygame.time.get_ticks()  # Get the key release time
+                    self.anti_spacecraft.cannon_mt.rate = 0  # Stop the cannon from moving
 
+                    # Use teh difference b/w key press and release to calculate impulse strength
                     diff = self.end_time - self.start_time
                     power = max(min(diff, 1000), 10)
                     impulse = power * Vec2d(1, 0)
                     impulse.rotate(self.anti_spacecraft.missile_body.angle)
 
-                    # Reset cool down
+                    # Reset cooldown
                     self.release_time = 120
                     self.check = True
 
-                    # Apply force to the missile (launch the missile)
+                    # Apply force to the missile (use the impulse to launch the missile)
                     self.anti_spacecraft.missile_body.apply_impulse_at_world_point \
                         (impulse, self.anti_spacecraft.missile_body.position)
 
@@ -198,7 +211,7 @@ class GameScene(SceneBase):
 
             pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
         else:
-            if pygame.key.get_pressed()[pygame.K_SPACE] and self.anti_spacecraft.missile_body:
+            if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]] and self.anti_spacecraft.missile_body:
                 # Position the missile
                 self.anti_spacecraft.missile_body.position = self.anti_spacecraft.cannon_b.position + Vec2d(
                     self.anti_spacecraft.cannon_s.radius - 37, 0).rotated(self.anti_spacecraft.cannon_b.angle)
@@ -332,7 +345,7 @@ class GameScene(SceneBase):
     """
 
     def missile_terrain_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time > 0:
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]] and self.release_time > 0:
             self.space.remove(self.anti_spacecraft.missile_body)
             self.space.remove(self.anti_spacecraft.missile_shape)
             self.collision = True
@@ -346,7 +359,7 @@ class GameScene(SceneBase):
         return True
 
     def missile_spacecraft_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[pygame.K_SPACE]:
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[1]]]:
             self.spacecraft.receive_damage(20)
             self.player2_pts += 10
             self.collision = True
