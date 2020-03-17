@@ -20,7 +20,7 @@ class GameScene(SceneBase):
     border_sf = pymunk.ShapeFilter(group=2)
 
     def __init__(self):
-        """This method initializes the Game Scene class. It is responsible for controlling the gameplay.
+        """This constructor method initializes the Game Scene class. It is responsible for controlling the gameplay.
         Here all the game objects are initialized and used in one combined environment:
             * the first part is the pygame environment where all the sprites(images) are managed. This environment
               also displays the text and is responsible for opening and closing new windows, checking button clicks
@@ -33,48 +33,54 @@ class GameScene(SceneBase):
         That way we can use the physics engine behind pymunk (chipmunk) together with the images, surfaces and user-
         input-handlers provided by pygame.
         """
-        SceneBase.__init__(self)
+        SceneBase.__init__(self)  # This statement ensures that this class inherits its behaviour from its Superclass
+        # Abstract methods of all scenes (ProcessInput, Render, Update, etc.), screen resolutions, text fonts,
+        # general text drawing methods and so on.
 
-        # Initialize the environment and all the objects except the players:
+        # Initialize the environment and all the objects except the players objects: -----------------------------------
         #        terrain, borders, landing pad, stars, background, etc.
         self.space = pymunk.Space()  # Pymunk Space - the active game environment
-        self.space.gravity = EARTH_GRAVITY
-        self.borders()
-        self.terrain = self.random_terrain()
-        self.space.add(self.terrain)
-        self.landing_pad = LandingPad(self.screen_width - 100, self.screen_height)
+        self.space.gravity = EARTH_GRAVITY  # Adjust the environment characteristics
+        self.borders()  # This creates the solid borders encapsulating the space
+        self.random_terrain()  # Generates the random terrain of the space
+
+        # Initialize the Landing pad object (creates both pymunk body,shape and pygame sprite surface)
+        self.landing_pad = LandingPad(self.screen_width - 100, self.screen_height)  # Pygame representation
+        # Pymunk representation - A pymunk segment object that is created based on the position of the pygame sprite
         self.pymunk_landing_pad = pymunk.Segment(self.space.static_body, flipy((self.landing_pad.rect.left + 14,
-                                                                                self.landing_pad.rect.top + 16),
-                                                                               self.screen_height),
-                                                 flipy((self.landing_pad.rect.right - 14,
-                                                        self.landing_pad.rect.top + 16), self.screen_height), 5)
-        self.ctrls = Controls.get_controls()
+            self.landing_pad.rect.top + 16), self.screen_height), flipy((self.landing_pad.rect.right - 14,
+            self.landing_pad.rect.top + 16), self.screen_height), 5)
 
-        self.star_field = StarField(self.screen_width, self.screen_height)
-        self.missile = Missile()  # Missile object
-        self.background = pg.image.load("frames/splash_BG.jpg")
-        self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames
+        # This variable fetches the game controls from the options menu (updated every game)
+        self.ctrls = Controls.get_controls()  # Controls is a static class which handles the game controls
 
-        # Anti-spacecraft
+        self.star_field = StarField(self.screen_width, self.screen_height)  # The stars moving in the background
+        self.missile = Missile()  # Pygame missile object
+        self.background = pg.image.load("frames/splash_BG.jpg")  # A background image
+        self.release_time = 0  # Used for making the cooldown function of the shooter. Between 0 and 120 frames (2 sec)
+        # --------------------------------------------------------------------------------------------------------------
+
+        # Anti-spacecraft object
         self.anti_spacecraft = AntiSpaceCraft()
 
-        # Spacecraft
+        # Spacecraft object
         self.spacecraft = Spacecraft(self.screen_width)
 
-        # Collision handler looks for shapes with collision type 2 and 3
-        # 2 -> spacecraft which is set further down in the constructor
+        # Collision handlers look for shapes with certain collision types
+        # 2 -> spacecraft which is set in the class constructor
         # 3 -> missile which is set in the anti_spacecraft.create_missile() method
         # 4 -> wall segments
         self.missile_and_spacecraft_handler = self.space.add_collision_handler(2, 3)
         self.missile_and_terrain = self.space.add_collision_handler(4, 3)
         self.spacecraft_and_terrain_handler = self.space.add_collision_handler(2, 4)
 
-        # We must set the 4 callbacks so the handler works properly
-        # Even though we're just using the .begin one
+        # We must set the 4 callback methods of the handlers
         self.start_collision_handlers()
+
         # Add spacecraft and anti-spacecraft pymunk representations to space
         self.add_objects_to_space()
 
+        # These variables are used for score counting, cooldowns, collision verifications and other checks
         self.player1_pts = 0
         self.player2_pts = 0
         self.end_time = 0
@@ -82,12 +88,22 @@ class GameScene(SceneBase):
         self.check = True
         self.collision = False
 
+    """ The next sequence of 5 methods are inherited from Scene Base and have their own implementation in each scene.
+        Therefore, the purpose of each of them is explained in the SceneBase class. """
+
     def ProcessInput(self, events, pressed_keys):
 
-        # Arrow keys movement
-        keys = pygame.key.get_pressed()  # checking pressed keys
+        # --------------------------------------------------------------------------------------------------------------
+        # This block responds to the user input for controlling the vehicles. A dictionary (CONTROL_DICT) located in
+        # constants.py is used to provide changeability of the default controls. It  maps all the available pygame.KEY
+        # objects to Strings (the key names), so when user changes a control in the OptionsScene the game updates
+        keys = pygame.key.get_pressed()  # Get the pressed keys (a list that has 0 or 1 next to each keyboard key)
+
+        # Controls of the anti-spacecraft except shooting (it is handled separately further down)
+        # Get the key object mapped to the description at index 5 in the # user-defined controls list
+        # All the if else checks in this block work in the same fashion
         if keys[CONTROL_DICT[self.ctrls[5]]]:
-            self.anti_spacecraft.force_right()
+            self.anti_spacecraft.force_right()  # If
         elif keys[CONTROL_DICT[self.ctrls[3]]]:
             self.anti_spacecraft.force_left()
         else:
@@ -100,6 +116,7 @@ class GameScene(SceneBase):
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
 
+        # Controls of spacecraft (it is controllable only if it hasn't crashed)
         if not self.spacecraft.crashed:
             # Rotate spacecraft (in radians)
             if keys[CONTROL_DICT[self.ctrls[0]]]:
@@ -108,7 +125,8 @@ class GameScene(SceneBase):
                 self.spacecraft.body.angle -= math.radians(2)
             if keys[CONTROL_DICT[self.ctrls[1]]]:
                 self.spacecraft.apply_thrust()
-
+        # End of block -------------------------------------------------------------------------------------------------
+        
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
@@ -283,6 +301,7 @@ class GameScene(SceneBase):
         # Spacecraft object
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
 
+        # Landing pad object
         self.space.add(self.pymunk_landing_pad)
 
     def start_collision_handlers(self):
@@ -397,7 +416,7 @@ class GameScene(SceneBase):
             floor.collision_type = 4
             floor.filter = GameScene.border_sf
             terrain.append(floor)
-        return terrain
+        self.space.add(terrain)
 
     def borders(self):
         # Screen borders
