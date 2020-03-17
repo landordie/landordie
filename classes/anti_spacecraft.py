@@ -82,8 +82,8 @@ class AntiSpaceCraft:
         missile_shape = pymunk.Poly(missile_body, vs)
         missile_shape.color = (115, 148, 107)
         missile_shape.friction = .5
-        missile_shape.collision_type = 2
-        missile_shape.filter = AntiSpaceCraft.sf
+        missile_shape.collision_type = 3
+        #missile_shape.filter = AntiSpaceCraft.sf
         # Setting the missile collision type so the handler can look for it and handle it
         # missile_shape.collision_type = 3
         return missile_body, missile_shape

@@ -16,7 +16,6 @@ from .star_field import StarField
 # (!) Note (!) : Every time we use self.screen_height and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
-
     border_sf = pymunk.ShapeFilter(group=2)
 
     def __init__(self):
@@ -32,8 +31,10 @@ class GameScene(SceneBase):
         self.space.add(self.terrain)
         self.landing_pad = LandingPad(self.screen_width - 100, self.screen_height)
         self.pymunk_landing_pad = pymunk.Segment(self.space.static_body, flipy((self.landing_pad.rect.left + 14,
-            self.landing_pad.rect.top + 16), self.screen_height), flipy((self.landing_pad.rect.right - 14,
-            self.landing_pad.rect.top + 16), self.screen_height), 5)
+                                                                                self.landing_pad.rect.top + 16),
+                                                                               self.screen_height),
+                                                 flipy((self.landing_pad.rect.right - 14,
+                                                        self.landing_pad.rect.top + 16), self.screen_height), 5)
         self.ctrls = Controls.get_controls()
 
         self.star_field = StarField(self.screen_width, self.screen_height)
@@ -46,16 +47,14 @@ class GameScene(SceneBase):
 
         # Spacecraft
         self.spacecraft = Spacecraft(self.screen_width)
-        # Setting the spacecraft collision type so the collision handler can check for it
-        self.spacecraft.shape.collision_type = 2
 
         # Collision handler looks for shapes with collision type 2 and 3
         # 2 -> spacecraft which is set further down in the constructor
         # 3 -> missile which is set in the anti_spacecraft.create_missile() method
         # 4 -> wall segments
-        self.handler = self.space.add_collision_handler(2, 3)
-        self.wall_handler = self.space.add_collision_handler(4, 3)
-        self.spacecraft_handler = self.space.add_collision_handler(4, 2)
+        self.missile_and_spacecraft_handler = self.space.add_collision_handler(2, 3)
+        self.missile_and_terrain = self.space.add_collision_handler(4, 3)
+        self.spacecraft_and_terrain_handler = self.space.add_collision_handler(2, 4)
 
         # We must set the 4 callbacks so the handler works properly
         # Even though we're just using the .begin one
@@ -136,7 +135,6 @@ class GameScene(SceneBase):
                     self.space.add(self.anti_spacecraft.missile_body)
 
                     # Add the missile body to the flying missiles
-                    self.anti_spacecraft.missile_shape.collision_type = 3
                     self.anti_spacecraft.flying_missiles.append(self.anti_spacecraft.missile_body)
 
             # Apply gravitational effects to all the current flying missiles
@@ -187,7 +185,8 @@ class GameScene(SceneBase):
         Missile sprite blit
         """
         if self.anti_spacecraft.missile_shape:
-            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body, self.screen_height)
+            m, missile_img = self.missile.get_attachment_coordinates(self.anti_spacecraft.missile_body,
+                                                                     self.screen_height)
             if not self.collision:
                 display.blit(missile_img, m)
 
@@ -205,10 +204,13 @@ class GameScene(SceneBase):
         fuel = max(self.anti_spacecraft.fuel, 0)
         pygame.draw.line(display, RED, flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
                          flipy((self.anti_spacecraft.chassis_b.position[0] + 87,
-                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height), 10)  # Red bar underneath
-        pygame.draw.line(display, GREEN, flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
+                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height),
+                         10)  # Red bar underneath
+        pygame.draw.line(display, GREEN,
+                         flipy((self.anti_spacecraft.chassis_b.position - (80, 45)), self.screen_height),
                          flipy((self.anti_spacecraft.chassis_b.position[0] - 79 + fuel / 3,
-                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height), 10)  # FUEL (green bar)
+                                self.anti_spacecraft.chassis_b.position[1] - 45), self.screen_height),
+                         10)  # FUEL (green bar)
 
         ###########################
         # Spacecraft health bar
@@ -224,8 +226,9 @@ class GameScene(SceneBase):
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
 
-        p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
-        self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1]-15)
+        p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(
+            self.anti_spacecraft.chassis_b, self.screen_height)
+        self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1] - 15)
         display.blit(rotated_body_img, self.anti_spacecraft.body_sprite.rect)
 
         # Move the Anti-Spacecraft if buttons pressed
@@ -261,7 +264,7 @@ class GameScene(SceneBase):
         self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
         self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
                        self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
-                     # self.anti_spacecraft.pin9, self.anti_spacecraft.pin10)
+        # self.anti_spacecraft.pin9, self.anti_spacecraft.pin10)
         self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
 
         # Spacecraft object
@@ -270,48 +273,54 @@ class GameScene(SceneBase):
         self.space.add(self.pymunk_landing_pad)
 
     def start_collision_handlers(self):
-        self.wall_handler.begin = self.wall_collision_begin
-        self.handler.begin = self.collision_begin
-        self.spacecraft_handler.begin = self.collision_with_terrain
+        self.missile_and_terrain.begin = self.missile_terrain_collision_begin
+        self.missile_and_spacecraft_handler.begin = self.missile_spacecraft_collision_begin
+        self.spacecraft_and_terrain_handler.begin = self.spacecraft_terrain_collision_begin
 
-        self.handler.pre_solve = self.collision_pre
-        self.handler.post_solve = self.post_solve_adjust_scores
-        self.handler.separate = self.collision_separate
-        self.wall_handler.pre_solve = self.collision_pre
-        self.wall_handler.post_solve = self.post_solve_adjust_scores
-        self.wall_handler.separate = self.collision_separate
-        self.spacecraft_handler.pre_solve = self.collision_pre
-        self.spacecraft_handler.post_solve = self.post_solve_adjust_scores
-        self.spacecraft_handler.separate = self.collision_separate
+        self.missile_and_spacecraft_handler.pre_solve = self.collision_pre
+        self.missile_and_spacecraft_handler.post_solve = self.collision_post_solve
+        self.missile_and_spacecraft_handler.separate = self.collision_separate
+        self.missile_and_terrain.pre_solve = self.collision_pre
+        self.missile_and_terrain.post_solve = self.collision_post_solve
+        self.missile_and_terrain.separate = self.collision_separate
+        self.spacecraft_and_terrain_handler.pre_solve = self.collision_pre
+        self.spacecraft_and_terrain_handler.post_solve = self.collision_post_solve
+        self.spacecraft_and_terrain_handler.separate = self.collision_separate
 
-    # The following 4 methods(callbacks) are required for the collision handler to work
+    # The followinwg 4 methods(callbacks) are required for the collision handler to work
     # The only one we are using is the collision_begin
     # It happens at the exact moment a missile and the spacecraft collide
-    def post_solve_adjust_scores(self, arbiter, space, data):
-        pass
 
-    def wall_collision_begin(self, arbiter, space, data):
-        self.space.remove(self.anti_spacecraft.missile_body)
-        self.space.remove(self.anti_spacecraft.missile_shape)
-        self.collision = True
+    def missile_terrain_collision_begin(self, arbiter, space, data):
+        if not pygame.key.get_pressed()[pygame.K_SPACE] and self.release_time > 0:
+            self.space.remove(self.anti_spacecraft.missile_body)
+            self.space.remove(self.anti_spacecraft.missile_shape)
+            self.collision = True
 
         return True
 
-    def collision_with_terrain(self, arbiter, space, data):
+    def spacecraft_terrain_collision_begin(self, arbiter, space, data):
         if self.spacecraft.terrain_collision:
             self.spacecraft.receive_damage(25)
         self.spacecraft.terrain_collision = False
         return True
 
-    def collision_begin(self, arbiter, space, data):
-        self.spacecraft.receive_damage(20)
-        self.player2_pts += 10
-        self.collision = True
+    def missile_spacecraft_collision_begin(self, arbiter, space, data):
+        if pygame.key.get_pressed()[pygame.K_SPACE]:
+            print("skip")
+        else:
+            self.spacecraft.receive_damage(20)
+            self.player2_pts += 10
+            self.collision = True
 
-        self.space.remove(self.anti_spacecraft.missile_body)
-        self.space.remove(self.anti_spacecraft.missile_shape)
+            self.space.remove(self.anti_spacecraft.missile_body)
+            self.space.remove(self.anti_spacecraft.missile_shape)
+            print("remove")
 
         return True
+
+    def collision_post_solve(self, arbiter, space, data):
+        pass
 
     def collision_pre(self, arbiter, space, data):
         return True
@@ -331,10 +340,10 @@ class GameScene(SceneBase):
             msg = self.font_warning.render("The spacecraft has been destroyed (0 HP left)", False, (255, 0, 6))
 
         msg_rect = msg.get_rect()
-        msg_rect.center = ((self.screen_width/2), (self.screen_height/2.3))
+        msg_rect.center = ((self.screen_width / 2), (self.screen_height / 2.3))
         instructions = self.font_warning.render("Game ended. Press ENTER to see results.", False, CYAN)
         instructions_rect = instructions.get_rect()
-        instructions_rect.center = ((self.screen_width/2), (self.screen_height/2))
+        instructions_rect.center = ((self.screen_width / 2), (self.screen_height / 2))
 
         screen.blit(msg, msg_rect)
         screen.blit(instructions, instructions_rect)

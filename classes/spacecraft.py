@@ -35,6 +35,8 @@ class Spacecraft(Sprite):
         self.shape = pymunk.Poly(self.body, self.triangle)
         self.shape.friction = 0.5
         self.shape.color = BLACK_INVISIBLE
+        # Setting the spacecraft collision type so the collision handler can check for it
+        self.shape.collision_type = 2
         self.body.position = 600, 700
 
     # Change health bar color as the health drops
@@ -69,5 +71,5 @@ class Spacecraft(Sprite):
         self.damage += dmg * 1.5
 
     def get_landing_condition(self):
-        return (self.damage < 100 and (-10 <= degrees(self.body.angle) <= 10) and
+        return (self.health > 0 and (-10 <= degrees(self.body.angle) <= 10) and
                 (abs(self.body.velocity.y) < 300))
