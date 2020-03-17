@@ -16,10 +16,23 @@ from .star_field import StarField
 # (!) Note (!) : Every time we use self.screen_height and G_SCREEN_WIDTH we have to type "constants." before so it works
 
 class GameScene(SceneBase):
+    # Creates pymunk shape filter object which enables objects to pass through each other, do not collide
     border_sf = pymunk.ShapeFilter(group=2)
 
     def __init__(self):
+        """This method initializes the Game Scene class. It is responsible for controlling the gameplay.
+        Here all the game objects are initialized and used in one combined environment:
+            * the first part is the pygame environment where all the sprites(images) are managed. This environment
+              also displays the text and is responsible for opening and closing new windows, checking button clicks
+              and event occurrences.
 
+            * the second one is the pymunk space object which represents our physical realistic world. It creates and
+              handles all the bodies and shapes standing behind the pygame sprites. All the physical forces in the
+              pymunk space act on the bodies of the objects and they then determine what tha behaviour of the sprites
+              will be.
+        That way we can use the physics engine behind pymunk (chipmunk) together with the images, surfaces and user-
+        input-handlers provided by pygame.
+        """
         SceneBase.__init__(self)
 
         # Initialize the environment and all the objects except the players:
