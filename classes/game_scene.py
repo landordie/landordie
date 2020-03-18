@@ -1,13 +1,12 @@
 import math
 import random
 import pymunk
-from pymunk import pygame_util, Vec2d
+from pymunk import pygame_util
 from classes.landing_pad import LandingPad
 from classes.spacecraft import Spacecraft
 from .scene_base import *
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
-from .missile import Missile
 from .controls import Controls
 from pygame.time import Clock as GameClock
 from .star_field import StarField
@@ -62,7 +61,7 @@ class GameScene(SceneBase):
         self.anti_spacecraft = AntiSpaceCraft()
 
         # Spacecraft object
-        self.spacecraft = Spacecraft(self.screen_width)
+        self.spacecraft = Spacecraft()
 
         # Collision handlers look for shapes with certain collision types
         # 2 -> spacecraft which is set in the class constructor
@@ -128,7 +127,7 @@ class GameScene(SceneBase):
 
         # The following for-loop checks each event that has been passed to the ProcessInput method
         for event in events:
-            # TODO: Remove if in final code
+            # TODO: Remove 'if' in final code
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
@@ -142,7 +141,9 @@ class GameScene(SceneBase):
                 # Check if the shooting button is pressed and initialize the mechanism
             if self.release_time <= 0:
                 if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.check:
-                    # Create new missile and add it to the space
+                    # Create new Pymunk missile and add its shape to the space, body will be added later
+                    # It has to be created away from the space so that it doesn't collide with anything.
+                    # It will be positioned in the Render method
                     self.anti_spacecraft.missile.create((-1000, -1232))
                     self.space.add(self.anti_spacecraft.missile.shape)
 
@@ -152,6 +153,7 @@ class GameScene(SceneBase):
                     self.anti_spacecraft.missile.launched = False
                     self.anti_spacecraft.missile.collided = False
                     self.check = False
+
                 # If the shooting key is released calculate the impulse and add the
                 # pymunk body of the missile to the space
                 if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[7]]:
@@ -203,7 +205,8 @@ class GameScene(SceneBase):
         # the position of the cannon and a red line is drawn on the screen that indicates the strength of the impulse
         else:
             if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.anti_spacecraft.missile.body:
-
+                # Position the missile relative to the current cannon position
+                # Adjust the Pymunk missile's rotation angle to be exactly the same the cannon's
                 self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
                                                                 self.anti_spacecraft.cannon_s)
 
@@ -214,9 +217,7 @@ class GameScene(SceneBase):
                 h = power / 4
                 pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
 
-        """
-        Missile sprite blit
-        """
+        # This piece of code is displaying the pygame sprite (the image) for the missile
         if self.anti_spacecraft.missile.shape:
             # TODO: Make sure to explain this in report
             # The method get_attachment_coordinates() determines the exact position the pygame object must be placed at
@@ -235,13 +236,13 @@ class GameScene(SceneBase):
 
         ###########################
         # Anti-Spacecraft fuel bar
-        ##########################
+        ###########################
         # Display the Anti-Spacecraft fuel bar - the part that has been consumed turns red; initially it is green.
         self.anti_spacecraft.fuel_bar(display, self.screen_height)
 
         ###########################
         # Spacecraft health bar
-        ##########################
+        ###########################
         # Spacecraft health bar - it is green, and as the health of the craft drops its colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
 
@@ -341,9 +342,10 @@ class GameScene(SceneBase):
     # When a missile collides with the terrain it disappears except in the cases where the missile is still in the
     # cannon of the anti-spacecraft (not active missile)
     def missile_terrain_collision_begin(self, arbiter, space, data):
-        self.space.remove(self.anti_spacecraft.missile.body)
-        self.space.remove(self.anti_spacecraft.missile.shape)
-        self.anti_spacecraft.missile.collided = True
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and not self.anti_spacecraft.missile.shape:
+            self.space.remove(self.anti_spacecraft.missile.body)
+            self.space.remove(self.anti_spacecraft.missile.shape)
+            self.anti_spacecraft.missile.collided = True
 
         return True
 
@@ -358,12 +360,13 @@ class GameScene(SceneBase):
     # When a missile collides with the spacecraft it disappears, deals damage to the craft and increments player 1's
     # score, except in the cases where the missile is still in the cannon of the anti-spacecraft (not active missile)
     def missile_spacecraft_collision_begin(self, arbiter, space, data):
-        self.spacecraft.receive_damage(20)
-        self.player2_pts += 10
-        self.anti_spacecraft.missile.collided = True
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]]:
+            self.spacecraft.receive_damage(20)
+            self.player2_pts += 10
+            self.anti_spacecraft.missile.collided = True
 
-        self.space.remove(self.anti_spacecraft.missile.body)
-        self.space.remove(self.anti_spacecraft.missile.shape)
+            self.space.remove(self.anti_spacecraft.missile.body)
+            self.space.remove(self.anti_spacecraft.missile.shape)
 
         return True
 
