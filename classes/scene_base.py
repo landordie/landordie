@@ -13,7 +13,12 @@ class SceneBase:
         General purpose:
             1 - ProcessInput() - This method is responsible for processing all the events that occur in the environment
             (game window). Every frame a list of all the filltered events (the ones we care about - button presses,
-            mouse movement, etc.) are passed to this method. It then executes the functionality relatedgit """
+            mouse movement, etc.) are passed to this method. It then executes the functionality specified for each event
+            of interest.
+            2 - Update() - This method's purpose is to update any variables within the frames. In our case the are left
+            empty as no such updates are required by the program
+            3 - Render() - Here all the rendering for the certain scene occurs. This method is displaying all objects on
+             the screen (backgrounds, sprites, pymunk shapes, terrain, etc.)"""
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
