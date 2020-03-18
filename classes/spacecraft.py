@@ -1,6 +1,6 @@
 from constants import *
 from .sprite_class import Sprite
-from random import randint, uniform
+from random import randint
 import pymunk
 from math import degrees
 
@@ -8,13 +8,18 @@ from math import degrees
 class Spacecraft(Sprite):
     """ Changing the Sprite class to work for our solution - to create static objects(background, obstacles, etc.)"""
 
-    def __init__(self, max_width):
-        super().__init__('frames/lander.gif')  # call Sprite initializer
-        self.engines_activated = False
-        self.width = max_width
+    def __init__(self):
+        # call Sprite initializer (this creates an image surface object, a Rectangle object and provides
+        # the 'get_attachment_coordinates() method).
+        super().__init__('frames/lander.gif')
+
         # This variable holds the rotated image if the lander is being rotated or the original image by default
         self.normal = self.image
+        
+        # This variable holds the image for the case when thrust is applied and must appear. The original is swapped 
+        # with this image every time the activate engine button is pressed on keyboard
         self.activated_img = pg.image.load("frames/lander_active.png")
+        
         # This method takes the actual size of the image ignoring its transparent parts
         self.mask = pg.mask.from_surface(self.image)
 
@@ -28,11 +33,15 @@ class Spacecraft(Sprite):
         self.terrain_collision_cooldown = 0
         self.terrain_collision = True
 
-        self.triangle = [(-30, -25), (-10, -25), (10, -25), (30, -25), (0, 35)]
+        """Initializing the pymunk representation of the space craft. The list of vertices is used by Pymunk to create 
+        the shape of the spacecraft body. Each tuple in the list is a coordinate of a point. Linking all points creates
+        the shape. Then we initialize the mass, moment, Body and Shape objects. We set the friction that acts on the 
+        craft and adjust its color and collision type. Lastly, we position the spacecraft."""
+        self.polygon_vertices = [(-30, -25), (-10, -25), (10, -25), (30, -25), (0, 35)]
         self.mass = 0.6
-        self.moment = pymunk.moment_for_poly(self.mass, self.triangle)
+        self.moment = pymunk.moment_for_poly(self.mass, self.polygon_vertices)
         self.body = pymunk.Body(self.mass, self.moment)
-        self.shape = pymunk.Poly(self.body, self.triangle)
+        self.shape = pymunk.Poly(self.body, self.polygon_vertices)
         self.shape.friction = 0.5
         self.shape.color = BLACK_INVISIBLE
         # Setting the spacecraft collision type so the collision handler can check for it
@@ -61,8 +70,8 @@ class Spacecraft(Sprite):
 
     # Apply thrust force to the spacecraft (make it fly)
     def apply_thrust(self):
-        self.body.apply_impulse_at_local_point((self.body.angle, 20), (0, 0))
-        self.image = self.activated_img
+        self.body.apply_impulse_at_local_point((self.body.angle, 20), (0, 0))  # Generate and apply an impulse
+        self.image = self.activated_img  # Swap the current image with the activated for the blit() method
 
     def reset_stats(self):
         """ Method resets all the attributes of the lander to default """
@@ -73,8 +82,12 @@ class Spacecraft(Sprite):
     def receive_damage(self, dmg):
         # Decrease health
         self.health -= dmg
-        self.damage += dmg * 1.5
+        self.damage += dmg * 1.5  # This variable is used in the health bar, to ensure that it decreases properly
 
     def get_landing_condition(self):
+        """ The method is responsible for checking spacecraft-related landing conditions. It is called every time the
+            spacecraft collides with the landing pad sprite. On such a collision the health of the spacecraft must be
+            more than 0, its rotation angle must be at max 10 in both directions and its falling velocity must be less
+            than 300 pixels per frame."""
         return (self.health > 0 and (-10 <= degrees(self.body.angle) <= 10) and
-                (abs(self.body.velocity.y) < 300))
+                (-300 < self.body.velocity.y < 20))

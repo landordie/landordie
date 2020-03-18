@@ -61,7 +61,7 @@ class GameScene(SceneBase):
         self.anti_spacecraft = AntiSpaceCraft()
 
         # Spacecraft object
-        self.spacecraft = Spacecraft(self.screen_width)
+        self.spacecraft = Spacecraft()
 
         # Collision handlers look for shapes with certain collision types
         # 2 -> spacecraft which is set in the class constructor
