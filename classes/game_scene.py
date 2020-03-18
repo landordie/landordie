@@ -342,9 +342,10 @@ class GameScene(SceneBase):
     # When a missile collides with the terrain it disappears except in the cases where the missile is still in the
     # cannon of the anti-spacecraft (not active missile)
     def missile_terrain_collision_begin(self, arbiter, space, data):
-        self.space.remove(self.anti_spacecraft.missile.body)
-        self.space.remove(self.anti_spacecraft.missile.shape)
-        self.anti_spacecraft.missile.collided = True
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.release_time > 0:
+            self.space.remove(self.anti_spacecraft.missile.body)
+            self.space.remove(self.anti_spacecraft.missile.shape)
+            self.anti_spacecraft.missile.collided = True
 
         return True
 
@@ -359,12 +360,13 @@ class GameScene(SceneBase):
     # When a missile collides with the spacecraft it disappears, deals damage to the craft and increments player 1's
     # score, except in the cases where the missile is still in the cannon of the anti-spacecraft (not active missile)
     def missile_spacecraft_collision_begin(self, arbiter, space, data):
-        self.spacecraft.receive_damage(20)
-        self.player2_pts += 10
-        self.anti_spacecraft.missile.collided = True
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]]:
+            self.spacecraft.receive_damage(20)
+            self.player2_pts += 10
+            self.anti_spacecraft.missile.collided = True
 
-        self.space.remove(self.anti_spacecraft.missile.body)
-        self.space.remove(self.anti_spacecraft.missile.shape)
+            self.space.remove(self.anti_spacecraft.missile.body)
+            self.space.remove(self.anti_spacecraft.missile.shape)
 
         return True
 
