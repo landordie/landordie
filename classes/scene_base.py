@@ -2,10 +2,18 @@ import pygame
 from constants import *
 
 
-pygame.font.init()  # Initialize
+pygame.font.init()  # Initialize the pygame font objects
 
 
 class SceneBase:
+    """ This class is the Superclass of all the other scene classes - MenuScene(), GameScene(), SplashScene(),
+    ResultsScene() and OptionsScene(). It creates 5 abstract methods - ProcessInput, Render, Update, SwitchToScene and
+    Terminate. Each method is inherited by the above classes and overwritten with the functionallity required by the
+    particular class.
+        General purpose:
+            1 - ProcessInput() - This method is responsible for processing all the events that occur in the environment
+            (game window). Every frame a list of all the filltered events (the ones we care about - button presses,
+            mouse movement, etc.) are passed to this method. It then executes the functionality relatedgit """
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
