@@ -17,8 +17,16 @@ class SceneBase:
             of interest.
             2 - Update() - This method's purpose is to update any variables within the frames. In our case the are left
             empty as no such updates are required by the program
-            3 - Render() - Here all the rendering for the certain scene occurs. This method is displaying all objects on
-             the screen (backgrounds, sprites, pymunk shapes, terrain, etc.)"""
+            3 - Render() - Here, all the rendering for the certain scene occurs. This method is displaying all objects
+            on the screen (backgrounds, sprites, pymunk shapes, terrain, etc.). It reflects any changes on variables as
+            it is executed every frame.
+            4 - SwitchToScene() - This method is used to change the focus of the main program from one scene to another.
+            For example, when the Options button is clicked in the MenuScene the SwitchToScene method is setting the
+            '.next' attribute of the current scene to OptionsScene(). That is how when the main program starts calling
+            the Render() and ProcessInput() for the 'current_scene' variable, it starts displaying the OptionsScene.
+            5 - Terminate() - This method sets the current scenes '.next' variable to None. That is how clicking on
+            the 'X' (exit) button of the window stops the game.
+            """
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
