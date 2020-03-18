@@ -43,11 +43,9 @@ class GameScene(SceneBase):
         self.random_terrain()  # Generates the random terrain of the space
 
         # Initialize the Landing pad object (creates both pymunk body,shape and pygame sprite surface)
-        self.landing_pad = LandingPad(self.screen_width - 100, self.screen_height)  # Pygame representation
+        self.landing_pad = LandingPad(self.screen_width, self.screen_height)  # Pygame representation
         # Pymunk representation - A pymunk segment object that is created based on the position of the pygame sprite
-        self.pymunk_landing_pad = pymunk.Segment(self.space.static_body, flipy((self.landing_pad.rect.left + 14,
-            self.landing_pad.rect.top + 16), self.screen_height), flipy((self.landing_pad.rect.right - 14,
-            self.landing_pad.rect.top + 16), self.screen_height), 5)
+        self.pymunk_landing_pad = self.landing_pad.pymunk_pad(self.space, self.screen_height)
 
         # This variable fetches the game controls from the options menu (updated every game)
         self.ctrls = Controls.get_controls()  # Controls is a static class which handles the game controls
@@ -135,12 +133,12 @@ class GameScene(SceneBase):
             if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[1]]:
                 self.spacecraft.image = self.spacecraft.normal
 
-            # -----------------------------------------Start of block---------------------------------------------------
+            # -----------------------------------------Start of block----------------------------------------- ----------
             # The following block is responsible for shooting missiles from the anti-spacecraft vehicle
             # If the cooldown is 0 (Player 1 hasn't shot in the last 2 seconds)
                 # Check if the shooting button is pressed and initialize the mechanism
             if self.release_time <= 0:
-                if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.check:
+                if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.anti_spacecraft.missile.collided:
                     # Create new Pymunk missile and add its shape to the space, body will be added later
                     # It has to be created away from the space so that it doesn't collide with anything.
                     # It will be positioned in the Render method
@@ -156,7 +154,8 @@ class GameScene(SceneBase):
 
                 # If the shooting key is released calculate the impulse and add the
                 # pymunk body of the missile to the space
-                if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[7]]:
+                elif event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[7]] \
+                        and self.anti_spacecraft.missile.body not in self.space.bodies:
                     self.end_time = pygame.time.get_ticks()
                     diff = self.end_time - self.start_time
 
@@ -171,7 +170,7 @@ class GameScene(SceneBase):
             # ------------------------------------------End of block ---------------------------------------------------
 
             # Apply gravitational effects to the flying missile
-            if self.anti_spacecraft.missile.body:
+            if self.anti_spacecraft.missile.launched:
                 self.anti_spacecraft.missile.apply_gravity()
 
     def Update(self):
@@ -197,6 +196,7 @@ class GameScene(SceneBase):
         # a blue line is drawn on the screen which shows the remaining cooldown time
         if self.release_time > 0:
             self.release_time -= 1
+            print(self.release_time)
             self.start_time = pygame.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
 
@@ -342,9 +342,10 @@ class GameScene(SceneBase):
     # When a missile collides with the terrain it disappears except in the cases where the missile is still in the
     # cannon of the anti-spacecraft (not active missile)
     def missile_terrain_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and not self.anti_spacecraft.missile.shape:
+        if self.anti_spacecraft.missile.launched:
             self.space.remove(self.anti_spacecraft.missile.body)
             self.space.remove(self.anti_spacecraft.missile.shape)
+            self.anti_spacecraft.missile.launched = False
             self.anti_spacecraft.missile.collided = True
 
         return True
@@ -360,13 +361,13 @@ class GameScene(SceneBase):
     # When a missile collides with the spacecraft it disappears, deals damage to the craft and increments player 1's
     # score, except in the cases where the missile is still in the cannon of the anti-spacecraft (not active missile)
     def missile_spacecraft_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]]:
+        if self.anti_spacecraft.missile.launched:
             self.spacecraft.receive_damage(20)
             self.player2_pts += 10
-            self.anti_spacecraft.missile.collided = True
-
             self.space.remove(self.anti_spacecraft.missile.body)
             self.space.remove(self.anti_spacecraft.missile.shape)
+            self.anti_spacecraft.missile.launched = False
+            self.anti_spacecraft.missile.collided = True
 
         return True
 

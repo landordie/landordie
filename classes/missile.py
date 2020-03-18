@@ -16,7 +16,7 @@ class Missile(Sprite):
         super().__init__('frames/missile_small.gif')  # call Sprite initializer
         self.body, self.shape = None, None
         self.launched = False
-        self.collided = False
+        self.collided = True
 
     def create(self, position):
         """
