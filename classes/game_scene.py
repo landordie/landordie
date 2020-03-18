@@ -342,7 +342,7 @@ class GameScene(SceneBase):
     # When a missile collides with the terrain it disappears except in the cases where the missile is still in the
     # cannon of the anti-spacecraft (not active missile)
     def missile_terrain_collision_begin(self, arbiter, space, data):
-        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.release_time > 0:
+        if not pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]]:
             self.space.remove(self.anti_spacecraft.missile.body)
             self.space.remove(self.anti_spacecraft.missile.shape)
             self.anti_spacecraft.missile.collided = True

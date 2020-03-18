@@ -2,7 +2,7 @@ import pygame
 from constants import *
 
 
-pygame.font.init()
+pygame.font.init()  # Initialize
 
 
 class SceneBase:
