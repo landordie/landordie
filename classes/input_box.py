@@ -8,7 +8,7 @@ class InputBox:
 
     def __init__(self, x, y, text='', w=100, h=35):
         self.rect = pg.Rect(x, y, w, h)
-        self.color = RED
+        self.color = BRIGHT_PURPLE
         self.text = text
         self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(text, True, WHITE)
         self.id_num = InputBox.no
