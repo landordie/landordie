@@ -26,7 +26,7 @@ class SceneBase:
             the Render() and ProcessInput() for the 'current_scene' variable, it starts displaying the OptionsScene.
             5 - Terminate() - This method sets the current scenes '.next' variable to None. That is how clicking on
             the 'X' (exit) button of the window stops the game.
-            """
+    """
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
