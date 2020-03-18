@@ -19,6 +19,7 @@ class Game:
         pygame.init()
         screen = pygame.display
         clock = pygame.time.Clock()
+        pygame.display.set_caption('LAND OR DIE')
 
         self.menu.background = pygame.image.load("frames/BG.png")
 
