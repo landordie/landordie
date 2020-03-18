@@ -88,6 +88,6 @@ class Spacecraft(Sprite):
         """ The method is responsible for checking spacecraft-related landing conditions. It is called every time the
             spacecraft collides with the landing pad sprite. On such a collision the health of the spacecraft must be
             more than 0, its rotation angle must be at max 10 in both directions and its falling velocity must be less
-            than 300 pixels per frame."""
+            than 300 pixels per sec."""
         return (self.health > 0 and (-10 <= degrees(self.body.angle) <= 10) and
                 (-300 < self.body.velocity.y < 20))
