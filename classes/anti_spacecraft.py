@@ -86,6 +86,7 @@ class AntiSpaceCraft:
         return body, shape
 
     def add_to_space(self, space):
+        # Add all the body parts of the anti-spacecraft to the Pymunk space
         space.add(self.wheel1_b, self.wheel1_s)
         space.add(self.wheel2_b, self.wheel2_s)
         space.add(self.wheel3_b, self.wheel3_s)
