@@ -13,10 +13,15 @@ class LandingPad(Sprite):
         self.rect.right = random.randint(155, width - 100)
         self.mask = pg.mask.from_surface(self.image)
 
+    # This method generates and returns a pymunk segment object which is used to
+    # detect physics based collision between the spaceship and the landing pad
+    # We are doing it this way because we don't track collision based on sprites but on pymunk physics objects
     def pymunk_pad(self, space, height):
         return pm.Segment(space.static_body, flipy((self.rect.left + 14, self.rect.top + 16), height),
                           flipy((self.rect.right - 14, self.rect.top + 16), height), 5)
 
+    # If these conditions are met, the method returns whether the spaceship has landed
+    # on the landing pad (successfully or not)
     def check_for_landing_attempt(self, spacecraft):
         if spacecraft.rect.right < self.rect.right and \
                 spacecraft.rect.left > self.rect.left and spacecraft.rect.bottom <= self.rect.top + 15 \

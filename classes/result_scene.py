@@ -27,6 +27,10 @@ class ResultScene(SceneBase):
         if event.type == pygame.KEYDOWN:
             # If a player has finished writing their name
             if event.key == pygame.K_RETURN and self.player_no < 3:
+                if len(self.player1_name) == 0:
+                    self.player1_name = "DEFAULT_PLAYER1"
+                elif len(self.player2_name) == 0:
+                    self.player2_name = "DEFAULT_PLAYER2"
                 self.player_no += 1
             # If player 1 is writing
             elif self.player_no == 1:

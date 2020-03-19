@@ -11,7 +11,7 @@ class OptionsScene(SceneBase):
 
     @staticmethod
     def getInstance():
-        """ Static access method. """
+        """ Static access method. Implementation of Singleton pattern"""
         if OptionsScene.__instance is None:
             OptionsScene()
         return OptionsScene.__instance
@@ -33,20 +33,20 @@ class OptionsScene(SceneBase):
             YELLOW,
             'Main Menu')
 
-        """Containers"""
+        # Container for resolution buttons
         self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 3
         self.res_cont_x, self.res_cont_y = (self.screen_width / 2) - (self.res_cont_w * 2.26), \
                                            (self.screen_height / 2) - (self.res_cont_h / 2.35)
         self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
         self.res_cont.fill(BLACK_HIGHLIGHT2)
 
+        # Container for controls boxes
         self.button_cont_w, self.button_cont_h = self.screen_width / 3, self.screen_height / 1.5
         self.button_cont_x, self.button_cont_y = (self.screen_width / 2), (self.screen_height / 5)
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
-        # TODO: Make the position of buttons be relative to container and not screen width/height
-
+        # Buttons to change resolution
         self._res2 = Button(
             (self.res_cont_w / 3, self.res_cont_h / 0.85, BUTTON_WIDTH, BUTTON_HEIGHT),
             GREEN, "1280x800")
@@ -54,6 +54,7 @@ class OptionsScene(SceneBase):
             (self.res_cont_w / 3, self.res_cont_h / 0.62, BUTTON_WIDTH, BUTTON_HEIGHT),
             GREEN, "1440x900")
 
+        # Input boxes to change controls
         self.input_box1 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.35, 'A')
         self.input_box2 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.60, 'W')
         self.input_box3 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.85, 'D')
@@ -101,6 +102,7 @@ class OptionsScene(SceneBase):
         screen.set_mode((self.screen_width, self.screen_height))
 
         # Background parallax effect
+        # It works the same way as in the Main Menu scene
         image_width = self.background.get_rect().width
         rel_x = self.x % image_width
         screen.get_surface().blit(self.background, (rel_x - image_width, 0))
@@ -109,6 +111,8 @@ class OptionsScene(SceneBase):
         self.x -= 1
 
         """Drawing the containers and displaying info text"""
+        """(!) Containers are displayed relative to the screen size;
+            (!) Buttons are displayed relative to the containers position"""
         screen.get_surface().blit(self.res_cont, (self.res_cont_x, self.res_cont_y, self.res_cont_w, self.res_cont_h))
         self.draw_text(screen, "Resolution", (self.res_cont_x + self.res_cont_w / 2, self.res_cont_y / 1.1),
                        self.font_medium, WHITE)

@@ -66,10 +66,15 @@ class MenuScene(SceneBase):
         # TODO: Write test to make sure self.background is not NONE
         # Background parallax effect
         image_width = self.background.get_rect().width
+        # The relative x of the image used for the parallax effect
         rel_x = self.x % image_width
+        # Displaying the image based on the relative x and the image width
         screen.get_surface().blit(self.background, (rel_x - image_width, 0))
+        # When the right end of the image reaches the right side of the screen
+        # a new image starts displaying so we do not have any black spaces
         if rel_x < self.screen_width:
             screen.get_surface().blit(self.background, (rel_x, 0))
+        # This decrement is what makes the image "move"
         self.x -= 1
 
         self.control_logo()
@@ -88,6 +93,8 @@ class MenuScene(SceneBase):
         if self.logo_counter % 5 == 0:
             self.current_logo = self.logos[(self.logos.index(self.current_logo)+1) % 22]
 
+    # This method is used when changing the resolutions
+    # It recalculates the relative positions of all buttons on the main menu screen and puts them where they should be
     def update_all(self):
         self.menu_button.rect.x,  self.menu_button.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2
         self.menu_button_2.rect.x,  self.menu_button_2.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53
