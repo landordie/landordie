@@ -1,3 +1,6 @@
+"""
+Options scene class
+"""
 from classes import MenuScene
 from classes.input_box import InputBox
 from .game_scene import *

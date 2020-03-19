@@ -1,3 +1,6 @@
+"""
+Game scene class
+"""
 import math
 import random
 import pymunk
@@ -44,6 +47,7 @@ class GameScene(SceneBase):
 
         # Initialize the Landing pad object (creates both pymunk body,shape and pygame sprite surface)
         self.landing_pad = LandingPad(self.screen_width, self.screen_height)  # Pygame representation
+
         # Pymunk representation - A pymunk segment object that is created based on the position of the pygame sprite
         self.pymunk_landing_pad = self.landing_pad.pymunk_pad(self.space, self.screen_height)
 
@@ -80,7 +84,6 @@ class GameScene(SceneBase):
         self.player2_pts = 0
         self.end_time = 0
         self.start_time = 0
-        self.check = True
 
     # TODO: !!! THIS IS IMPORTANT, TOO !!!
     """ The next sequence of 5 methods (ProcessInput(), Update(), Render(), SwitchToScene(), Terminate()) are inherited 
@@ -98,11 +101,16 @@ class GameScene(SceneBase):
         # Controls of the anti-spacecraft except shooting (it is handled separately further down)
         # Get the key object mapped to the description at index 5 in the # user-defined controls list
         # All the if else checks in this block work in the same fashion
-        if keys[CONTROL_DICT[self.ctrls[5]]]:
-            self.anti_spacecraft.force_right()  # If
-        elif keys[CONTROL_DICT[self.ctrls[3]]]:
-            self.anti_spacecraft.force_left()
-        else:
+
+        if self.anti_spacecraft.fuel:  # If the anti-spacecraft still has some fuel left
+            # Apply force on the wheels accordingly
+            if keys[CONTROL_DICT[self.ctrls[5]]]:
+                self.anti_spacecraft.force_right()  # If
+            elif keys[CONTROL_DICT[self.ctrls[3]]]:
+                self.anti_spacecraft.force_left()
+            else:
+                self.anti_spacecraft.force = DEFAULT_FORCE
+        else:  # If out of fuel then stop the wheels
             self.anti_spacecraft.force = DEFAULT_FORCE
 
         if keys[CONTROL_DICT[self.ctrls[6]]] and self.anti_spacecraft.cannon_b.angle < 0:
@@ -136,7 +144,7 @@ class GameScene(SceneBase):
             # -----------------------------------------Start of block----------------------------------------- ----------
             # The following block is responsible for shooting missiles from the anti-spacecraft vehicle
             # If the cooldown is 0 (Player 1 hasn't shot in the last 2 seconds)
-                # Check if the shooting button is pressed and initialize the mechanism
+            # Check if the shooting button is pressed and initialize the mechanism
             if self.release_time <= 0:
                 if pygame.key.get_pressed()[CONTROL_DICT[self.ctrls[7]]] and self.anti_spacecraft.missile.collided:
                     # Create new Pymunk missile and add its shape to the space, body will be added later
@@ -150,7 +158,6 @@ class GameScene(SceneBase):
                     self.start_time = pygame.time.get_ticks()
                     self.anti_spacecraft.missile.launched = False
                     self.anti_spacecraft.missile.collided = False
-                    self.check = False
 
                 # If the shooting key is released calculate the impulse and add the
                 # pymunk body of the missile to the space
@@ -166,7 +173,6 @@ class GameScene(SceneBase):
 
                     # Reset cool down
                     self.release_time = 120
-                    self.check = True
             # ------------------------------------------End of block ---------------------------------------------------
 
             # Apply gravitational effects to the flying missile
@@ -196,7 +202,6 @@ class GameScene(SceneBase):
         # a blue line is drawn on the screen which shows the remaining cooldown time
         if self.release_time > 0:
             self.release_time -= 1
-            print(self.release_time)
             self.start_time = pygame.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
 
@@ -234,15 +239,9 @@ class GameScene(SceneBase):
         # Show the Landing pad Sprite on screen
         display.blit(self.landing_pad.image, self.landing_pad.rect)
 
-        ###########################
-        # Anti-Spacecraft fuel bar
-        ###########################
         # Display the Anti-Spacecraft fuel bar - the part that has been consumed turns red; initially it is green.
         self.anti_spacecraft.fuel_bar(display, self.screen_height)
 
-        ###########################
-        # Spacecraft health bar
-        ###########################
         # Spacecraft health bar - it is green, and as the health of the craft drops its colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
 
@@ -294,15 +293,7 @@ class GameScene(SceneBase):
         # pin-joints), the spacecraft body and shape and the landing pad body to the Pymunk space
 
         # Anti-spacecraft Parts (represent the whole vehicle)
-        self.space.add(self.anti_spacecraft.wheel1_b, self.anti_spacecraft.wheel1_s)
-        self.space.add(self.anti_spacecraft.wheel2_b, self.anti_spacecraft.wheel2_s)
-        # self.space.add(self.anti_spacecraft.wheel3_b, self.anti_spacecraft.wheel3_s)
-        self.space.add(self.anti_spacecraft.chassis_b, self.anti_spacecraft.chassis_s)
-        self.space.add(self.anti_spacecraft.cannon_b, self.anti_spacecraft.cannon_s)
-        self.space.add(self.anti_spacecraft.pin1, self.anti_spacecraft.pin2, self.anti_spacecraft.pin3,
-                       self.anti_spacecraft.pin4, self.anti_spacecraft.pin5, self.anti_spacecraft.pin6)
-        # self.anti_spacecraft.pin9, self.anti_spacecraft.pin10)
-        self.space.add(self.anti_spacecraft.pin8, self.anti_spacecraft.cannon_mt)
+        self.anti_spacecraft.add_to_space(self.space)
 
         # Spacecraft object
         self.space.add(self.spacecraft.body, self.spacecraft.shape)
@@ -343,10 +334,7 @@ class GameScene(SceneBase):
     # cannon of the anti-spacecraft (not active missile)
     def missile_terrain_collision_begin(self, arbiter, space, data):
         if self.anti_spacecraft.missile.launched:
-            self.space.remove(self.anti_spacecraft.missile.body)
-            self.space.remove(self.anti_spacecraft.missile.shape)
-            self.anti_spacecraft.missile.launched = False
-            self.anti_spacecraft.missile.collided = True
+            self.anti_spacecraft.missile.remove_from_space(self.space)
 
         return True
 
@@ -364,10 +352,7 @@ class GameScene(SceneBase):
         if self.anti_spacecraft.missile.launched:
             self.spacecraft.receive_damage(20)
             self.player2_pts += 10
-            self.space.remove(self.anti_spacecraft.missile.body)
-            self.space.remove(self.anti_spacecraft.missile.shape)
-            self.anti_spacecraft.missile.launched = False
-            self.anti_spacecraft.missile.collided = True
+            self.anti_spacecraft.missile.remove_from_space(self.space)
 
         return True
 

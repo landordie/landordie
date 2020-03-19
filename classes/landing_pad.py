@@ -1,3 +1,6 @@
+"""
+Landing pad class
+"""
 import pygame as pg
 import pymunk as pm
 from classes.sprite_class import Sprite
@@ -17,8 +20,10 @@ class LandingPad(Sprite):
     # detect physics based collision between the spaceship and the landing pad
     # We are doing it this way because we don't track collision based on sprites but on pymunk physics objects
     def pymunk_pad(self, space, height):
-        return pm.Segment(space.static_body, flipy((self.rect.left + 14, self.rect.top + 16), height),
-                          flipy((self.rect.right - 14, self.rect.top + 16), height), 5)
+        pm_pad = pm.Segment(space.static_body, flipy((self.rect.left + 14, self.rect.top + 16), height),
+                            flipy((self.rect.right - 14, self.rect.top + 16), height), 5)
+        pm_pad.collision_type = 4
+        return pm_pad
 
     # If these conditions are met, the method returns whether the spaceship has landed
     # on the landing pad (successfully or not)

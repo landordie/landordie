@@ -77,3 +77,9 @@ class Missile(Sprite):
         :return True if the missile is launched and has not collided with another shape
         """
         return self.launched and not self.collided
+
+    def remove_from_space(self, space):
+        space.remove(self.body)
+        space.remove(self.shape)
+        self.launched = False
+        self.collided = True

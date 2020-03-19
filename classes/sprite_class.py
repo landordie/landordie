@@ -1,3 +1,6 @@
+"""
+Sprite class
+"""
 import pygame
 from math import degrees
 from pymunk import Vec2d

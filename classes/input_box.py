@@ -1,3 +1,6 @@
+"""
+Input box class
+"""
 from constants import *
 
 
@@ -24,7 +27,8 @@ class InputBox:
                 self.active = not self.active
             else:
                 self.active = False
-        if event.type == pg.KEYDOWN:
+        if event.type == pg.KEYDOWN:  # Whenever a key is pressed display
+            # the name of the key in the input box
             if self.active:
                 if event.key == pg.K_BACKSPACE:
                     self.text = self.text[:-1]
@@ -64,7 +68,7 @@ class InputBox:
                     else:
                         self.text = event.unicode.upper()
 
-                    # update boxes list
+                    # Update boxes list
                     InputBox.boxes[self.id_num] = self.text
                     self.active = False
                 # Re-render the text.

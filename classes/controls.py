@@ -1,3 +1,6 @@
+"""
+Controls class
+"""
 import constants
 
 

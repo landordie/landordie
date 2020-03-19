@@ -1,3 +1,6 @@
+"""
+Result scene class
+"""
 import csv
 from datetime import date
 from .scene_base import *
@@ -27,9 +30,9 @@ class ResultScene(SceneBase):
         if event.type == pygame.KEYDOWN:
             # If a player has finished writing their name
             if event.key == pygame.K_RETURN and self.player_no < 3:
-                if len(self.player1_name) == 0:
+                if self.player_no == 1 and len(self.player1_name) == 0:
                     self.player1_name = "DEFAULT_PLAYER1"
-                elif len(self.player2_name) == 0:
+                elif self.player_no == 2 and len(self.player2_name) == 0:
                     self.player2_name = "DEFAULT_PLAYER2"
                 self.player_no += 1
             # If player 1 is writing

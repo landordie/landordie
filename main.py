@@ -1,3 +1,6 @@
+"""
+Game class
+"""
 # ------------------------------------------#
 
 # Code for scene architecture taken from:
