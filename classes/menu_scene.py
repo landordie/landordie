@@ -1,4 +1,3 @@
-from load_images import load_images, update as title_update
 from .button import Button
 from .game_scene import GameScene
 from .scene_base import *
@@ -27,12 +26,15 @@ class MenuScene(SceneBase):
         SceneBase.__init__(self)
 
         # Start and Quit buttons
-        self.menu_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2, BUTTON_WIDTH, BUTTON_HEIGHT),
+        self.menu_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2.2, BUTTON_WIDTH, BUTTON_HEIGHT),
                                   YELLOW, 'Start')
-        self.menu_button_2 = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53, BUTTON_WIDTH,
+        self.menu_button_2 = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.4, BUTTON_WIDTH,
                                      BUTTON_HEIGHT), GREEN, 'Options')
-        self.menu_button_3 = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.25, BUTTON_WIDTH,
+        self.menu_button_3 = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.18, BUTTON_WIDTH,
                                      BUTTON_HEIGHT), RED, 'Quit')
+        self.menu_button_4 = Button(
+            (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.7, BUTTON_WIDTH,
+             BUTTON_HEIGHT), RED, 'Account')
 
         self.background = None
         self.logos = [pygame.image.load("frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]
@@ -52,6 +54,10 @@ class MenuScene(SceneBase):
                     self.SwitchToScene(OptionsScene.getInstance())
                 elif self.menu_button.on_click(event):  # start button
                     self.SwitchToScene(SplashScene(InputBox.boxes))
+                elif self.menu_button_4.on_click(event):
+                    from .account_scene import AccountScene
+                    AccountScene.getInstance().update_all()
+                    self.SwitchToScene(AccountScene.getInstance())
                 elif self.menu_button_3.on_click(event):  # quit button
                     self.Terminate()
 
@@ -84,6 +90,7 @@ class MenuScene(SceneBase):
         self.menu_button.update(screen.get_surface())
         self.menu_button_2.update(screen.get_surface())
         self.menu_button_3.update(screen.get_surface())
+        self.menu_button_4.update(screen.get_surface())
 
     def control_logo(self):
         self.logo_counter += 1
@@ -96,6 +103,7 @@ class MenuScene(SceneBase):
     # This method is used when changing the resolutions
     # It recalculates the relative positions of all buttons on the main menu screen and puts them where they should be
     def update_all(self):
-        self.menu_button.rect.x,  self.menu_button.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2
-        self.menu_button_2.rect.x,  self.menu_button_2.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.53
-        self.menu_button_3.rect.x , self.menu_button_3.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.25
+        self.menu_button.rect.x,  self.menu_button.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 2.2
+        self.menu_button_2.rect.x,  self.menu_button_2.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.4
+        self.menu_button_3.rect.x , self.menu_button_3.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.18
+        self.menu_button_4.rect.x, self.menu_button_4.rect.y = self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.7

@@ -3,7 +3,8 @@ Options scene class
 """
 from classes import MenuScene
 from classes.input_box import InputBox
-from .game_scene import *
+from constants import *
+from .scene_base import SceneBase
 from .button import Button
 import pygame
 
@@ -78,8 +79,6 @@ class OptionsScene(SceneBase):
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                self.SwitchToScene(GameScene())
             """
             Handling changing of resolution
             """
