@@ -360,6 +360,10 @@ class GameScene(SceneBase):
         pass
 
     def collision_pre(self, arbiter, space, data):
+        # If the spacecraft collides with the landing pad with a high velocity
+        if self.pymunk_landing_pad in arbiter.shapes:
+            # Generate an impulse that makes it bounce in the air
+            self.spacecraft.body.apply_impulse_at_world_point((math.radians(90), 250), self.spacecraft.body.position)
         return True
 
     def collision_separate(self, arbiter, space, data):
