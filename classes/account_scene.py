@@ -125,6 +125,7 @@ class AccountScene(SceneBase):
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
 
             if command == "check":
+                self.logged_in = True
                 pass
             elif command == "register":
                 for field in self.fields:

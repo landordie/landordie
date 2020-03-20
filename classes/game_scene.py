@@ -13,6 +13,7 @@ from .anti_spacecraft import AntiSpaceCraft
 from .controls import Controls
 from pygame.time import Clock as GameClock
 from .star_field import StarField
+import pymysql
 
 
 class GameScene(SceneBase):
@@ -141,7 +142,7 @@ class GameScene(SceneBase):
             if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[1]]:
                 self.spacecraft.image = self.spacecraft.normal
 
-            # -----------------------------------------Start of block----------------------------------------- ----------
+            # -----------------------------------------Start of block---------------------------------------------------
             # The following block is responsible for shooting missiles from the anti-spacecraft vehicle
             # If the cooldown is 0 (Player 1 hasn't shot in the last 2 seconds)
             # Check if the shooting button is pressed and initialize the mechanism
@@ -274,7 +275,10 @@ class GameScene(SceneBase):
             if paused:
                 self.Terminate()
             else:
-                self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+                if self.logged_in:
+                    self.SwitchToScene(None)
+                else:
+                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
         # If a landing attempt is performed and the conditions passes (e.g velocity is not too high, the position is
         # correct, the angle of rotation is not too big, etc.) increment the score of the craft player and stop game
@@ -285,7 +289,10 @@ class GameScene(SceneBase):
                     self.Terminate()
                 else:
                     self.player1_pts += 50
-                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+                    if self.logged_in:
+                        self.SwitchToScene(MenuScene.getInstance())
+                    else:
+                        self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 # ======================================================================================================================
 
     """ All these methods below are helpers which are used for simplifying the above code."""
@@ -405,6 +412,25 @@ class GameScene(SceneBase):
 
             pygame.display.update()
             GameClock().tick(FPS)
+
+    # def connect_DB(self, command):
+    #     try:
+    #         connection = pymysql.connect(host='localhost', user='root', password='', db='users')
+    #
+    #         if command == "check":
+    #             pass
+    #         elif command == "insert":
+    #             try:
+    #                 with connection.cursor() as cursor:
+    #                     sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
+    #                     cursor.execute(sql, (self.fields[0].text, self.fields[1].text))
+    #                     connection.commit()
+    #                     self.logged_in = True
+    #                     self.status = 'Operation executed successfully!'
+    #             finally:
+    #                 connection.close()
+    #     except pymysql.err.OperationalError:
+    #         self.status = 'The server is currently offline. Please try again later.'
 
     def random_terrain(self):
         """
