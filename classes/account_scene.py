@@ -38,11 +38,17 @@ class AccountScene(SceneBase):
         self.background = pygame.image.load("frames/BG.png")
         self.x = 0
 
-        # Container for controls boxes
+        # Container for credential fields
         self.button_cont_w, self.button_cont_h = self.screen_width / 2, self.screen_height / 3
         self.button_cont_x, self.button_cont_y = (self.screen_width / 2 - self.button_cont_w / 2), (self.screen_height / 5)
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
         self.button_cont.fill(BLACK_HIGHLIGHT2)
+
+        # Container for the database response
+        self.status_cont_w, self.status_cont_h = self.screen_width / 1.2, self.screen_height / 12
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), (self.screen_height / 12)
+        self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
+        self.status_cont.fill(BLACK_HIGHLIGHT2)
 
         # Input boxes to change controls
         self.input_box1 = InputBox(self.button_cont_x * 1.7, self.button_cont_y + 50, '', 350, 33)
@@ -96,8 +102,10 @@ class AccountScene(SceneBase):
                       self.font_medium, WHITE)
 
         if self.status != '':
+            screen.get_surface().blit(self.status_cont,
+                                      (self.status_cont_x, self.status_cont_y, self.status_cont_w, self.status_cont_h))
             self.draw_text(screen, self.status, (self.screen_width / 2, self.screen_height / 8),
-                       self.font_playernum, WHITE)
+                           self.font_playernum, WHITE)
 
         self.input_box1.draw(screen.get_surface())
         self.input_box2.draw(screen.get_surface(), True)
@@ -119,16 +127,20 @@ class AccountScene(SceneBase):
             if command == "check":
                 pass
             elif command == "register":
+                for field in self.fields:
+                    if field.text == '':
+                        self.status = 'You cannot submit an empty field. Please try again!'
+                        return
                 try:
                     with connection.cursor() as cursor:
                         sql = "SELECT `Username` FROM `users`"
                         cursor.execute(sql)
                         a = [row[0] for row in cursor.fetchall()]
-                        if self.input_box1.text in a:
+                        if self.fields[0].text in a:
                             self.status = 'A user with that username already exists. Please try again!'
                         else:
                             sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
-                            cursor.execute(sql, (self.input_box1.text, self.input_box2.text))
+                            cursor.execute(sql, (self.fields[0].text, self.fields[1].text))
                             connection.commit()
                             self.status = 'Operation executed successfully!'
                 finally:
