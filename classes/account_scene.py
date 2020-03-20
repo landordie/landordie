@@ -61,7 +61,7 @@ class AccountScene(SceneBase):
                     menu = MenuScene.getInstance()
                     self.SwitchToScene(menu)
                 if self.register_button.on_click(event):
-                    self.status = self.connect_DB("register")
+                    self.connect_DB("register")
 
     def Update(self):
         pass
@@ -95,6 +95,10 @@ class AccountScene(SceneBase):
         self.draw_text(screen, "Password:", (self.button_cont_x * 1.4, self.button_cont_y * 2.03),
                       self.font_medium, WHITE)
 
+        if self.status != '':
+            self.draw_text(screen, self.status, (self.screen_width / 2, self.screen_height / 8),
+                       self.font_playernum, WHITE)
+
         self.input_box1.draw(screen.get_surface())
         self.input_box2.draw(screen.get_surface(), True)
 
@@ -109,23 +113,27 @@ class AccountScene(SceneBase):
                     BUTTON_WIDTH / 2), self.screen_height / 1.7
 
     def connect_DB(self, command):
-        connection = pymysql.connect(host='localhost', user='root', password='', db='users')
+        try:
+            connection = pymysql.connect(host='localhost', user='root', password='', db='users')
 
-        if command == "check":
-            pass
-        elif command == "register":
-            try:
-                with connection.cursor() as cursor:
-                    sql = "SELECT `Username` FROM `users`"
-                    cursor.execute(sql)
-                    a = list(cursor.fetchall())
-                    for x in a:
-                        if x[0] == self.input_box1.text:
-                            return 'A user with that username already exists. Please try again!'
+            if command == "check":
+                pass
+            elif command == "register":
+                try:
+                    with connection.cursor() as cursor:
+                        sql = "SELECT `Username` FROM `users`"
+                        cursor.execute(sql)
+                        a = [row[0] for row in cursor.fetchall()]
+                        if self.input_box1.text in a:
+                            self.status = 'A user with that username already exists. Please try again!'
                         else:
                             sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
                             cursor.execute(sql, (self.input_box1.text, self.input_box2.text))
                             connection.commit()
-                            return 'Operation executed successfully!'
-            finally:
-                connection.close()
+                            self.status = 'Operation executed successfully!'
+                finally:
+                    connection.close()
+        except pymysql.err.OperationalError:
+            self.status = 'The server is currently offline. Please try again later.'
+
+
