@@ -38,14 +38,14 @@ class ResultScene(SceneBase):
             # If player 1 is writing
             elif self.player_no == 1:
                 # If the pressed button corresponds to a alphabetical char (a,b,c,d...,x,y,z)
-                if event.unicode.isalpha() and len(self.player1_name) < 16:
+                if event.unicode.isalnum() and len(self.player1_name) < 16:
                     self.player1_name += event.unicode
                 # If the user would like to delete a char from the screen
                 elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                     self.player1_name = self.player1_name[:-1]
             # If player two is writing
             elif self.player_no == 2:
-                if event.unicode.isalpha() and len(self.player2_name) < 16:
+                if event.unicode.isalnum() and len(self.player2_name) < 16:
                     self.player2_name += event.unicode
                 elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                     self.player2_name = self.player2_name[:-1]

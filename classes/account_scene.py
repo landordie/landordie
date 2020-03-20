@@ -3,6 +3,7 @@ from .game_scene import *
 from .button import Button
 import pygame
 from .input_box import InputBox
+import pymysql.cursors
 
 
 class AccountScene(SceneBase):
@@ -46,21 +47,24 @@ class AccountScene(SceneBase):
         # Input boxes to change controls
         self.input_box1 = InputBox(self.button_cont_x * 1.7, self.button_cont_y + 50, '', 350, 33)
         self.input_box2 = InputBox(self.button_cont_x * 1.7, self.button_cont_y * 1.60 + 50, '', 350, 33)
+        self.status = ''
+        self.fields = [self.input_box1, self.input_box2]
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
+            for input_box in self.fields:
+                input_box.handle_event(event, 2)
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.menu_button.on_click(event):
                     menu = MenuScene.getInstance()
                     self.SwitchToScene(menu)
+                if self.register_button.on_click(event):
+                    self.status = self.connect_DB("register")
 
     def Update(self):
         pass
-
-        # (!) When adding buttons to the start screen
-        # (!) Add them here, in this method
 
     def Render(self, screen):
         screen.set_mode((self.screen_width, self.screen_height))
@@ -92,8 +96,7 @@ class AccountScene(SceneBase):
                       self.font_medium, WHITE)
 
         self.input_box1.draw(screen.get_surface())
-
-        self.input_box2.draw(screen.get_surface())
+        self.input_box2.draw(screen.get_surface(), True)
 
     # This method is used when changing the resolutions
     # It recalculates the relative positions of all buttons on the main menu screen and puts them where they should be
@@ -105,3 +108,24 @@ class AccountScene(SceneBase):
         self.login_button.rect.x, self.login_button.rect.y = self.screen_width / 2 - (
                     BUTTON_WIDTH / 2), self.screen_height / 1.7
 
+    def connect_DB(self, command):
+        connection = pymysql.connect(host='localhost', user='root', password='', db='users')
+
+        if command == "check":
+            pass
+        elif command == "register":
+            try:
+                with connection.cursor() as cursor:
+                    sql = "SELECT `Username` FROM `users`"
+                    cursor.execute(sql)
+                    a = list(cursor.fetchall())
+                    for x in a:
+                        if x[0] == self.input_box1.text:
+                            return 'A user with that username already exists. Please try again!'
+                        else:
+                            sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
+                            cursor.execute(sql, (self.input_box1.text, self.input_box2.text))
+                            connection.commit()
+                            return 'Operation executed successfully!'
+            finally:
+                connection.close()
