@@ -34,7 +34,7 @@ class MenuScene(SceneBase):
                                      BUTTON_HEIGHT), RED, 'Quit')
         self.menu_button_4 = Button(
             (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.7, BUTTON_WIDTH,
-             BUTTON_HEIGHT), RED, 'Account')
+             BUTTON_HEIGHT), RED, 'Accounts')
 
         self.background = None
         self.logos = [pygame.image.load("frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]

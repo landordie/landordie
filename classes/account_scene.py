@@ -41,8 +41,10 @@ class AccountScene(SceneBase):
         self.x = 0
 
         # Container for credential fields
-        self.button_cont_w, self.button_cont_h = self.screen_width / 2, self.screen_height / 3
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2 - self.button_cont_w / 2), (self.screen_height / 5)
+        self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), (
+                self.screen_height * 0.15)
+        self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
@@ -53,10 +55,12 @@ class AccountScene(SceneBase):
         self.status_cont.fill(BLACK_HIGHLIGHT2)
 
         # Input boxes to handle input for username and password
-        self.input_box1 = InputBox(self.button_cont_x * 1.7, self.button_cont_y + 50, '', 350, 33)
-        self.input_box2 = InputBox(self.button_cont_x * 1.7, self.button_cont_y * 1.60 + 50, '', 350, 33)
+        self.input_box1 = InputBox(self.button_cont_x * 4.5, self.button_cont_y * 1.3, '', 350, 33)
+        self.input_box2 = InputBox(self.button_cont_x * 4.5, self.button_cont_y * 1.9, '', 350, 33)
+        self.input_box3 = InputBox(self.button_cont2_x * 1.28, self.button_cont_y * 1.3, '', 350, 33)
+        self.input_box4 = InputBox(self.button_cont2_x * 1.28, self.button_cont_y * 1.9, '', 350, 33)
         self.status = ''  # This variable indicates the status of the DB connection
-        self.fields = [self.input_box1, self.input_box2]  # A list used to group the input fields for cleaner code
+        self.fields = [self.input_box1, self.input_box2, self.input_box3, self.input_box4]  # A list used to group the input fields for cleaner code
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
@@ -81,54 +85,83 @@ class AccountScene(SceneBase):
 
     def Render(self, screen):
         screen.set_mode((self.screen_width, self.screen_height))
+        display = screen.get_surface()
 
         # Background parallax effect
         image_width = self.background.get_rect().width
         # The relative x of the image used for the parallax effect
         rel_x = self.x % image_width
         # Displaying the image based on the relative x and the image width
-        screen.get_surface().blit(self.background, (rel_x - image_width, 0))
+        display.blit(self.background, (rel_x - image_width, 0))
         # When the right end of the image reaches the right side of the screen
         # a new image starts displaying so we do not have any black spaces
         if rel_x < self.screen_width:
-            screen.get_surface().blit(self.background, (rel_x, 0))
+            display.blit(self.background, (rel_x, 0))
         # This decrement is what makes the image "move"
         self.x -= 1
         # Update buttons
-        self.menu_button.update(screen.get_surface())
-        self.login_button.update(screen.get_surface())
-        self.register_button.update(screen.get_surface())
+        self.menu_button.update(display)
+        self.login_button.update(display)
+        self.register_button.update(display)
 
         # Display containers, input boxes and instructions
-        screen.get_surface().blit(self.button_cont,
+        display.blit(self.button_cont,
                                   (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
 
-        self.draw_text(screen, "Username:", (self.button_cont_x * 1.4, self.button_cont_y * 1.42),
+        display.blit(self.button_cont,
+                     (self.button_cont2_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
+
+        self.draw_text(screen, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45),
                        self.font_medium, WHITE)
-        self.draw_text(screen, "Password:", (self.button_cont_x * 1.4, self.button_cont_y * 2.03),
+        self.draw_text(screen, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05),
                       self.font_medium, WHITE)
+        self.draw_text(screen, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Password:", (self.button_cont2_x * 1.15, self.button_cont_y * 2.05),
+                       self.font_medium, WHITE)
 
         # If the status variable is changed (the value not equal to the initial one)
         if self.status != '':
             # Show the status on screen
-            screen.get_surface().blit(self.status_cont,
+            display.blit(self.status_cont,
                                       (self.status_cont_x, self.status_cont_y, self.status_cont_w, self.status_cont_h))
             self.draw_text(screen, self.status, (self.screen_width / 2, self.screen_height / 8),
                            self.font_playernum, WHITE)
 
         # Draw credential fields on screen and reflect any changes to their content
-        self.input_box1.draw(screen.get_surface())
-        self.input_box2.draw(screen.get_surface(), True)  # True here indicates that the field must be hidden (with '*')
+        self.input_box1.draw(display)
+        self.input_box2.draw(display, True)  # True here indicates that the field must be hidden (with '*')
+        self.input_box3.draw(display)
+        self.input_box4.draw(display, True)
 
     # This method is used when changing the resolutions
     # It recalculates the relative positions of all buttons on the main menu screen and puts them where they should be
     def update_all(self):
+        # Container for credential fields
+        self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), (
+                    self.screen_height * 0.15)
+        self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
+        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+
+        # Container for the database response
+        self.status_cont_w, self.status_cont_h = self.screen_width / 1.2, self.screen_height / 12
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), (
+                    self.screen_height / 12)
+        self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
+
         self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width / 2 - (
                     BUTTON_WIDTH / 2), self.screen_height / 1.2
         self.register_button.rect.x, self.register_button.rect.y = self.screen_width / 2 - (
                     BUTTON_WIDTH / 2), self.screen_height / 1.4
         self.login_button.rect.x, self.login_button.rect.y = self.screen_width / 2 - (
                     BUTTON_WIDTH / 2), self.screen_height / 1.7
+
+        # Input boxes to handle input for username and password
+        self.input_box1.rect.x, self.input_box1.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.3
+        self.input_box2.rect.x, self.input_box2.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.9
+        self.input_box3.rect.x, self.input_box3.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.3
+        self.input_box4.rect.x, self.input_box4.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.9
 
     def connect_DB(self, command):
         """The method is used to connect to a local database and make checks or register new users in it."""
