@@ -9,12 +9,13 @@ from .star_field import StarField
 
 
 class ResultScene(SceneBase):
-    def __init__(self, player1_pts, player2_pts):
+    def __init__(self, player1_pts, player2_pts, logged_in=False):
         SceneBase.__init__(self)
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
         self.background = pygame.image.load('frames/splash_BG.jpg')
         self.star_field = StarField(self.screen_width, self.screen_height)
+        self.type = logged_in
 
         self.menu_button = Button(
             (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT),
@@ -65,10 +66,13 @@ class ResultScene(SceneBase):
                 from classes import MenuScene
                 self.SwitchToScene(MenuScene.getInstance())
             else:
-                if self.player_no == 1:
-                    self.get_player_name(event)
-                elif self.player_no == 2:
-                    self.get_player_name(event)
+                if not self.type:
+                    if self.player_no == 1:
+                        self.get_player_name(event)
+                    elif self.player_no == 2:
+                        self.get_player_name(event)
+                else:
+
 
     def Update(self):
         pass

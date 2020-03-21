@@ -16,7 +16,7 @@ class MenuScene(SceneBase):
             MenuScene()
         return MenuScene.__instance
 
-    def __init__(self, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
+    def __init__(self):
         """ Virtually private constructor. """
         if MenuScene.__instance is not None:
             raise Exception("This class is a MenuScene!")

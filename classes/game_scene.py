@@ -272,7 +272,7 @@ class GameScene(SceneBase):
                 self.Terminate()
             else:
                 if SceneBase.logged_in:
-                    self.SwitchToScene(None)
+                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts, True))
                 else:
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
@@ -286,8 +286,7 @@ class GameScene(SceneBase):
                 else:
                     self.player1_pts += 50
                     if SceneBase.logged_in:
-                        print(self.logged_in)
-                        self.SwitchToScene(None)
+                        self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts, True))
                     else:
                         self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 # ======================================================================================================================
