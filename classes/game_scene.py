@@ -285,8 +285,9 @@ class GameScene(SceneBase):
                     self.Terminate()
                 else:
                     self.player1_pts += 50
-                    if SceneBase.logged_in:
-                        self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts, True))
+                    if SceneBase.logged_in:  # this attribute is set to True if the current player has logged into their
+                        # account from the Account menu
+                        self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
                     else:
                         self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 # ======================================================================================================================

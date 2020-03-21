@@ -12,13 +12,12 @@ from .star_field import StarField
 
 
 class ResultScene(SceneBase):
-    def __init__(self, player1_pts, player2_pts, logged_in=False):
+    def __init__(self, player1_pts, player2_pts):
         SceneBase.__init__(self)
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
         self.background = pygame.image.load('frames/splash_BG.jpg')
         self.star_field = StarField(self.screen_width, self.screen_height)
-        self.type = logged_in
 
         self.menu_button = Button(
             (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT),
@@ -30,7 +29,7 @@ class ResultScene(SceneBase):
         self.player_no = 1
         self.status = ''
 
-        if self.type:
+        if SceneBase.logged_in:
             self.connect_DB()
 
     # A method to populate player names from user input and display them on the screen
@@ -73,7 +72,7 @@ class ResultScene(SceneBase):
                 from classes import MenuScene
                 self.SwitchToScene(MenuScene.getInstance())
             else:
-                if not self.type:
+                if not SceneBase.logged_in:
                     if self.player_no == 1:
                         self.get_player_name(event)
                     elif self.player_no == 2:
@@ -104,7 +103,7 @@ class ResultScene(SceneBase):
                        (self.screen_width / 2, self.screen_height / 1.5),
                        self.press2s, CYAN)
 
-        if not self.type:
+        if not SceneBase.logged_in:
             self.draw_text(screen, "Please type your name or initials.", (self.screen_width / 2, self.screen_height / 4),
                            self.font_medium, CYAN)
             self.draw_text(screen, "As you start typing, your name will appear "
