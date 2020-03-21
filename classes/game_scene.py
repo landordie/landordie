@@ -134,10 +134,6 @@ class GameScene(SceneBase):
 
         # The following for-loop checks each event that has been passed to the ProcessInput method
         for event in events:
-            # TODO: Remove 'if' in final code
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
-                self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
-
             # This stop displaying the thrust once the key responsible for activating spacecraft engines is released
             if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.ctrls[1]]:
                 self.spacecraft.image = self.spacecraft.normal
@@ -275,7 +271,7 @@ class GameScene(SceneBase):
             if paused:
                 self.Terminate()
             else:
-                if self.logged_in:
+                if SceneBase.logged_in:
                     self.SwitchToScene(None)
                 else:
                     self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
@@ -289,8 +285,9 @@ class GameScene(SceneBase):
                     self.Terminate()
                 else:
                     self.player1_pts += 50
-                    if self.logged_in:
-                        self.SwitchToScene(MenuScene.getInstance())
+                    if SceneBase.logged_in:
+                        print(self.logged_in)
+                        self.SwitchToScene(None)
                     else:
                         self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 # ======================================================================================================================

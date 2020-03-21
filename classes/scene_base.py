@@ -27,12 +27,12 @@ class SceneBase:
             5 - Terminate() - This method sets the current scenes '.next' variable to None. That is how clicking on
             the 'X' (exit) button of the window stops the game.
     """
+    logged_in = False
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
     def __init__(self):
         self.next = self
-        self.logged_in = False
         # Fonts:
         self.font_medium = pygame.font.Font(DEFAULT_FONT, 18)
         self.font_playernum = pygame.font.Font(DEFAULT_FONT, 17)

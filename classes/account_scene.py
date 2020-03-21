@@ -68,6 +68,8 @@ class AccountScene(SceneBase):
                     self.SwitchToScene(menu)
                 if self.register_button.on_click(event):
                     self.connect_DB("register")
+                if self.login_button.on_click(event):
+                    self.connect_DB("check")
 
     def Update(self):
         pass
@@ -124,28 +126,47 @@ class AccountScene(SceneBase):
         try:
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
 
+            for field in self.fields:
+                if field.text == '':
+                    self.status = 'You cannot submit an empty field. Please try again!'
+                    return
+
             if command == "check":
-                self.logged_in = True
-                pass
+                if not self.logged_in:
+                    try:
+                        with connection.cursor() as cursor:
+                            sql = "SELECT `Username`, `Password` FROM `users` WHERE (Username='%s') AND (Password='%s')"\
+                                  % (self.fields[0].text, self.fields[1].text)
+                            cursor.execute(sql)
+                            a = cursor.fetchone()
+                            if a is not None:
+                                self.status = 'You are now signed in as [%s]! Enjoy the game.' % self.fields[0].text
+                                SceneBase.logged_in = True
+                            else:
+                                self.status = 'Wrong credentials entered. Please check the input again. '
+                    finally:
+                        connection.close()
+                else:
+                    self.status = 'You are already signed in! Please log out first.'
+
             elif command == "register":
-                for field in self.fields:
-                    if field.text == '':
-                        self.status = 'You cannot submit an empty field. Please try again!'
-                        return
-                try:
-                    with connection.cursor() as cursor:
-                        sql = "SELECT `Username` FROM `users`"
-                        cursor.execute(sql)
-                        a = [row[0] for row in cursor.fetchall()]
-                        if self.fields[0].text in a:
-                            self.status = 'A user with that username already exists. Please try again!'
-                        else:
-                            sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
-                            cursor.execute(sql, (self.fields[0].text, self.fields[1].text))
-                            connection.commit()
-                            self.status = 'Operation executed successfully!'
-                finally:
-                    connection.close()
+                if not self.logged_in:
+                    try:
+                        with connection.cursor() as cursor:
+                            sql = "SELECT `Username` FROM `users`"
+                            cursor.execute(sql)
+                            a = [row[0] for row in cursor.fetchall()]
+                            if self.fields[0].text in a:
+                                self.status = 'A user with that username already exists. Please try again!'
+                            else:
+                                sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
+                                cursor.execute(sql, (self.fields[0].text, self.fields[1].text))
+                                connection.commit()
+                                self.status = 'Operation executed successfully!'
+                    finally:
+                        connection.close()
+                else:
+                    self.status = 'You are already signed in! Please log out to proceed.'
         except pymysql.err.OperationalError:
             self.status = 'The server is currently offline. Please try again later.'
 
