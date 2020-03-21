@@ -141,6 +141,7 @@ class AccountScene(SceneBase):
                             a = cursor.fetchone()
                             if a is not None:
                                 self.status = 'You are now signed in as [%s]! Enjoy the game.' % self.fields[0].text
+                                SceneBase.credentials = [self.fields[0].text, self.fields[1].text]
                                 SceneBase.logged_in = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again. '

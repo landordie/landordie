@@ -409,25 +409,6 @@ class GameScene(SceneBase):
             pygame.display.update()
             GameClock().tick(FPS)
 
-    # def connect_DB(self, command):
-    #     try:
-    #         connection = pymysql.connect(host='localhost', user='root', password='', db='users')
-    #
-    #         if command == "check":
-    #             pass
-    #         elif command == "insert":
-    #             try:
-    #                 with connection.cursor() as cursor:
-    #                     sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
-    #                     cursor.execute(sql, (self.fields[0].text, self.fields[1].text))
-    #                     connection.commit()
-    #                     self.logged_in = True
-    #                     self.status = 'Operation executed successfully!'
-    #             finally:
-    #                 connection.close()
-    #     except pymysql.err.OperationalError:
-    #         self.status = 'The server is currently offline. Please try again later.'
-
     def random_terrain(self):
         """
         Create a random terrain from a sequence of linked pymunk segment objects.

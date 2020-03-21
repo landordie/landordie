@@ -3,6 +3,9 @@ Result scene class
 """
 import csv
 from datetime import date
+
+import pymysql
+
 from .scene_base import *
 from .button import *
 from .star_field import StarField
@@ -25,6 +28,10 @@ class ResultScene(SceneBase):
         self.player2_name = ""
         # Holds a value to determine which player's name is being received as input
         self.player_no = 1
+        self.status = ''
+
+        if self.type:
+            self.connect_DB()
 
     # A method to populate player names from user input and display them on the screen
     def get_player_name(self, event):
@@ -71,8 +78,6 @@ class ResultScene(SceneBase):
                         self.get_player_name(event)
                     elif self.player_no == 2:
                         self.get_player_name(event)
-                else:
-
 
     def Update(self):
         pass
@@ -82,6 +87,11 @@ class ResultScene(SceneBase):
         screen.get_surface().blit(self.background, (0, 0))
         self.star_field.draw_stars(screen.get_surface())
 
+        self.display_scene(screen)
+
+        self.menu_button.update(screen.get_surface())
+
+    def display_scene(self, screen):
         self.draw_text(screen, "GAME RESULTS",
                        (self.screen_width / 2, self.screen_height / 5),
                        self.press2s, CYAN)
@@ -93,33 +103,50 @@ class ResultScene(SceneBase):
         self.draw_text(screen, f"Player 2 Score = {self.player2_pts} points",
                        (self.screen_width / 2, self.screen_height / 1.5),
                        self.press2s, CYAN)
-        
-        self.draw_text(screen, "Please type your name or initials.", (self.screen_width/2, self.screen_height/4), self.font_medium, CYAN)
-        self.draw_text(screen, "As you start typing, your name will appear "
-                               "on the screen", (self.screen_width/2, self.screen_height/3.33), self.font_medium, CYAN)
-        self.draw_text(screen, "To confirm press ENTER | To delete a character use BACKSPACE",
-                       (self.screen_width/2, self.screen_height/2.85), self.font_medium, CYAN)
-        self.draw_text(screen, "Name >>", (self.screen_width/2.45, self.screen_height/2.15), self.font_medium, CYAN)
-        self.draw_text(screen, "Name >>", (self.screen_width/2.45, self.screen_height/1.35), self.font_medium, CYAN)
 
-        # Two blocks displaying the names of the players
-        block = self.font_medium.render(self.player1_name, True, CYAN)
-        rect = block.get_rect()
-        rect.left = self.screen_width / 2.15
-        rect.top = self.screen_height / 2.21
+        if not self.type:
+            self.draw_text(screen, "Please type your name or initials.", (self.screen_width / 2, self.screen_height / 4),
+                           self.font_medium, CYAN)
+            self.draw_text(screen, "As you start typing, your name will appear "
+                                   "on the screen", (self.screen_width / 2, self.screen_height / 3.33), self.font_medium,
+                           CYAN)
+            self.draw_text(screen, "To confirm press ENTER | To delete a character use BACKSPACE",
+                           (self.screen_width / 2, self.screen_height / 2.85), self.font_medium, CYAN)
+            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15), self.font_medium, CYAN)
+            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35), self.font_medium, CYAN)
 
-        block2 = self.font_medium.render(self.player2_name, True, CYAN)
-        rect2 = block2.get_rect()
-        rect2.left = self.screen_width / 2.15
-        rect2.top = self.screen_height / 1.38
+            # Two blocks displaying the names of the players
+            block = self.font_medium.render(self.player1_name, True, CYAN)
+            rect = block.get_rect()
+            rect.left = self.screen_width / 2.15
+            rect.top = self.screen_height / 2.21
 
-        screen.get_surface().blit(block, rect)
-        screen.get_surface().blit(block2, rect2)
+            block2 = self.font_medium.render(self.player2_name, True, CYAN)
+            rect2 = block2.get_rect()
+            rect2.left = self.screen_width / 2.15
+            rect2.top = self.screen_height / 1.38
 
-        # Variable player_no changes on every press of the button Enter until it is equal to 4
-        if self.player_no == 3:
-            self.store_result()
-            self.player_no += 1
+            screen.get_surface().blit(block, rect)
+            screen.get_surface().blit(block2, rect2)
 
-        self.menu_button.update(screen.get_surface())
+            # Variable player_no changes on every press of the button Enter until it is equal to 4
+            if self.player_no == 3:
+                self.store_result()
+                self.player_no += 1
+        else:
+            self.draw_text(screen, self.status,
+                           (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
 
+    def connect_DB(self):
+        try:
+            connection = pymysql.connect(host='localhost', user='root', password='', db='users')
+            try:
+                with connection.cursor() as cursor:
+                    sql = "UPDATE `users` SET `Score`=%s WHERE Username='%s'" % (self.player1_pts, SceneBase.credentials[0])
+                    cursor.execute(sql)
+                    connection.commit()
+                    self.status = 'Scores for player [%s] updated successfully!' % SceneBase.credentials[0]
+            finally:
+                connection.close()
+        except pymysql.err.OperationalError:
+            self.status = 'The server is currently offline. Please try again later.'

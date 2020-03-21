@@ -28,6 +28,7 @@ class SceneBase:
             the 'X' (exit) button of the window stops the game.
     """
     logged_in = False
+    credentials = []
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
