@@ -27,8 +27,8 @@ class SceneBase:
             5 - Terminate() - This method sets the current scenes '.next' variable to None. That is how clicking on
             the 'X' (exit) button of the window stops the game.
     """
-    logged_in = False
-    credentials = []
+    logged_in = False  # This variable indicates if a player has logged in. The variable is shared by all the scenes
+    credentials = []   # This list contains the credentials of the currently logged in user
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
@@ -48,8 +48,6 @@ class SceneBase:
         text_rect = text.get_rect(center=position)
         screen.get_surface().blit(text, text_rect)
 
-    # Using this method mainly for testing
-    # The game logic will be implemented in the Update() method
     def ProcessInput(self, events, pressed_keys):
         print("(!) Override in child class (!)")
 

@@ -29,7 +29,7 @@ class ResultScene(SceneBase):
         self.player_no = 1
         self.status = ''
 
-        if SceneBase.logged_in:
+        if SceneBase.logged_in:  # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
     # A method to populate player names from user input and display them on the screen
@@ -57,7 +57,7 @@ class ResultScene(SceneBase):
                 elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                     self.player2_name = self.player2_name[:-1]
 
-    def store_result(self):
+    def store_result(self):  # This method saves the current scores to a local .csv file
         with open('highscore_list.csv', mode='a') as csv_file:
             fieldnames = ['Name', 'Score', 'Date']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -68,10 +68,12 @@ class ResultScene(SceneBase):
 
     def ProcessInput(self, events, pressed_keys):
         for event in events:
+            # Check for the menu button click
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 from classes import MenuScene
                 self.SwitchToScene(MenuScene.getInstance())
             else:
+                # Otherwise get player names if local storage will be used
                 if not SceneBase.logged_in:
                     if self.player_no == 1:
                         self.get_player_name(event)
@@ -82,15 +84,18 @@ class ResultScene(SceneBase):
         pass
 
     def Render(self, screen):
+        # Render the background and star field
         screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().blit(self.background, (0, 0))
         self.star_field.draw_stars(screen.get_surface())
 
-        self.display_scene(screen)
+        self.display_scene(screen)  # Display the scene specific content (depends on the storage to be used)
 
+        # Handle the menu button
         self.menu_button.update(screen.get_surface())
 
     def display_scene(self, screen):
+        # Display main messages
         self.draw_text(screen, "GAME RESULTS",
                        (self.screen_width / 2, self.screen_height / 5),
                        self.press2s, CYAN)
@@ -103,6 +108,7 @@ class ResultScene(SceneBase):
                        (self.screen_width / 2, self.screen_height / 1.5),
                        self.press2s, CYAN)
 
+        # If not logged in ask for user names for both players for the .cvs safe
         if not SceneBase.logged_in:
             self.draw_text(screen, "Please type your name or initials.", (self.screen_width / 2, self.screen_height / 4),
                            self.font_medium, CYAN)
@@ -133,19 +139,21 @@ class ResultScene(SceneBase):
                 self.store_result()
                 self.player_no += 1
         else:
+            # If the user decides to save scores to the DB, blit status
             self.draw_text(screen, self.status,
                            (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
 
-    def connect_DB(self):
-        try:
+    def connect_DB(self):  # Method to connect to the database and update the score of the current user
+        try:  # Try to connect to DB
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
             try:
-                with connection.cursor() as cursor:
+                with connection.cursor() as cursor:  # Create a cursor object
+                    # Write SQL statement, execute and commit the changes
                     sql = "UPDATE `users` SET `Score`=%s WHERE Username='%s'" % (self.player1_pts, SceneBase.credentials[0])
                     cursor.execute(sql)
                     connection.commit()
                     self.status = 'Scores for player [%s] updated successfully!' % SceneBase.credentials[0]
             finally:
-                connection.close()
-        except pymysql.err.OperationalError:
+                connection.close()  # Always close the connection
+        except pymysql.err.OperationalError:  # If error occurs with the connection to the DB, notify user
             self.status = 'The server is currently offline. Please try again later.'

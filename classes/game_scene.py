@@ -271,10 +271,7 @@ class GameScene(SceneBase):
             if paused:
                 self.Terminate()
             else:
-                if SceneBase.logged_in:
-                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts, True))
-                else:
-                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+                self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 
         # If a landing attempt is performed and the conditions passes (e.g velocity is not too high, the position is
         # correct, the angle of rotation is not too big, etc.) increment the score of the craft player and stop game
@@ -285,11 +282,7 @@ class GameScene(SceneBase):
                     self.Terminate()
                 else:
                     self.player1_pts += 50
-                    if SceneBase.logged_in:  # this attribute is set to True if the current player has logged into their
-                        # account from the Account menu
-                        self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
-                    else:
-                        self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
 # ======================================================================================================================
 
     """ All these methods below are helpers which are used for simplifying the above code."""
