@@ -109,7 +109,7 @@ class ResultScene(SceneBase):
                        self.press2s, CYAN)
 
         # If not logged in ask for user names for both players for the .cvs safe
-        if not SceneBase.logged_in:
+        if not (SceneBase.logged_in[0] or SceneBase.logged_in[1]):
             self.draw_text(screen, "Please type your name or initials.", (self.screen_width / 2, self.screen_height / 4),
                            self.font_medium, CYAN)
             self.draw_text(screen, "As you start typing, your name will appear "
