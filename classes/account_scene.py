@@ -8,8 +8,6 @@ import pymysql.cursors
 
 class AccountScene(SceneBase):
     __instance = None
-    logged_in = [False, False]  # This variable indicates if a player has logged in. The variable is shared by all the scenes
-    credentials = [[], []]  # This list contains the credentials of the currently logged in user
 
     @staticmethod
     def getInstance():
@@ -193,7 +191,7 @@ class AccountScene(SceneBase):
                     return
 
             if command == "login_sc":  # If the request asks the DB to check if user exists
-                if not self.logged_in[0]:  # and another user is not currently logged in from the session
+                if not SceneBase.logged_in[0]:  # and another user is not currently logged in from the session
                     try:
                         # Create a cursor object which will be used to execute commands on the DB
                         with connection.cursor() as cursor:
@@ -204,9 +202,8 @@ class AccountScene(SceneBase):
                             player = cursor.fetchone()  # And get the result of the query
                             if player:  # If the check was successful (a table entry is returned)
                                 self.status = 'Spacecraft player signed in as [{0}]! Enjoy the game.'.format(name)
-                                for field in [name, pw]:
-                                    AccountScene.credentials.append(field)  # Update the state
-                                self.logged_in[0] = True
+                                SceneBase.credentials[0] = [name, pw]  # Update the state
+                                SceneBase.logged_in[0] = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again.'
                     finally:  # Always close the connection
@@ -215,7 +212,7 @@ class AccountScene(SceneBase):
                     self.status = 'You are already signed in! Please log out first.'
 
             elif command == "register_sc":  # If the DB has to register a new user
-                if not self.logged_in[0]:  # and one is not currently logged into another account
+                if not SceneBase.logged_in[0]:  # and one is not currently logged into another account
                     try:
                         with connection.cursor() as cursor:  # Create a cursor object
                             sql = "SELECT `Username` FROM `users`"  # Define the statement in SQL
@@ -234,7 +231,7 @@ class AccountScene(SceneBase):
                 else:
                     self.status = 'You are already signed in! Please log out to proceed.'
             elif command == "login_asc":  # If the request asks the DB to check if user exists
-                if not self.logged_in[1]:  # and another user is not currently logged in from the session
+                if not SceneBase.logged_in[1]:  # and another user is not currently logged in from the session
                     try:
                         # Create a cursor object which will be used to execute commands on the DB
                         with connection.cursor() as cursor:
@@ -244,10 +241,9 @@ class AccountScene(SceneBase):
                             cursor.execute(sql)  # Execute statement
                             player = cursor.fetchone()  # And get the result of the query
                             if player:  # If the check was successful (a table entry is returned)
-                                self.status = 'Spacecraft player signed in as [{0}]! Enjoy the game.'.format(name)
-                                for field in [name, pw]:
-                                    AccountScene.credentials.append(field)  # Update the state
-                                self.logged_in[1] = True
+                                self.status = 'Anti-spacecraft player signed in as [{0}]! Enjoy the game.'.format(name)
+                                SceneBase.credentials[1] = [name, pw]  # Update the state
+                                SceneBase.logged_in[1] = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again.'
                     finally:  # Always close the connection
@@ -256,7 +252,7 @@ class AccountScene(SceneBase):
                     self.status = 'You are already signed in! Please log out first.'
 
             elif command == "register_asc":  # If the DB has to register a new user
-                if not self.logged_in[1]:  # and one is not currently logged into another account
+                if not SceneBase.logged_in[1]:  # and one is not currently logged into another account
                     try:
                         with connection.cursor() as cursor:  # Create a cursor object
                             sql = "SELECT `Username` FROM `users`"  # Define the statement in SQL

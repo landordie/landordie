@@ -9,7 +9,7 @@ import pymysql
 from .scene_base import *
 from .button import *
 from .star_field import StarField
-from .account_scene import AccountScene
+#from .account_scene import AccountScene
 
 
 class ResultScene(SceneBase):
@@ -30,7 +30,7 @@ class ResultScene(SceneBase):
         self.player_no = 1
         self.status = ''
 
-        if AccountScene.logged_in[0] or AccountScene.logged_in[1]:  # If we are logged in and the game has finished, save the scores to the DB)
+        if SceneBase.logged_in[0] or SceneBase.logged_in[1]:  # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
     # A method to populate player names from user input and display them on the screen
@@ -75,7 +75,7 @@ class ResultScene(SceneBase):
                 self.SwitchToScene(MenuScene.getInstance())
             else:
                 # Otherwise get player names if local storage will be used
-                if not (AccountScene.logged_in[0] or AccountScene.logged_in[1]):
+                if not (SceneBase.logged_in[0] or SceneBase.logged_in[1]):
                     if self.player_no == 1:
                         self.get_player_name(event)
                     elif self.player_no == 2:
@@ -110,7 +110,7 @@ class ResultScene(SceneBase):
                        self.press2s, CYAN)
 
         # If not logged in ask for user names for both players for the .cvs safe
-        if not (AccountScene.logged_in[0] or AccountScene.logged_in[1]):
+        if not (SceneBase.logged_in[0] or SceneBase.logged_in[1]):
             self.draw_text(screen, "Please type your name or initials.", (self.screen_width / 2, self.screen_height / 4),
                            self.font_medium, CYAN)
             self.draw_text(screen, "As you start typing, your name will appear "
@@ -149,21 +149,21 @@ class ResultScene(SceneBase):
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
             try:
                 with connection.cursor() as cursor:  # Create a cursor object
-                    if AccountScene.logged_in[0]:
+                    if SceneBase.logged_in[0]:
                         # Write SQL statement, execute and commit the changes
                         sql = "UPDATE `users` SET `Spacecraft Score`=" + str(self.player1_pts) + " WHERE Username='" + \
-                              str(AccountScene.credentials[0][0]) + "'"
+                              str(SceneBase.credentials[0][0]) + "'"
                         cursor.execute(sql)
                         connection.commit()
-                        self.status = 'Scores for player [%s] updated successfully!' % AccountScene.credentials[0][0]
-                    if AccountScene.logged_in[1]:
+                        self.status = 'Scores for player [%s] updated successfully!' % SceneBase.credentials[0][0]
+                    if SceneBase.logged_in[1]:
                         # Write SQL statement, execute and commit the changes
                         sql = "UPDATE `users` SET `Anti-spacecraft Score`=" + str(
                             self.player2_pts) + " WHERE Username='" + \
-                              str(AccountScene.credentials[1][0]) + "'"
+                              str(SceneBase.credentials[1][0]) + "'"
                         cursor.execute(sql)
                         connection.commit()
-                        self.status = 'Scores for player [%s] updated successfully!' % AccountScene.credentials[1][0]
+                        self.status = 'Scores for player [%s] updated successfully!' % SceneBase.credentials[1][0]
             finally:
                 connection.close()  # Always close the connection
         except pymysql.err.OperationalError:  # If error occurs with the connection to the DB, notify user
