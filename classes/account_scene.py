@@ -8,8 +8,6 @@ import pymysql.cursors
 
 class AccountScene(SceneBase):
     __instance = None
-    logged_in = [False, False]  # This variable indicates if a player has logged in. The variable is shared by all the scenes
-    credentials = []  # This list contains the credentials of the currently logged in user
 
     @staticmethod
     def getInstance():
@@ -206,7 +204,7 @@ class AccountScene(SceneBase):
                                 self.status = 'Spacecraft player signed in as [{0}]! Enjoy the game.'.format(name)
                                 for field in [name, pw]:
                                     AccountScene.credentials.append(field)  # Update the state
-                                AccountScene.logged_in = True
+                                self.logged_in[0] = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again.'
                     finally:  # Always close the connection
@@ -247,7 +245,7 @@ class AccountScene(SceneBase):
                                 self.status = 'Spacecraft player signed in as [{0}]! Enjoy the game.'.format(name)
                                 for field in [name, pw]:
                                     AccountScene.credentials.append(field)  # Update the state
-                                AccountScene.logged_in = True
+                                self.logged_in[1] = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again.'
                     finally:  # Always close the connection

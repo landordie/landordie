@@ -29,7 +29,7 @@ class ResultScene(SceneBase):
         self.player_no = 1
         self.status = ''
 
-        if SceneBase.logged_in:  # If we are logged in and the game has finished, save the scores to the DB)
+        if SceneBase.logged_in[0] or SceneBase.logged_in[1]:  # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
     # A method to populate player names from user input and display them on the screen
