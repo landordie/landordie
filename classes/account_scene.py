@@ -53,7 +53,7 @@ class AccountScene(SceneBase):
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
         # Container for the database response
-        self.status_cont_w, self.status_cont_h = self.screen_width / 1.2, self.screen_height / 15
+        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), (
                 self.screen_height / 15)
         self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
