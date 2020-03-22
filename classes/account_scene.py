@@ -8,7 +8,7 @@ import pymysql.cursors
 
 class AccountScene(SceneBase):
     __instance = None
-    logged_in = False  # This variable indicates if a player has logged in. The variable is shared by all the scenes
+    logged_in = [False, False]  # This variable indicates if a player has logged in. The variable is shared by all the scenes
     credentials = []  # This list contains the credentials of the currently logged in user
 
     @staticmethod
@@ -84,13 +84,13 @@ class AccountScene(SceneBase):
                     menu = MenuScene.getInstance()
                     self.SwitchToScene(menu)
                 elif self.reg_sc_button.on_click(event):  # Register user with DB
-                    self.connect_db("register", self.input_box1.text, self.input_box2.text)
+                    self.connect_db("register_sc", self.input_box1.text, self.input_box2.text)
                 elif self.login_sc_button.on_click(event):  # Check if user in DB and sign them in if True
-                    self.connect_db("login", self.input_box1.text, self.input_box2.text)
+                    self.connect_db("login_sc", self.input_box1.text, self.input_box2.text)
                 elif self.reg_a_sc_button.on_click(event):  # Register user with DB
-                    self.connect_db("register", self.input_box3.text, self.input_box4.text)
+                    self.connect_db("register_asc", self.input_box3.text, self.input_box4.text)
                 elif self.login_a_sc_button.on_click(event):  # Check if user in DB and sign them in if True
-                    self.connect_db("login", self.input_box3.text, self.input_box4.text)
+                    self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
 
     def Update(self):
         pass
@@ -192,8 +192,8 @@ class AccountScene(SceneBase):
                     self.status = 'You cannot submit an empty field. Please try again!'
                     return
 
-            if command == "login":  # If the request asks the DB to check if user exists
-                if not self.logged_in:  # and another user is not currently logged in from the session
+            if command == "login_sc":  # If the request asks the DB to check if user exists
+                if not self.logged_in[0]:  # and another user is not currently logged in from the session
                     try:
                         # Create a cursor object which will be used to execute commands on the DB
                         with connection.cursor() as cursor:
@@ -214,8 +214,49 @@ class AccountScene(SceneBase):
                 else:
                     self.status = 'You are already signed in! Please log out first.'
 
-            elif command == "register":  # If the DB has to register a new user
-                if not self.logged_in:  # and one is not currently logged into another account
+            elif command == "register_sc":  # If the DB has to register a new user
+                if not self.logged_in[0]:  # and one is not currently logged into another account
+                    try:
+                        with connection.cursor() as cursor:  # Create a cursor object
+                            sql = "SELECT `Username` FROM `users`"  # Define the statement in SQL
+                            cursor.execute(sql)  # Execute it
+                            a = [row[0] for row in cursor.fetchall()]  # Fetch all username entries from the response
+                            if name in a:  # Check if a user with that name already exists
+                                self.status = 'A user with that username already exists. Please try again!'
+                            else:  # If not
+                                # Insert the current user and commit the changes to the server
+                                sql = "INSERT INTO `users` (`Username`, `Password`) VALUES (%s, %s)"
+                                cursor.execute(sql, (name, pw))
+                                connection.commit()
+                                self.status = 'Operation executed successfully!'
+                    finally:  # Always close the connection
+                        connection.close()
+                else:
+                    self.status = 'You are already signed in! Please log out to proceed.'
+            elif command == "login_asc":  # If the request asks the DB to check if user exists
+                if not self.logged_in[1]:  # and another user is not currently logged in from the session
+                    try:
+                        # Create a cursor object which will be used to execute commands on the DB
+                        with connection.cursor() as cursor:
+                            # Create the SQL statement to get the users with the given credentials
+                            sql = "SELECT `Username`, `Password` FROM `users` WHERE (Username='{0}') " \
+                                  "AND (Password='{1}')".format(name, pw)
+                            cursor.execute(sql)  # Execute statement
+                            player = cursor.fetchone()  # And get the result of the query
+                            if player:  # If the check was successful (a table entry is returned)
+                                self.status = 'Spacecraft player signed in as [{0}]! Enjoy the game.'.format(name)
+                                for field in [name, pw]:
+                                    AccountScene.credentials.append(field)  # Update the state
+                                AccountScene.logged_in = True
+                            else:
+                                self.status = 'Wrong credentials entered. Please check the input again.'
+                    finally:  # Always close the connection
+                        connection.close()
+                else:
+                    self.status = 'You are already signed in! Please log out first.'
+
+            elif command == "register_asc":  # If the DB has to register a new user
+                if not self.logged_in[1]:  # and one is not currently logged into another account
                     try:
                         with connection.cursor() as cursor:  # Create a cursor object
                             sql = "SELECT `Username` FROM `users`"  # Define the statement in SQL

@@ -27,6 +27,7 @@ class SceneBase:
             5 - Terminate() - This method sets the current scenes '.next' variable to None. That is how clicking on
             the 'X' (exit) button of the window stops the game.
     """
+    logged_in = [False, False]
     screen_width = DEFAULT_WIDTH
     screen_height = DEFAULT_HEIGHT
 
