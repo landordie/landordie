@@ -8,7 +8,10 @@ import pymysql.cursors
 
 class AccountScene(SceneBase):
     __instance = None
-    logged_in = False  # This variable indicates if a player has logged in. The variable is shared by all the scenes
+    logged_in = {
+        'Spacecraft': False,
+        'Anti_spacecraft': False
+    }  # Indicates if a player has logged in. The variable is shared by all the scenes
     credentials = []  # This list contains the credentials of the currently logged in user
 
     @staticmethod
