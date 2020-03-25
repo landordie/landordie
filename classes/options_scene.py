@@ -1,5 +1,5 @@
 """
-Options scene class
+Options scene class.
 """
 from classes import MenuScene
 from classes.input_box import InputBox
@@ -14,28 +14,29 @@ class OptionsScene(SceneBase):
     controls = []
 
     @staticmethod
-    def getInstance():
-        """ Static access method. Implementation of Singleton pattern"""
+    def get_instance():
+        """Static access method. Implementation of Singleton pattern."""
         if OptionsScene.__instance is None:
             OptionsScene()
         return OptionsScene.__instance
 
     def __init__(self):
-        """ Virtually private constructor. """
+        """Virtually private constructor."""
+        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
+        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
+        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
+
         if OptionsScene.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
             OptionsScene.__instance = self
 
-        SceneBase.__init__(self)
-        self.background = pygame.image.load("frames/BG.png")
-        self.x = 0
-        self.input_boxes = []
+        self.background = pygame.image.load("frames/BG.png")  # Initialize the background
+        self.x = 0  # Attribute to simulate the x-axis position of the background image
 
-        self.menu_button = Button(
-            (self.screen_width * 0.2, self.screen_height * 0.8, BUTTON_WIDTH, BUTTON_HEIGHT),
-            YELLOW,
-            'Main Menu')
+        # Create button allowing the user to return to main menu
+        self.menu_button = Button((self.screen_width * 0.2, self.screen_height * 0.8, BUTTON_WIDTH, BUTTON_HEIGHT),
+                                  YELLOW, 'Main Menu')
 
         # Container for resolution buttons
         self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 3
@@ -55,10 +56,10 @@ class OptionsScene(SceneBase):
             (self.res_cont_w / 3, self.res_cont_h / 0.85, BUTTON_WIDTH, BUTTON_HEIGHT),
             GREEN, "1280x800")
         self._res3 = Button(
-            (self.res_cont_w / 3, self.res_cont_h / 0.62, BUTTON_WIDTH, BUTTON_HEIGHT),
+            (self.res_cont_w / 3, self.res_cont_h / 0.6, BUTTON_WIDTH, BUTTON_HEIGHT),
             GREEN, "1440x900")
 
-        # Input boxes to change controls
+        # Input boxes to change controls (and a list allowing iteration over the input boxes)
         self.input_box1 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.35, 'A')
         self.input_box2 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.60, 'W')
         self.input_box3 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.85, 'D')
@@ -71,55 +72,55 @@ class OptionsScene(SceneBase):
         self.input_boxes = [self.input_box1, self.input_box2, self.input_box3, self.input_box4, self.input_box5,
                             self.input_box6, self.input_box7, self.input_box8]
 
-    def ProcessInput(self, events, pressed_keys):
+    def process_input(self, events, pressed_keys):
         for event in events:
 
             for input_box in self.input_boxes:
                 input_box.handle_event(event)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                self.Terminate()
-            """
-            Handling changing of resolution
-            """
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self._res2.on_click(event):
-                _res = self._res2._text.split("x")
-                SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
-                self.update_all()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self._res3.on_click(event):
-                _res = self._res3._text.split("x")
-                SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
-                self.update_all()
+                self.terminate()
 
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
-                # Pass input box texts
-                menu = MenuScene.getInstance()
-                menu.update_all()
-                self.SwitchToScene(menu)
+            # Handling change of resolution
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self._res2.on_click(event):
+                    _res = self._res2.text_string.split("x")
+                    SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
+                    self.update_all()
+                elif self._res3.on_click(event):
+                    _res = self._res3.text_string.split("x")
+                    SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
+                    self.update_all()
+                elif self.menu_button.on_click(event):
+                    # Pass input box texts
+                    menu = MenuScene.get_instance()
+                    menu.update_all()
+                    self.switch_to_scene(menu)
 
-    def Update(self):
-        pass
-
-    def Render(self, screen):
-        screen.set_mode((self.screen_width, self.screen_height))
+    def render(self, screen):
+        screen.set_mode((self.screen_width, self.screen_height))  # Set the screen size
+        display = screen.get_surface()  # Get the surface of the screen
 
         # Background parallax effect
-        # It works the same way as in the Main Menu scene
+        # It works the same way as in the MenuScene instance
         image_width = self.background.get_rect().width
-        rel_x = self.x % image_width
-        screen.get_surface().blit(self.background, (rel_x - image_width, 0))
+        rel_x = self.x % image_width  # The relative x of the image used for the parallax effect
+        # Displaying the image based on the relative x and the image width
+        display.blit(self.background, (rel_x - image_width, 0))
+        # When the right end of the image reaches the right side of the screen
+        # a new image starts displaying so we do not have any black spaces
         if rel_x < self.screen_width:
-            screen.get_surface().blit(self.background, (rel_x, 0))
-        self.x -= 1
+            display.blit(self.background, (rel_x, 0))
+        self.x -= 1  # This decrement is what makes the image "move"
 
         """Drawing the containers and displaying info text"""
         """(!) Containers are displayed relative to the screen size;
             (!) Buttons are displayed relative to the containers position"""
-        screen.get_surface().blit(self.res_cont, (self.res_cont_x, self.res_cont_y, self.res_cont_w, self.res_cont_h))
+        display.blit(self.res_cont, (self.res_cont_x, self.res_cont_y, self.res_cont_w, self.res_cont_h))
         self.draw_text(screen, "Resolution", (self.res_cont_x + self.res_cont_w / 2, self.res_cont_y / 1.1),
                        self.font_medium, WHITE)
 
-        screen.get_surface().blit(self.button_cont,
+        display.blit(self.button_cont,
                                   (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
         self.draw_text(screen, "Controls", (self.button_cont_x + self.button_cont_w // 2, self.button_cont_y // 1.1),
                        self.font_medium, WHITE)
@@ -147,12 +148,12 @@ class OptionsScene(SceneBase):
         self.draw_text(screen, "Shoot", (self.input_box8.rect.x * 0.85, self.input_box8.rect.y * 1.04),
                        self.font_medium, LIGHT_GREY)
 
-        self.menu_button.update(screen.get_surface())
-        self._res2.update(screen.get_surface())
-        self._res3.update(screen.get_surface())
+        self.menu_button.update(display)
+        self._res2.update(display)
+        self._res3.update(display)
 
         for input_box in self.input_boxes:
-            input_box.draw(screen.get_surface())
+            input_box.draw(display)
             input_box.update()
 
     def update_all(self):
@@ -160,20 +161,21 @@ class OptionsScene(SceneBase):
         # The button that returns to Main Menu
         self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.2, self.screen_height * 0.8
 
-        # The two containers
+        # The resolution buttons container
         self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 3
         self.res_cont_x, self.res_cont_y = (self.screen_width / 2) - (self.res_cont_w * 2.26), \
                                            (self.screen_height / 2) - (self.res_cont_h / 2.35)
+        self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
+
+        # The two buttons for resolutions
+        self._res2.rect.x, self._res2.rect.y = self.res_cont_w / 3, self.res_cont_h / 0.85
+        self._res3.rect.x, self._res3.rect.y = self.res_cont_w / 3, self.res_cont_h / 0.6
 
         self.button_cont_w, self.button_cont_h = self.screen_width / 3, self.screen_height / 1.5
         self.button_cont_x, self.button_cont_y = (self.screen_width / 2), (self.screen_height / 5)
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
 
-        # The two buttons for resolutions
-        self._res2.rect.x, self._res2.rect.y = self.res_cont_w / 3, self.res_cont_h / .85
-        self._res3.rect.x, self._res3.rect.y = self.res_cont_w / 3, self.res_cont_h / .62
-        self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
-
+        # Make adjustments to the input box positions by iterating over the list
         position_fractions = [[1.5, 1.5, 1.5, 1.45, 1.45, 1.45, 1.45, 1.45],
                               [1.35, 1.60, 1.85, 2.75, 3, 3.25, 3.50, 3.75]]
         i = 0

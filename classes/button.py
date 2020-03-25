@@ -11,8 +11,8 @@ class Button:
         self.rect = pg.Rect(rect)
         self.color = color
         self.font = pg.font.Font(DEFAULT_FONT, 15)
+        self.text_string = text
         self.text = self.font.render(text, True, WHITE)
-        self._text = text
         self.hovered = False
         self.image = pg.image.load("frames/Table_01.png")
         self.active_image = pg.image.load("frames/Table_01_active.png")

@@ -1,8 +1,9 @@
+"""
+SceneBase class.
+"""
 import pygame
 from constants import *
-
-
-pygame.font.init()  # Initialize the pygame font objects
+pygame.font.init()  # Initialize the Pygame font objects
 
 
 class SceneBase:
@@ -31,6 +32,7 @@ class SceneBase:
     screen_height = DEFAULT_HEIGHT
 
     def __init__(self):
+        """Initialization method"""
         self.next = self
         # Fonts:
         self.font_medium = pygame.font.Font(DEFAULT_FONT, 18)
@@ -40,32 +42,31 @@ class SceneBase:
         self.font_freesans_bold = pygame.font.Font(DEFAULT_FONT, 15)
         self.press2s = pygame.font.Font("PressStart2P.ttf", 14)
 
+    def process_input(self, events, pressed_keys):
+        print("(!) Override in child class (!)")
+
+    def update(self):
+        pass
+
+    def render(self, screen):
+        print("(!) Override in child class (!)")
+
+    def switch_to_scene(self, next_scene):
+        self.next = next_scene
+
+    def terminate(self):
+        self.switch_to_scene(None)
+
     @staticmethod
     def draw_text(screen, message, position, font, color=(0, 0, 0)):
+        """
+        Draw text on the given screen surface
+        :param screen: screen
+        :param message: text message to draw
+        :param position: position of the text message
+        :param font: font of text message
+        :param color: color of text message
+        """
         text = font.render(message, False, color)
         text_rect = text.get_rect(center=position)
         screen.get_surface().blit(text, text_rect)
-
-    def ProcessInput(self, events, pressed_keys):
-        print("(!) Override in child class (!)")
-
-    def Update(self):
-        print("(!) Override in child class (!)")
-
-    def Render(self, screen):
-        print("(!) Override in child class (!)")
-
-    def SwitchToScene(self, next_scene):
-        self.next = next_scene
-
-    def Terminate(self):
-        self.SwitchToScene(None)
-
-
-
-
-
-
-
-
-

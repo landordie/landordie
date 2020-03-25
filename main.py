@@ -15,6 +15,7 @@ from classes import *
 class Game:
     def __init__(self):
         self.menu = MenuScene()
+        self.menu.background = pygame.image.load("frames/BG.png")
         self.run_game(60, self.menu)
 
     def run_game(self, fps, starting_scene):
@@ -24,8 +25,6 @@ class Game:
         screen = pygame.display
         clock = pygame.time.Clock()
         pygame.display.set_caption('LAND OR DIE')
-
-        self.menu.background = pygame.image.load("frames/BG.png")
 
         # Set the active scene
         active_scene = starting_scene
@@ -50,16 +49,16 @@ class Game:
                         quit_attempt = True
 
                 if quit_attempt:
-                    active_scene.Terminate()
+                    active_scene.terminate()
                 else:
                     # If not quitting add events into list
                     filtered_events.append(event)
 
             # Pass the list of events and pressed keys for processing by the current scene
-            active_scene.ProcessInput(filtered_events, pressed_keys)
-            active_scene.Update()
+            active_scene.process_input(filtered_events, pressed_keys)
+            active_scene.update()
             # Render current scene's objects to the screen
-            active_scene.Render(screen)
+            active_scene.render(screen)
 
             # Switch the scene after exiting the current scene loop
             prev_scene = active_scene

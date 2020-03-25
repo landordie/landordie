@@ -6,8 +6,12 @@ from .star_field import StarField
 
 
 class SplashScene(SceneBase):
+
     def __init__(self, box_texts=None):
-        SceneBase.__init__(self)
+        """SplashScene initialization method"""
+        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
+        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
+        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
 
         self.star_field = StarField(self.screen_width, self.screen_height)
         self.splash_w, self.splash_h = self.screen_width / 1.4, self.screen_height / 1.3
@@ -63,17 +67,17 @@ class SplashScene(SceneBase):
         else:
             raise ValueError("Error when specifying player number.")
 
-    def ProcessInput(self, events, pressed_keys):
+    def process_input(self, events, pressed_keys):
         for event in events:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.Terminate()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.splash_button.on_click(event):
                 self.SwitchToScene(GameScene())
 
-    def Update(self):
+    def update(self):
         pass
 
-    def Render(self, screen):
+    def render(self, screen):
         screen.set_mode((self.screen_width, self.screen_height))
         
         screen.get_surface().blit(self.background, (0, 0))

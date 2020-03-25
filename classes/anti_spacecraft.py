@@ -1,5 +1,5 @@
 """
-AntiSpaceCraft class
+AntiSpaceCraft class.
 """
 from classes.missile import Missile
 from constants import *
@@ -8,14 +8,14 @@ from .sprite_class import Sprite
 
 
 class AntiSpaceCraft:
-    """Anti-spacecraft vehicle instance class"""
+    """Anti-spacecraft vehicle instance class."""
 
     sf = pymunk.ShapeFilter(group=1)  # This shape filter object is responsible for making sure that all the parts of
     # the anti-spacecraft vehicle (chassis, wheels, cannon, joints) can overlap and do not collide with each other.
 
     def __init__(self, mass=DEFAULT_MASS, position=(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4)):
         """
-        Create all the body parts of (construct) the anti-spacecraft vehicle
+        Create all the body parts of (construct) the anti-spacecraft vehicle.
         :param mass: default body mass
         :param position: default body position
         """

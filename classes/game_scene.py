@@ -35,9 +35,9 @@ class GameScene(SceneBase):
         That way we can use the physics engine behind pymunk (chipmunk) together with the images, surfaces and user-
         input-handlers provided by pygame.
         """
-        SceneBase.__init__(self)  # This statement ensures that this class inherits its behaviour from its Superclass
-        # Abstract methods of all scenes (ProcessInput, Render, Update, etc.), screen resolutions, text fonts,
-        # general text drawing methods and so on.
+        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
+        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
+        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
 
         # Initialize the environment and all the objects except the players objects: -----------------------------------
         #        terrain, borders, landing pad, stars, background, etc.
@@ -91,8 +91,7 @@ class GameScene(SceneBase):
         from Scene Base and have their own implementation in each scene. Therefore, the purpose of each of them is 
         explained in the SceneBase class. """
 
-    def ProcessInput(self, events, pressed_keys):
-
+    def process_input(self, events, pressed_keys):
         # -------------------------------------------Start of block-----------------------------------------------------
         # This block responds to the user input for controlling the vehicles. A dictionary (CONTROL_DICT) located in
         # constants.py is used to provide changeability of the default controls. It  maps all the available pygame.KEY
@@ -176,10 +175,7 @@ class GameScene(SceneBase):
             if self.anti_spacecraft.missile.launched:
                 self.anti_spacecraft.missile.apply_gravity()
 
-    def Update(self):
-        pass
-
-    def Render(self, screen):
+    def render(self, screen):
         # A screen (Pygame surface object or the environment) is passed to the method from its predecessor scene)
         display = screen.get_surface()  # Convert the screen into display
         screen.set_mode((self.screen_width, self.screen_height))  # Set the resolution of the screen
@@ -269,9 +265,9 @@ class GameScene(SceneBase):
         if self.spacecraft.health <= 0:
             paused = self.pause_game('no HP', display)
             if paused:
-                self.Terminate()
+                self.terminate()
             else:
-                self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+                self.switch_to_scene(ResultScene(self.player1_pts, self.player2_pts))
 
         # If a landing attempt is performed and the conditions passes (e.g velocity is not too high, the position is
         # correct, the angle of rotation is not too big, etc.) increment the score of the craft player and stop game
@@ -279,10 +275,10 @@ class GameScene(SceneBase):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
                 if paused:
-                    self.Terminate()
+                    self.terminate()
                 else:
                     self.player1_pts += 50
-                    self.SwitchToScene(ResultScene(self.player1_pts, self.player2_pts))
+                    self.switch_to_scene(ResultScene(self.player1_pts, self.player2_pts))
 # ======================================================================================================================
 
     """ All these methods below are helpers which are used for simplifying the above code."""

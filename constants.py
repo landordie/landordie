@@ -56,7 +56,9 @@ DEFAULT_MASS = 1
 DEFAULT_FRICTION = .5
 DEFAULT_CONTROLS = ['A', 'W', 'D', 'Left', 'Up', 'Right', 'Down', 'Space']
 
+# Constant used in calculating mid-air velocity of missiles every frame (air resistance effect)
 MISSILE_DRAG_CONSTANT = 0.0002
+
 CONTROL_DICT = {
         'Q': pg.K_q,
         'W': pg.K_w,
@@ -125,5 +127,5 @@ CONTROL_DICT = {
 
 
 def flipy(p, h):
-    """Convert chipmunk coordinates to pygame coordinates."""
+    """Convert chipmunk coordinates to Pygame coordinates."""
     return Vec2d(p[0], -p[1] + h)
