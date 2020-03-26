@@ -32,7 +32,7 @@ class SceneBase:
     screen_height = DEFAULT_HEIGHT
 
     def __init__(self):
-        """Initialization method"""
+        """Virtually private constructor which initializes the SceneBase superclass."""
         self.next = self
         # Fonts:
         self.font_medium = pygame.font.Font(DEFAULT_FONT, 18)

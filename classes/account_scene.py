@@ -16,18 +16,20 @@ class AccountsScene(SceneBase):
 
     @staticmethod
     def get_instance():
-        """Static access method."""
+        """Static access method. Ensures the singularity of a class instance"""
         if AccountsScene.__instance is None:
             AccountsScene()
         return AccountsScene.__instance
 
     def __init__(self):
+        """Virtually private constructor which initializes the Accounts scene."""
         super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
         # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
         # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
 
+        # Check if there are any instances of the class already created
         if AccountsScene.__instance is not None:
-            raise Exception("This class is an AccountInstance!")
+            raise Exception("This class is an AccountsInstance!")
         else:
             AccountsScene.__instance = self
 
@@ -106,17 +108,17 @@ class AccountsScene(SceneBase):
         display = screen.get_surface()  # Get the surface of the screen
 
         # Background parallax effect
+        # It works the same way as in the MenuScene instance
         image_width = self.background.get_rect().width
-        # The relative x of the image used for the parallax effect
-        rel_x = self.x % image_width
+        rel_x = self.x % image_width  # The relative x of the image used for the parallax effect
         # Displaying the image based on the relative x and the image width
         display.blit(self.background, (rel_x - image_width, 0))
         # When the right end of the image reaches the right side of the screen
         # a new image starts displaying so we do not have any black spaces
         if rel_x < self.screen_width:
             display.blit(self.background, (rel_x, 0))
-        # This decrement is what makes the image "move"
-        self.x -= 1
+        self.x -= 1  # This decrement is what makes the image "move"
+
         # Update buttons
         self.menu_button.update(display)
         self.log_in_sc_button.update(display)

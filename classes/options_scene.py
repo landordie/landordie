@@ -21,8 +21,8 @@ class OptionsScene(SceneBase):
         return OptionsScene.__instance
 
     def __init__(self):
-        """Virtually private constructor."""
-        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
+        """Virtually private constructor which initializes the Options scene."""
+        super().__init__()  # Call the super class (SceneBase) constructor method. This statement ensures that this
         # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
         # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
 
