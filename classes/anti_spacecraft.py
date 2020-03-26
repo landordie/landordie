@@ -5,6 +5,7 @@ from classes.missile import Missile
 from constants import *
 import pymunk
 from .sprite_class import Sprite
+from math import radians, degrees
 
 
 class AntiSpaceCraft:
@@ -13,15 +14,13 @@ class AntiSpaceCraft:
     sf = pymunk.ShapeFilter(group=1)  # This shape filter object is responsible for making sure that all the parts of
     # the anti-spacecraft vehicle (chassis, wheels, cannon, joints) can overlap and do not collide with each other.
 
-    def __init__(self, mass=DEFAULT_MASS, position=(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4)):
+    def __init__(self, position=(DEFAULT_WIDTH / 2, DEFAULT_HEIGHT / 4)):
         """
         Create all the body parts of (construct) the anti-spacecraft vehicle.
-        :param mass: default body mass
         :param position: default body position
         """
         self._fuel = 500  # A fuel indicator that decreases with movement
         self.force = DEFAULT_FORCE  # The default force that acts on the wheels of the vehicle
-        self.wheels = []  # A list that manages the wheels (similar to a group)
 
         # Anti-spacecraft wheels
         self.wheel1_b, self.wheel1_s = self.create_body(ANTI_SPACECRAFT_WHEEL_MASS,
@@ -30,32 +29,29 @@ class AntiSpaceCraft:
         self.wheel2_b, self.wheel2_s = self.create_body(ANTI_SPACECRAFT_WHEEL_MASS,
                                                         (position[0] + ANTI_SPACECRAFT_CHASSIS[0] / 1.5,
                                                          position[1]), ANTI_SPACECRAFT_WHEEL_SIZE)
-
-        self.wheel3_b, self.wheel3_s = self.create_body(ANTI_SPACECRAFT_WHEEL_MASS, (position[0], position[1]),
+        self.wheel3_b, self.wheel3_s = self.create_body(ANTI_SPACECRAFT_WHEEL_MASS,
+                                                        (position[0], position[1]),
                                                         ANTI_SPACECRAFT_WHEEL_SIZE)
 
         # Add all wheels to the wheels list (used for applying force to all of them with a for loop)
-        self.wheels.extend((self.wheel1_b, self.wheel2_b, self.wheel3_b))
+        self.wheels = [self.wheel1_b, self.wheel2_b, self.wheel3_b]
 
         # Anti-spacecraft chassis creation
         self.chassis_b, self.chassis_s = self.create_body(ANTI_SPACECRAFT_CHASSIS_MASS, position,
                                                           ANTI_SPACECRAFT_CHASSIS)
         self.chassis_s.color = DARK_GREY  # Set the anti-spacecraft chassis color
 
-        # Create the cannon (pymunk body and shape)
+        # Create the cannon (Pymunk body and shape)
         self.cannon_b, self.cannon_s = self.create_body(ANTI_SPACECRAFT_CANNON_MASS,
                                                         (position[0] - ANTI_SPACECRAFT_CHASSIS[0] / 2,
                                                          position[1] + ANTI_SPACECRAFT_CHASSIS[1] / 2),
                                                         ANTI_SPACECRAFT_CANNON)
         self.cannon_s.color = DARK_GREY  # Set the anti-spacecraft cannon color
-
-        self.missile = Missile()  # Initialize the missile (creates both the pygame and pymunk missile representations)
         self.body_sprite = Sprite("frames/tanker.png")  # Sprite for the body (a tank image)
         self.cannon_sprite = Sprite("frames/cannon.png")  # Sprite for the cannon
 
         # Anti-spacecraft joints which are used to connect all the components together with wires.
         # These connections ensure the flexibility of the vehicle during collisions and slope conquering
-        # TODO: Use for-loop (?)
         self.pin1 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (-ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
         self.pin2 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (ANTI_SPACECRAFT_CHASSIS[0] / 2, 0))
         self.pin3 = pymunk.PinJoint(self.wheel1_b, self.chassis_b, (0, 0), (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
@@ -68,12 +64,11 @@ class AntiSpaceCraft:
         self.pin10 = pymunk.PinJoint(self.wheel2_b, self.chassis_b, (0, 0), (0, -ANTI_SPACECRAFT_CHASSIS[1] / 2))
         self.pin11 = pymunk.PinJoint(self.cannon_b, self.chassis_b, (ANTI_SPACECRAFT_CANNON[0] / 2, 0),
                                      (0, ANTI_SPACECRAFT_CHASSIS[1] / 2))
-        # TODO:
-        # self.pin1.color = self.pin2.color = self.pin3.color = self.pin4.color = self.pin5.color = self.pin6.color = \
-        #     self.pin7.color = self.pin8.color = self.pin9.color = self.pin10.color = self.pin11.color = DARK_GREY
+
         # Create a simple motor for the cannon so it rotates around its pin joint
         self.cannon_mt = pymunk.SimpleMotor(self.cannon_b, self.chassis_b, 0)
-        self.cannon_mt.collide_bodies = False
+
+        self.missile = Missile()  # Create missile instance
 
     @staticmethod
     def create_body(mass, position, shape_type, friction=TERRAIN_FRICTION):
@@ -123,8 +118,9 @@ class AntiSpaceCraft:
 
     def force_right(self):
         """
-        Consume fuel and increase the force towards the positive direction of the x-axis. The change in the force will be
-        reflected in the apply_force() method above, as it is called and updated every frame
+        Consume fuel and increase the force towards the positive direction of the x-axis. The
+        change in the force will be reflected in the apply_force() method above, as it is called
+        and updated every frame
         """
         self.fuel -= 1
         self.force = (ANTI_SPACECRAFT_MOVE_FORCE, 0)

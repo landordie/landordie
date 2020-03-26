@@ -1,9 +1,9 @@
 """
-Result scene class
+'result_scene.py' module.
+Used in instantiation of a Result scene (window).
 """
 import csv
 from datetime import date
-
 import pymysql
 from .scene_base import *
 from .button import *
@@ -11,8 +11,13 @@ from .star_field import StarField
 
 
 class ResultScene(SceneBase):
+    """ResultScene subclass."""
+
     def __init__(self, player1_pts, player2_pts):
-        SceneBase.__init__(self)
+        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
+        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
+        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
+
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
         self.background = pygame.image.load('frames/splash_BG.jpg')
@@ -27,8 +32,8 @@ class ResultScene(SceneBase):
         # Holds a value to determine which player's name is being received as input
         self.player_no = 1
         self.status = ''
-        from classes import AccountScene  # Avoiding circular dependencies
-        self.accounts = AccountScene.getInstance()
+        from classes import AccountsScene  # Avoiding circular dependencies
+        self.accounts = AccountsScene.get_instance()
         if self.accounts.logged_in[0] or self.accounts.logged_in[1]:  # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
@@ -66,12 +71,12 @@ class ResultScene(SceneBase):
             writer.writerow({'Name': self.player1_name, 'Score': self.player1_pts, 'Date': date.today()})
             writer.writerow({'Name': self.player2_name, 'Score': self.player2_pts, 'Date': date.today()})
 
-    def ProcessInput(self, events, pressed_keys):
+    def process_input(self, events, pressed_keys):
         for event in events:
             # Check for the menu button click
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
                 from classes import MenuScene
-                self.SwitchToScene(MenuScene.getInstance())
+                self.switch_to_scene(MenuScene.get_instance())
             else:
                 # Otherwise get player names if local storage will be used
                 if not (self.accounts.logged_in[0] or self.accounts.logged_in[1]):
@@ -80,10 +85,10 @@ class ResultScene(SceneBase):
                     elif self.player_no == 2:
                         self.get_player_name(event)
 
-    def Update(self):
+    def update(self):
         pass
 
-    def Render(self, screen):
+    def render(self, screen):
         # Render the background and star field
         screen.set_mode((self.screen_width, self.screen_height))
         screen.get_surface().blit(self.background, (0, 0))

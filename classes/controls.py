@@ -1,5 +1,5 @@
 """
-Controls class
+'controls.py' module
 """
 import constants
 
@@ -9,8 +9,8 @@ class Controls:
     controls = constants.DEFAULT_CONTROLS
 
     @staticmethod
-    def update(ctrls):
-        Controls.controls = ctrls
+    def update(controls):
+        Controls.controls = controls
 
     @staticmethod
     def get_controls():

@@ -74,13 +74,10 @@ class OptionsScene(SceneBase):
 
     def process_input(self, events, pressed_keys):
         for event in events:
-
             for input_box in self.input_boxes:
                 input_box.handle_event(event)
-
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 self.terminate()
-
             # Handling change of resolution
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self._res2.on_click(event):
@@ -94,27 +91,27 @@ class OptionsScene(SceneBase):
                 elif self.menu_button.on_click(event):
                     # Pass input box texts
                     menu = MenuScene.get_instance()
-                    menu.update_all()
+                    menu.update()
                     self.switch_to_scene(menu)
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
-
         # Background parallax effect
         # It works the same way as in the MenuScene instance
         image_width = self.background.get_rect().width
-        rel_x = self.x % image_width  # The relative x of the image used for the parallax effect
-        # Displaying the image based on the relative x and the image width
+        rel_x = self.x % image_width  # The relative x-axis position of the image used for the parallax effect
+        # Displaying the image based on the relative x-axis position and the image width
         display.blit(self.background, (rel_x - image_width, 0))
+
         # When the right end of the image reaches the right side of the screen
         # a new image starts displaying so we do not have any black spaces
         if rel_x < self.screen_width:
             display.blit(self.background, (rel_x, 0))
         self.x -= 1  # This decrement is what makes the image "move"
 
-        """Drawing the containers and displaying info text"""
-        """(!) Containers are displayed relative to the screen size;
-            (!) Buttons are displayed relative to the containers position"""
+        # Drawing the containers and displaying info text
+        # (!) Containers are displayed relative to the screen size;
+        # (!) Buttons are displayed relative to the containers position
         display.blit(self.res_cont, (self.res_cont_x, self.res_cont_y, self.res_cont_w, self.res_cont_h))
         self.draw_text(screen, "Resolution", (self.res_cont_x + self.res_cont_w / 2, self.res_cont_y / 1.1),
                        self.font_medium, WHITE)
@@ -151,6 +148,7 @@ class OptionsScene(SceneBase):
         self._res2.update(display)
         self._res3.update(display)
 
+        # Display and update input box fields
         for input_box in self.input_boxes:
             input_box.draw(display)
             input_box.update()

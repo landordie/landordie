@@ -15,10 +15,10 @@ from classes import *
 class Game:
     def __init__(self):
         self.menu = MenuScene()
-        self.menu.background = pygame.image.load("frames/BG.png")
         self.run_game(60, self.menu)
 
-    def run_game(self, fps, starting_scene):
+    @staticmethod
+    def run_game(fps, starting_scene):
         """Function to run the program"""
         # Initialize pygame objects
         pygame.init()
@@ -56,7 +56,6 @@ class Game:
 
             # Pass the list of events and pressed keys for processing by the current scene
             active_scene.process_input(filtered_events, pressed_keys)
-            active_scene.update()
             # Render current scene's objects to the screen
             active_scene.render(screen)
 

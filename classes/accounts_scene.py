@@ -10,7 +10,7 @@ import pymysql.cursors
 
 
 class AccountsScene(SceneBase):
-    """Accounts scene (window) instance class."""
+    """Accounts scene (window) singleton class."""
 
     __instance = None
 
@@ -49,7 +49,7 @@ class AccountsScene(SceneBase):
         self.log_in_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1,
                                           BUTTON_WIDTH, BUTTON_HEIGHT), GREEN, 'Log in')
 
-        self.reg_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1,
+        self.reg_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 1.6,
                                        BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Register')
 
         self.background = pygame.image.load("frames/BG.png")  # Initialize the background
@@ -100,6 +100,40 @@ class AccountsScene(SceneBase):
                 elif self.log_in_a_sc_button.on_click(event):  # Check if user in DB and sign them in if True
                     self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
 
+    def update(self):
+        """Recalculate and update relative positions of all buttons and input boxes."""
+        # Adjust credentials fields container position
+        self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
+                                                 (self.screen_height * 0.15)
+        self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
+        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+
+        # Adjust database response container position
+        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
+                                                 (self.screen_height / 15)
+        self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
+
+        # Update button positions
+        self.menu_button.rect.x, self.menu_button.rect.y = \
+            self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2
+
+        self.log_in_sc_button.rect.x, self.log_in_sc_button.rect.y = self.screen_width / 5.5, self.screen_height / 2.1
+
+        self.reg_sc_button.rect.x, self.reg_sc_button.rect.y = self.screen_width / 5.5, self.screen_height / 1.6
+
+        self.log_in_a_sc_button.rect.x, self.log_in_a_sc_button.rect.y = \
+            self.screen_width / 1.51, self.screen_height / 2.1
+
+        self.reg_a_sc_button.rect.x, self.reg_a_sc_button.rect.y = self.screen_width / 1.51, self.screen_height / 1.6
+
+        # Update input box positions
+        self.input_box1.rect.x, self.input_box1.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.3
+        self.input_box2.rect.x, self.input_box2.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.9
+        self.input_box3.rect.x, self.input_box3.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.3
+        self.input_box4.rect.x, self.input_box4.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.9
+
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
 
@@ -147,7 +181,7 @@ class AccountsScene(SceneBase):
             display.blit(self.status_cont,
                          (self.status_cont_x, self.status_cont_y, self.status_cont_w, self.status_cont_h))
             self.draw_text(screen, self.status, (self.screen_width / 2, self.screen_height / 10),
-                           self.font_playernum, WHITE)
+                           self.font_player_num, WHITE)
             self.cool_down += 1
 
         # Draw credential fields on screen and reflect any changes to their content
@@ -155,40 +189,6 @@ class AccountsScene(SceneBase):
         self.input_box2.draw(display, True)  # True here indicates that the field must be hidden (with '*')
         self.input_box3.draw(display)
         self.input_box4.draw(display, True)
-
-    def update_all(self):
-        """Recalculate and update relative positions of all buttons and input boxes."""
-        # Adjust credentials fields container position
-        self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
-                                                 (self.screen_height * 0.15)
-        self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
-        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
-
-        # Adjust database response container position
-        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
-        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
-                                                 (self.screen_height / 15)
-        self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
-
-        # Update button positions
-        self.menu_button.rect.x, self.menu_button.rect.y = \
-            self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2
-
-        self.log_in_sc_button.rect.x, self.log_in_sc_button.rect.y = self.screen_width / 5.5, self.screen_height / 2.1
-
-        self.reg_sc_button.rect.x, self.reg_sc_button.rect.y = self.screen_width / 5.5, self.screen_height / 1.6
-
-        self.log_in_a_sc_button.rect.x, self.log_in_a_sc_button.rect.y = \
-            self.screen_width / 1.51, self.screen_height / 2.1
-
-        self.reg_a_sc_button.rect.x, self.reg_a_sc_button.rect.y = self.screen_width / 1.51, self.screen_height / 1.6
-
-        # Update input box positions
-        self.input_box1.rect.x, self.input_box1.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.3
-        self.input_box2.rect.x, self.input_box2.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.9
-        self.input_box3.rect.x, self.input_box3.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.3
-        self.input_box4.rect.x, self.input_box4.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.9
 
     def connect_db(self, command, username, pw):
         """

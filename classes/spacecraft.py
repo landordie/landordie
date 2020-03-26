@@ -30,19 +30,19 @@ class Spacecraft(Sprite):
         self.health = 100
         self.damage = 0
         self.crashed = False
-        self.terrain_collision_cooldown = 0
+        self.terrain_collision_cd = 0
         self.terrain_collision = True
 
         """Initializing the pymunk representation of the space craft. The list of vertices is used by Pymunk to create 
         the shape of the spacecraft body. Each tuple in the list is a coordinate of a point. Linking all points creates
         the shape. Then we initialize the mass, moment, Body and Shape objects. We set the friction that acts on the 
         craft and adjust its color and collision type. Lastly, we position the spacecraft."""
-        self.polygon_vertices = [(-30, -25), (-10, -25), (10, -25), (30, -25), (0, 35)]
+        self.polygon_vertices = [(-30, -25), (30, -25), (0, 35)]
         self.mass = 0.6
         self.moment = pymunk.moment_for_poly(self.mass, self.polygon_vertices)
         self.body = pymunk.Body(self.mass, self.moment)
         self.shape = pymunk.Poly(self.body, self.polygon_vertices)
-        self.shape.friction = 0.5
+        self.shape.friction = 1
         self.shape.color = BLACK_INVISIBLE
         # Setting the spacecraft collision type so the collision handler can check for it
         self.shape.collision_type = 2
@@ -70,7 +70,7 @@ class Spacecraft(Sprite):
 
     # Apply thrust force to the spacecraft (make it fly)
     def apply_thrust(self):
-        self.body.apply_impulse_at_local_point((self.body.angle, 20), (0, 0))  # Generate and apply an impulse
+        self.body.apply_impulse_at_local_point((self.body.angle, 20))  # Generate and apply an impulse
         self.image = self.activated_img  # Swap the current image with the activated for the blit() method
 
     def reset_stats(self):

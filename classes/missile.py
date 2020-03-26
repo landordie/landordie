@@ -74,6 +74,7 @@ class Missile(Sprite):
 
     def ready_to_blit(self):
         """
+        Check if the missile is ready to be shown on the screen
         :return True if the missile is launched and has not collided with another shape
         """
         return self.launched and not self.collided
