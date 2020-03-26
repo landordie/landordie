@@ -1,14 +1,20 @@
 """
-Button Class
+button module.
 """
-import random
 from constants import *
 
 
 class Button:
+    """Button instance class. Used in the creation of all the buttons in the program."""
 
-    def __init__(self, rect, color, text):
-        self.rect = pg.Rect(rect)
+    def __init__(self, rect_size, color, text):
+        """
+        Button instance constructor.
+        :param rect_size: size of the button rectangle
+        :param color: color of the button rectangle
+        :param text: button text string
+        """
+        self.rect = pg.Rect(rect_size)
         self.color = color
         self.font = pg.font.Font(DEFAULT_FONT, 15)
         self.text_string = text
@@ -17,41 +23,44 @@ class Button:
         self.image = pg.image.load("frames/Table_01.png")
         self.active_image = pg.image.load("frames/Table_01_active.png")
 
-    def change_color(self):
-        """
-        Not used yet
-        """
-        self.color = [random.randint(0, 150) for _ in range(3)]
-
     def on_click(self, event):
+        """
+        Check for a button click.
+        :param event: program event
+        :return: True if the button is clicked and False otherwise
+        """
         if self.rect.collidepoint(event.pos):
             return True
         return False
 
     def check_hover(self):
+        """Play a sound if the mouse is hovering over a button."""
         if self.rect.collidepoint(pg.mouse.get_pos()):
             if not self.hovered:
                 self.hovered = True
-                pg.mixer.Sound(HOVER_SOUND).play()  # improve?
+                pg.mixer.Sound(HOVER_SOUND).play()
         else:
             self.hovered = False
 
     def wh_text(self):
         """
-        Text rectangle width and height as tuple
+        Get the width and height of the text rectangle.
+        :return: text rectangle width and height tuple
         """
         text_rect = self.text.get_rect()
         return text_rect.width, text_rect.height
 
     def update(self, surface):
         """
-        Update needs to be called every frame in the main loop.
+        Update button text position and image.
+        :param surface: screen surface
         """
         self.check_hover()
-        if self.hovered:
+        if self.hovered:  # Switch to active image of the button when hovered over
             surface.blit(self.active_image, (self.rect.x, self.rect.y))
         else:
             surface.blit(self.image, (self.rect.x, self.rect.y))
 
+        # Update button text position
         text_width, text_height = self.wh_text()
         surface.blit(self.text, (self.rect.centerx - (text_width / 2), self.rect.centery + 5))

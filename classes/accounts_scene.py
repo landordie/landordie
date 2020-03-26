@@ -1,5 +1,5 @@
 """
-Account
+accounts_scene module.
 """
 from .menu_scene import MenuScene
 from .game_scene import *
@@ -16,7 +16,7 @@ class AccountsScene(SceneBase):
 
     @staticmethod
     def get_instance():
-        """Static access method. Ensures the singularity of a class instance"""
+        """Static access method. Ensures the singularity of a class instance."""
         if AccountsScene.__instance is None:
             AccountsScene()
         return AccountsScene.__instance
@@ -37,37 +37,36 @@ class AccountsScene(SceneBase):
         self.credentials = [[], []]  # This list contains the credentials of the currently logged in user
 
         # Initialize buttons in the interface (menu, log in and register buttons)
-        self.menu_button = Button(
-            (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT),
-            YELLOW, 'Main Menu')
+        self.menu_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2,
+                                   BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Main Menu')
 
-        self.log_in_sc_button = Button((self.screen_width / 5.5, self.screen_height / 2.1, BUTTON_WIDTH, BUTTON_HEIGHT),
-                                       GREEN, 'Log in')
+        self.log_in_sc_button = Button((self.screen_width / 5.5, self.screen_height / 2.1,
+                                        BUTTON_WIDTH, BUTTON_HEIGHT), GREEN, 'Log in')
 
-        self.reg_sc_button = Button((self.screen_width / 5.5, self.screen_height / 1.6, BUTTON_WIDTH, BUTTON_HEIGHT),
-                                    RED, 'Register')
+        self.reg_sc_button = Button((self.screen_width / 5.5, self.screen_height / 1.6,
+                                     BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Register')
 
-        self.log_in_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1, BUTTON_WIDTH,
-                                          BUTTON_HEIGHT), GREEN, 'Log in')
+        self.log_in_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1,
+                                          BUTTON_WIDTH, BUTTON_HEIGHT), GREEN, 'Log in')
 
-        self.reg_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1, BUTTON_WIDTH, BUTTON_HEIGHT),
-                                      RED, 'Register')
+        self.reg_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1,
+                                       BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Register')
 
         self.background = pygame.image.load("frames/BG.png")  # Initialize the background
         self.x = 0  # Attribute to simulate the x-axis position of the background image
 
         # Container for credential fields
         self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), (
-                self.screen_height * 0.15)
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w),\
+                                                 (self.screen_height * 0.15)
         self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
         # Container for the database response
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
-        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), (
-                self.screen_height / 15)
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
+                                                 (self.screen_height / 15)
         self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
         self.status_cont.fill(BLACK_HIGHLIGHT2)
 
@@ -76,21 +75,19 @@ class AccountsScene(SceneBase):
         self.input_box2 = InputBox(self.button_cont_x * 4.5, self.button_cont_y * 1.9, '', 350, 33)
         self.input_box3 = InputBox(self.button_cont2_x * 1.28, self.button_cont_y * 1.3, '', 350, 33)
         self.input_box4 = InputBox(self.button_cont2_x * 1.28, self.button_cont_y * 1.9, '', 350, 33)
-        self.status = ''  # This variable indicates the status of the DB connection
         self.fields = [self.input_box1, self.input_box2, self.input_box3, self.input_box4]  # A list used to group the
         # input fields for cleaner code
+
+        self.status = ''  # This variable indicates the status of the DB connection
         self.cool_down = 0  # Status container cool down
 
     def process_input(self, events, pressed_keys):
         for event in events:
-            # Pass each event to the input boxes for handling
-            for input_box in self.fields:
+            for input_box in self.fields:  # Pass each event to the input boxes for handling
                 input_box.handle_event(event, 2)
-            # If the event is the escape button - exit game
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:  # Exit program on 'Esc' button
                 self.terminate()
-            # Track mouse clicks for button responsiveness
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
                 if self.menu_button.on_click(event):  # Go back to menu
                     menu = MenuScene.get_instance()
                     self.switch_to_scene(menu)
@@ -104,8 +101,7 @@ class AccountsScene(SceneBase):
                     self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
 
     def render(self, screen):
-        screen.set_mode((self.screen_width, self.screen_height))  # Set the screen size
-        display = screen.get_surface()  # Get the surface of the screen
+        display = self.adjust_screen(screen)  # Surface
 
         # Background parallax effect
         # It works the same way as in the MenuScene instance
@@ -126,16 +122,19 @@ class AccountsScene(SceneBase):
         self.log_in_a_sc_button.update(display)
         self.reg_a_sc_button.update(display)
 
-        # Display containers, input boxes and instructions
+        # Display containers and container and field names
         display.blit(self.button_cont,
                      (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
-
         display.blit(self.button_cont,
                      (self.button_cont2_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
 
+        self.draw_text(screen, "Spacecraft player", (self.button_cont_x * 2.9, self.button_cont_y * 0.9),
+                       self.font_medium, WHITE)
         self.draw_text(screen, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05),
+                       self.font_medium, WHITE)
+        self.draw_text(screen, "Anti-spacecraft player", (self.button_cont_x * 1.15, self.button_cont_y * 0.9),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45),
                        self.font_medium, WHITE)
@@ -168,8 +167,8 @@ class AccountsScene(SceneBase):
 
         # Adjust database response container position
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
-        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), (
-                self.screen_height / 15)
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
+                                                 (self.screen_height / 15)
         self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
 
         # Update button positions
@@ -198,7 +197,7 @@ class AccountsScene(SceneBase):
         :param username: player username
         :param pw: player password
         """
-        try:  # Thr try catch is used to handle cases where the DB is offline
+        try:  # Try Except is used to handle cases where the DB is offline
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')  # Create a connection
 
             for field in [username, pw]:  # Check if the credential fields are empty. If so notify user and abort action

@@ -7,4 +7,4 @@ from .anti_spacecraft import AntiSpaceCraft
 from .splash_scene import SplashScene
 from .scene_base import SceneBase
 from .options_scene import OptionsScene
-from .account_scene import AccountsScene
+from .accounts_scene import AccountsScene

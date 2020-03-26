@@ -1,5 +1,5 @@
 """
-Input box class
+input_box module.
 """
 from constants import *
 import pygame

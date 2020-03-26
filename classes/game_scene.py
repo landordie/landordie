@@ -1,5 +1,5 @@
 """
-Game scene class
+game_scene module.
 """
 import math
 import random
@@ -177,8 +177,7 @@ class GameScene(SceneBase):
 
     def render(self, screen):
         # A screen (Pygame surface object or the environment) is passed to the method from its predecessor scene)
-        display = screen.get_surface()  # Convert the screen into display
-        screen.set_mode((self.screen_width, self.screen_height))  # Set the resolution of the screen
+        display = self.adjust_screen(screen)  # Surface
         display.blit(self.background, (0, 0))  # Position the background on the display (0, 0) is the position from
         # which the image has to start. It is positioned based on top-left corner of the image and 0,0 is top-left
         # corner of Pygame coordinate system
@@ -295,8 +294,7 @@ class GameScene(SceneBase):
         self.space.add(self.pymunk_landing_pad)
 
     def start_collision_handlers(self):
-        # This method initializes all the collision handlers between different Pymunk objects
-        # An explanation is given below this method
+        """Initialize all the collision handlers between different Pymunk objects."""
         self.missile_and_terrain.begin = self.missile_terrain_collision_begin
         self.missile_and_spacecraft_handler.begin = self.missile_spacecraft_collision_begin
         self.spacecraft_and_terrain_handler.begin = self.spacecraft_terrain_collision_begin

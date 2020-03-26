@@ -1,5 +1,5 @@
 """
-Options scene class.
+options_scene module.
 """
 from classes import MenuScene
 from classes.input_box import InputBox
@@ -98,8 +98,7 @@ class OptionsScene(SceneBase):
                     self.switch_to_scene(menu)
 
     def render(self, screen):
-        screen.set_mode((self.screen_width, self.screen_height))  # Set the screen size
-        display = screen.get_surface()  # Get the surface of the screen
+        display = self.adjust_screen(screen)  # Surface
 
         # Background parallax effect
         # It works the same way as in the MenuScene instance

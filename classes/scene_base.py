@@ -1,5 +1,5 @@
 """
-SceneBase class.
+scene_base module.
 """
 import pygame
 from constants import *
@@ -56,6 +56,15 @@ class SceneBase:
 
     def terminate(self):
         self.switch_to_scene(None)
+
+    def adjust_screen(self, screen):
+        """
+        Update screen changes (resolution) and return the new surface
+        :param screen:
+        :return: surface of the screen
+        """
+        screen.set_mode((self.screen_width, self.screen_height))  # Set the screen size
+        return screen.get_surface()  # Get the surface of the screen
 
     @staticmethod
     def draw_text(screen, message, position, font, color=(0, 0, 0)):

@@ -1,5 +1,5 @@
 """
-AntiSpaceCraft class.
+anti_spacecraft module.
 """
 from classes.missile import Missile
 from constants import *
