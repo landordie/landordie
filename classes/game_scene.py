@@ -203,7 +203,7 @@ class GameScene(SceneBase):
                 self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
                                                                 self.anti_spacecraft.cannon_s)
 
-                # Display the red line on the screen, which increases with the time the shooting key is pressed
+                # Display a red line on the screen, which increases as the 'shoot' key is held pressed
                 current_time = pygame.time.get_ticks()
                 diff = current_time - self.start_time
                 power = max(min(diff, 750), 0)
@@ -220,6 +220,7 @@ class GameScene(SceneBase):
             m, missile_img = self.anti_spacecraft.missile.\
                 get_attachment_coordinates(self.anti_spacecraft.missile.body, self.screen_height)
             self.anti_spacecraft.missile.rect = missile_img.get_rect(left=m[0], top=m[1])
+
             # If there isn't a collision display the image on screen and the missile is launched
             if self.anti_spacecraft.missile.ready_to_blit():
                 display.blit(missile_img, self.anti_spacecraft.missile.rect)
