@@ -1,16 +1,15 @@
 """
-anti_spacecraft module.
+'anti_spacecraft.py' module.
+Used in instantiating the game anti-spacecraft.
 """
 from classes.missile import Missile
 from constants import *
 import pymunk
 from .sprite_class import Sprite
-from math import radians, degrees
 
 
 class AntiSpaceCraft:
     """Anti-spacecraft vehicle instance class."""
-
     sf = pymunk.ShapeFilter(group=1)  # This shape filter object is responsible for making sure that all the parts of
     # the anti-spacecraft vehicle (chassis, wheels, cannon, joints) can overlap and do not collide with each other.
 
@@ -22,7 +21,7 @@ class AntiSpaceCraft:
         self._fuel = 500  # A fuel indicator that decreases with movement
         self.force = DEFAULT_FORCE  # The default force that acts on the wheels of the vehicle
 
-        # Anti-spacecraft wheels
+        # Anti-spacecraft wheels initialization
         self.wheel1_b, self.wheel1_s = self.create_body(ANTI_SPACECRAFT_WHEEL_MASS,
                                                         (position[0] - ANTI_SPACECRAFT_CHASSIS[0] / 1.5,
                                                          position[1]), ANTI_SPACECRAFT_WHEEL_SIZE)

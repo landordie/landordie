@@ -18,7 +18,6 @@ from .star_field import StarField
 
 class GameScene(SceneBase):
     """GameScene subclass."""
-
     border_sf = pymunk.ShapeFilter(group=2)  # Game borders filter which allows shape grouping for collision avoidance
 
     def __init__(self):
@@ -51,9 +50,7 @@ class GameScene(SceneBase):
         # Pymunk representation - A Pymunk segment object that is created based on the position of
         # the Pygame sprite
         self.pymunk_landing_pad = self.landing_pad.pymunk_pad(self.space, self.screen_height)
-
         self.game_controls = Controls.get_controls()  # Fetch the game controls
-
         self.star_field = StarField(self.screen_width, self.screen_height)  # The stars moving in the background
         self.background = pg.image.load("frames/splash_BG.jpg")  # A background image
         self.release_time = 0  # Used for making the cooldown function of the shooter.
@@ -112,9 +109,12 @@ class GameScene(SceneBase):
         else:  # If out of fuel then stop the wheels
             self.anti_spacecraft.force = DEFAULT_FORCE
 
-        if keys[CONTROL_DICT[self.game_controls[6]]] and self.anti_spacecraft.cannon_b.angle < radians(-10):
+        # Anti-spacecraft cannon rotation (in radians)
+        if keys[CONTROL_DICT[self.game_controls[6]]] \
+                and self.anti_spacecraft.cannon_b.angle < radians(-10):
             self.anti_spacecraft.cannon_mt.rate = 2
-        elif keys[CONTROL_DICT[self.game_controls[4]]] and self.anti_spacecraft.cannon_b.angle >= -pi + radians(10):
+        elif keys[CONTROL_DICT[self.game_controls[4]]] \
+                and self.anti_spacecraft.cannon_b.angle >= -pi + radians(10):
             self.anti_spacecraft.cannon_mt.rate = -2
         else:
             self.anti_spacecraft.cannon_mt.rate = 0
@@ -173,11 +173,14 @@ class GameScene(SceneBase):
                 self.anti_spacecraft.missile.apply_gravity()
 
     def render(self, screen):
-        # A screen (Pygame surface object or the environment) is passed to the method from its predecessor scene)
+        # A screen (Pygame surface object or the environment) is passed to the method from its
+        # predecessor scene)
         display = self.adjust_screen(screen)  # Surface
-        display.blit(self.background, (0, 0))  # Position the background on the display (0, 0) is the position from
-        # which the image has to start. It is positioned based on top-left corner of the image and 0,0 is top-left
+
+        # Position the background on the display (0, 0) is the position from which the image has
+        # to start. It is positioned based on top-left corner of the image and 0,0 is top-left
         # corner of Pygame coordinate system
+        display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)  # Complement the background with some falling star effects
 
         # -------------------------------------------Start of block-----------------------------------------------------
@@ -187,15 +190,17 @@ class GameScene(SceneBase):
         draw_options = pymunk.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
-        # This block renders the missiles on the screen. While there is a cooldown active (the if statement),
-        # a blue line is drawn on the screen which shows the remaining cooldown time
+        # This block renders the missiles on the screen. While there is a cooldown active
+        # (the if statement), a blue line is drawn on the screen which shows the remaining
+        # cooldown time
         if self.release_time > 0:
             self.release_time -= 1
             self.start_time = pygame.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
             pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
-        # When the cooldown is not active and a shooting key is pressed, the missile is being positioned relative to
-        # the position of the cannon and a red line is drawn on the screen that indicates the strength of the impulse
+        # When the cooldown is not active and a shooting key is pressed, the missile is being
+        # positioned relative to the position of the cannon and a red line is drawn on the screen
+        # that indicates the strength of the impulse
         else:
             if pygame.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]] and self.anti_spacecraft.missile.body:
                 # Position the missile relative to the current cannon position
@@ -225,14 +230,22 @@ class GameScene(SceneBase):
             if self.anti_spacecraft.missile.ready_to_blit():
                 display.blit(missile_img, self.anti_spacecraft.missile.rect)
         # --------------------------------------------End of block -----------------------------------------------------
+        # Attach the sprite of the anti-spacecraft to its Pymunk body object
+        p, rotated_body_img = self.anti_spacecraft.body_sprite.\
+            get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
+        self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1] - 15)
+        display.blit(rotated_body_img, self.anti_spacecraft.body_sprite.rect)
 
-        # Show the Landing pad Sprite on screen
-        display.blit(self.landing_pad.image, self.landing_pad.rect)
+        self.anti_spacecraft.apply_force()  # Move the anti-spacecraft if buttons pressed
 
-        # Display the Anti-Spacecraft fuel bar - the part that has been consumed turns red; initially it is green.
+        # Display the anti-spacecraft fuel bar - the part that has been consumed turns red;
+        # initially it is green.
         self.anti_spacecraft.fuel_bar(display, self.screen_height)
 
-        # Spacecraft health bar - it is green, and as the health of the craft drops its colour changes to yellow and red
+        display.blit(self.landing_pad.image, self.landing_pad.rect)  # Show the Landing pad Sprite on screen
+
+        # Spacecraft health bar - it is green, and as the health of the craft drops its
+        # colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
 
         # Attach the spacecraft sprite to the Pymunk shape
@@ -240,19 +253,10 @@ class GameScene(SceneBase):
         self.spacecraft.rect = sc_sprite.get_rect(left=p[0], top=p[1])
         display.blit(sc_sprite, self.spacecraft.rect)
 
-        # Attach the sprite of the anti-spacecraft to its Pymunk body object
-        p, rotated_body_img = self.anti_spacecraft.body_sprite.get_attachment_coordinates(
-            self.anti_spacecraft.chassis_b, self.screen_height)
-        self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1] - 15)
-        display.blit(rotated_body_img, self.anti_spacecraft.body_sprite.rect)
-
-        # Move the Anti-Spacecraft if buttons pressed
-        self.anti_spacecraft.apply_force()
-
         # Introduce a cooldown function for the collision between the terrain and the spacecraft
-        # Before a collision occurs this doesn't do anything
-        # After a collision with the terrain, a new one can occur after minimum 2 seconds (120 Frames)
-        # This ensures that the spacecraft doesn't take additional damage while standing on the ground for some time
+        # Before a collision occurs this doesn't do anything. After a collision with the terrain,
+        # a new one can occur after minimum 2 seconds (120 Frames) This ensures that the spacecraft
+        # doesn't take additional damage while standing on the ground for some time
         self.spacecraft.terrain_collision_cd += 1
         if self.spacecraft.terrain_collision_cd > 120:
             self.spacecraft.terrain_collision = True
@@ -265,8 +269,9 @@ class GameScene(SceneBase):
                 self.terminate()
             else:
                 self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
-        # If a landing attempt is performed and the conditions passes (e.g velocity is not too high, the position is
-        # correct, the angle of rotation is not too big, etc.) increment the score of the craft player and stop game
+        # If a landing attempt is performed and the conditions passes (e.g velocity is not too high,
+        # the position is correct, the angle of rotation is not too big, etc.) increment the score
+        # of the craft player and stop game
         if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
@@ -275,9 +280,9 @@ class GameScene(SceneBase):
                 else:
                     self.spacecraft_pts += 50
                     self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
-# ======================================================================================================================
-
+    # ==================================================================================================================
     # Helper methods below
+
     def add_objects_to_space(self):
         """
         This adds all the components of the anti-spacecraft (cannon, wheels, chassis, pin joints),
@@ -303,22 +308,14 @@ class GameScene(SceneBase):
         self.spacecraft_and_terrain_handler.post_solve = self.collision_post_solve
         self.spacecraft_and_terrain_handler.separate = self.collision_separate
 
-    """
-    The following 4 methods(callbacks) - [collision_begin, collision_pre, collision_post, collision_separate] 
-       are required for each collision handler to work
-    The only one we are using is the one checking for the beginning of the collision
-    That is why we have implemented 3 collision handler begin methods. To check between:
-      1 - Missile and Terrain
-      2 - Spacecraft and Missile
-      3 - Spacecraft and Terrain
-    Each 'contact handler' (collision_begin method) is implementing its own functionality
-    The rest are not doing anything so we can use the same ones for all handlers
-    """
+    # The following 4 methods(callbacks) - [collision_begin, collision_pre, collision_post,
+    # collision_separate] are required for each collision handler to work. The only one we are
+    # using is the one checking for the beginning of the collision
 
     def missile_terrain_collision_begin(self, arbiter, space, data):
         """
         Missile and terrain collision callback method
-        :param arbiter: a pair of missile and terrain shapes and all of the data about their collision
+        :param arbiter: missile and terrain shapes pair and all of the data about their collision
         :param space: unit of simulation
         :param data: data to be manipulated
         :return: True when the missile and the terrain begin contact
@@ -330,7 +327,7 @@ class GameScene(SceneBase):
     def spacecraft_terrain_collision_begin(self, arbiter, space, data):
         """
         Spacecraft and terrain collision callback method
-        :param arbiter: a pair of spacecraft and terrain shapes and all of the data about their collision
+        :param arbiter: spacecraft and terrain shapes pair and all of the data about their collision
         :param space: unit of simulation
         :param data: data to be manipulated
         :return: True when the spacecraft and the terrain begin contact
@@ -358,21 +355,44 @@ class GameScene(SceneBase):
         return True
 
     def collision_post_solve(self, arbiter, space, data):
+        """
+        Shape collision callback method
+        :param arbiter: a pair of shapes and all of the data about their collision
+        :param space: unit of simulation
+        :param data: data to be manipulated
+        """
         pass
 
     def collision_pre(self, arbiter, space, data):
-        # If the spacecraft collides with the landing pad with a high velocity
-        if [self.pymunk_landing_pad, self.spacecraft.shape] in arbiter.shapes:
+        """
+        Shape collision callback method
+        :param arbiter: a pair of shapes and all of the data about their collision
+        :param space: unit of simulation
+        :param data: data to be manipulated
+        :return: True when two shapes are in contact
+        """
+        if [self.pymunk_landing_pad, self.spacecraft.shape] in arbiter.shapes:  # On spacecraft-landing pad collision
             # Generate an impulse that makes it bounce in the air
             self.spacecraft.body.apply_impulse_at_world_point((0, 250), self.spacecraft.body.position)
         return True
 
     def collision_separate(self, arbiter, space, data):
+        """
+        Shape collision callback method (just before separating)
+        :param arbiter: a pair of shapes and all of the data about their collision
+        :param space: unit of simulation
+        :param data: data to be manipulated
+        """
         pass
 
     def pause_game(self, msg_type, screen):
-        """ The method pauses the game after the player crashes, lands correctly or has no HP left and displays a
-        message, till the 'Return' key is pressed """
+        """
+        Pause the game after a player crash, correct landing or the spacecraft is out of HP.
+        Display a message, till the 'Return' key is pressed
+        :param msg_type: specifies the type of message to be displayd
+        :param screen: current scene screen window
+        :return: True on 'X' button click, False on pressing 'Return' key
+        """
         msg = ''
 
         if msg_type == 'landed':
@@ -397,8 +417,7 @@ class GameScene(SceneBase):
         while True:
             # Enter an infinite loop which can be interrupted by quitting or pressing Return key on keyboard
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    # Checks if the user wants to quit tha game by clicking on the "X" button
+                if event.type == pygame.QUIT:  # Quit program on 'X' button click
                     return True
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                     # Checks if any key is pressed - Resumes the game

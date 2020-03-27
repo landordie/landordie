@@ -12,7 +12,7 @@ from .star_field import StarField
 class SplashScene(SceneBase):
     """SplashScene subclass."""
 
-    def __init__(self, box_texts=None):
+    def __init__(self):
         """Virtually private constructor which initializes the Splash scene."""
         super().__init__()  # Call the super class (SceneBase) initialization method. This
         # statement ensures that this class inherits its behaviour from its Superclass.
@@ -33,15 +33,10 @@ class SplashScene(SceneBase):
         self.continue_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2),
                                        self.splash_h, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
-        if not box_texts:
-            self.controls = DEFAULT_CONTROLS
-        else:
-            self.controls = box_texts
+        self.controls = Controls.get_controls()  # Fetch the game controls
         self.player1_left, self.player1_right, self.player1_thrust = self.load_controls_images(1)
         self.player2_left, self.player2_right, self.player2_shoot, self.player2_cannon_left, self.player2_cannon_right \
             = self.load_controls_images(2)
-        # update controls
-        Controls.update(self.controls)
 
     def load_controls_images(self, player_num):
         """

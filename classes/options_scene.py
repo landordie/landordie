@@ -1,21 +1,26 @@
 """
-options_scene module.
+'options_scene.py' module.
+Used in instantiation of the Options scene (window).
 """
 from classes import MenuScene
 from classes.input_box import InputBox
 from constants import *
 from .scene_base import SceneBase
 from .button import Button
+from .controls import Controls
 import pygame
 
 
 class OptionsScene(SceneBase):
+    """OptionsScene singleton subclass."""
     __instance = None
-    controls = []
 
     @staticmethod
     def get_instance():
-        """Static access method. Implementation of Singleton pattern."""
+        """
+        Static access method. Ensures the singularity of a class instance.
+        :return: OptionsScene class instance
+        """
         if OptionsScene.__instance is None:
             OptionsScene()
         return OptionsScene.__instance
@@ -26,6 +31,7 @@ class OptionsScene(SceneBase):
         # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
         # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
 
+        # Check if there are any instances of the class already created
         if OptionsScene.__instance is not None:
             raise Exception("This class is a singleton!")
         else:
@@ -52,10 +58,10 @@ class OptionsScene(SceneBase):
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
         # Buttons to change resolution
-        self._res2 = Button(
+        self._res1 = Button(
             (self.res_cont_w / 3, self.res_cont_h / 0.85, BUTTON_WIDTH, BUTTON_HEIGHT),
             GREEN, "1280x800")
-        self._res3 = Button(
+        self._res2 = Button(
             (self.res_cont_w / 3, self.res_cont_h / 0.6, BUTTON_WIDTH, BUTTON_HEIGHT),
             GREEN, "1440x900")
 
@@ -74,25 +80,55 @@ class OptionsScene(SceneBase):
 
     def process_input(self, events, pressed_keys):
         for event in events:
-            for input_box in self.input_boxes:
+            for input_box in self.input_boxes:  # Handle input box events
                 input_box.handle_event(event)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:  # Quit on 'Esc' button press
                 self.terminate()
-            # Handling change of resolution
+            # Handle change of resolution. (update resolutions (globally) in the superclass
+            # so that it is reflected in every scene)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                if self._res2.on_click(event):
+                if self._res1.on_click(event):
+                    _res = self._res1.text_string.split("x")
+                    SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
+                    self.update()
+                elif self._res2.on_click(event):
                     _res = self._res2.text_string.split("x")
                     SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
-                    self.update_all()
-                elif self._res3.on_click(event):
-                    _res = self._res3.text_string.split("x")
-                    SceneBase.screen_width, SceneBase.screen_height = int(_res[0]), int(_res[1])
-                    self.update_all()
-                elif self.menu_button.on_click(event):
-                    # Pass input box texts
+                    self.update()
+                elif self.menu_button.on_click(event):  # Switch back to the Menu scene on 'Main Menu' button click
+                    input_box_texts = [box.text for box in self.input_boxes]  # Get the (new) controls
+                    Controls.update(input_box_texts)  # Update them (globally) in the controls class
                     menu = MenuScene.get_instance()
                     menu.update()
                     self.switch_to_scene(menu)
+
+    def update(self):
+        """Reposition all buttons/containers when changing resolutions"""
+        # The button that returns to Main Menu
+        self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.2, self.screen_height * 0.8
+
+        # The resolution buttons container
+        self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 3
+        self.res_cont_x, self.res_cont_y = (self.screen_width / 2) - (self.res_cont_w * 2.26), \
+                                           (self.screen_height / 2) - (self.res_cont_h / 2.35)
+        self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
+
+        # The two buttons for resolutions
+        self._res1.rect.x, self._res1.rect.y = self.res_cont_w / 3, self.res_cont_h / 0.85
+        self._res2.rect.x, self._res2.rect.y = self.res_cont_w / 3, self.res_cont_h / 0.6
+
+        self.button_cont_w, self.button_cont_h = self.screen_width / 3, self.screen_height / 1.5
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2), (self.screen_height / 5)
+        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+
+        # Make adjustments to the input box positions by iterating over the list
+        position_fractions = [[1.5, 1.5, 1.5, 1.45, 1.45, 1.45, 1.45, 1.45],
+                              [1.35, 1.60, 1.85, 2.75, 3, 3.25, 3.50, 3.75]]
+        i = 0
+        for input_box in self.input_boxes:
+            input_box.respond_to_resolution(self.button_cont_x * position_fractions[0][i],
+                                            self.button_cont_y * position_fractions[1][i])
+            i += 1
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
@@ -145,38 +181,10 @@ class OptionsScene(SceneBase):
                        self.font_medium, LIGHT_GREY)
 
         self.menu_button.update(display)
+        self._res1.update(display)
         self._res2.update(display)
-        self._res3.update(display)
 
         # Display and update input box fields
         for input_box in self.input_boxes:
             input_box.draw(display)
             input_box.update()
-
-    def update_all(self):
-        """Reposition all buttons/containers when changing resolutions"""
-        # The button that returns to Main Menu
-        self.menu_button.rect.x, self.menu_button.rect.y = self.screen_width * 0.2, self.screen_height * 0.8
-
-        # The resolution buttons container
-        self.res_cont_w, self.res_cont_h = self.screen_width / 5, self.screen_height / 3
-        self.res_cont_x, self.res_cont_y = (self.screen_width / 2) - (self.res_cont_w * 2.26), \
-                                           (self.screen_height / 2) - (self.res_cont_h / 2.35)
-        self.res_cont = pygame.Surface((self.res_cont_w, self.res_cont_h)).convert_alpha()
-
-        # The two buttons for resolutions
-        self._res2.rect.x, self._res2.rect.y = self.res_cont_w / 3, self.res_cont_h / 0.85
-        self._res3.rect.x, self._res3.rect.y = self.res_cont_w / 3, self.res_cont_h / 0.6
-
-        self.button_cont_w, self.button_cont_h = self.screen_width / 3, self.screen_height / 1.5
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2), (self.screen_height / 5)
-        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
-
-        # Make adjustments to the input box positions by iterating over the list
-        position_fractions = [[1.5, 1.5, 1.5, 1.45, 1.45, 1.45, 1.45, 1.45],
-                              [1.35, 1.60, 1.85, 2.75, 3, 3.25, 3.50, 3.75]]
-        i = 0
-        for input_box in self.input_boxes:
-            input_box.respond_to_resolution(self.button_cont_x * position_fractions[0][i],
-                                            self.button_cont_y * position_fractions[1][i])
-            i += 1

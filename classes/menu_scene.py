@@ -10,7 +10,6 @@ from .input_box import InputBox
 
 class MenuScene(SceneBase):
     """MenuScene singleton subclass."""
-
     __instance = None
 
     @staticmethod
@@ -60,7 +59,7 @@ class MenuScene(SceneBase):
                 self.terminate()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
                 if self.start_button.on_click(event):  # Switch to Splash scene
-                    self.switch_to_scene(SplashScene(InputBox.boxes))
+                    self.switch_to_scene(SplashScene())
                 elif self.accounts_button.on_click(event):  # Update scene and switch
                     from .accounts_scene import AccountsScene  # Avoiding circular dependencies
                     accounts_scene = AccountsScene.get_instance()

@@ -14,11 +14,11 @@ class SceneBase:
     switch_to_scene(), terminate(), adjust_screen() and draw_text(). Each method is inherited by the
     above classes and overwritten with the functionality required by the particular class.
     """
+    screen_width = DEFAULT_WIDTH
+    screen_height = DEFAULT_HEIGHT
 
     def __init__(self):
         """Virtually private constructor which initializes the SceneBase superclass."""
-        self.screen_width = DEFAULT_WIDTH
-        self.screen_height = DEFAULT_HEIGHT
         self.next = self
         # Fonts:
         self.font_medium = pygame.font.Font(DEFAULT_FONT, 18)

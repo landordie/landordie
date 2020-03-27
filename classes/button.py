@@ -1,11 +1,12 @@
 """
-button module.
+'button.py' module.
+Used in the creation of all the buttons in the program.
 """
 from constants import *
 
 
 class Button:
-    """Button instance class. Used in the creation of all the buttons in the program."""
+    """Button instance class."""
 
     def __init__(self, rect_size, color, text):
         """

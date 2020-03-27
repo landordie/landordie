@@ -1,37 +1,38 @@
 """
-input_box module.
+'input_box.py' module.
+Used for player input when changing controls in the Options scene, logging in
+and registering in Accounts scene and storing results in the Result scene.
 """
 from constants import *
 import pygame
 
 
 class InputBox:
-    # class variable with all input box texts
-    boxes = DEFAULT_CONTROLS
-    no = 0
+    """InputBox instance class."""
 
     def __init__(self, x, y, text='', w=100, h=35):
-        self.rect = pg.Rect(x, y, w, h)
-        self.color = BRIGHT_PURPLE
-        self.text = text
-        self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(text, True, WHITE)
-        self.id_num = InputBox.no
+        """Virtually private constructor which initializes the input box for player input."""
+        self.rect = pg.Rect(x, y, w, h)  # Set the rectangle coordinates along with its size
+        self.color = BRIGHT_PURPLE  # Set the rectangle color (outline)
+        self.text = text  # Set the text string inside the box
+        self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(text, True, WHITE)  # Set the text font and color
+        self.active = False  # Boolean attribute for showing activity of a box (highlighting)
 
-        InputBox.no += 1
-        self.active = False
-
-    def handle_event(self, event, type=1):
+    def handle_event(self, event, box_type=1):
+        """
+        Handle event concerning the input box.
+        :param event: rendered event
+        :param box_type: 1 -> normal input box, 2 -> hidden symbols (password) box
+        """
         if event.type == pg.MOUSEBUTTONDOWN:
-            # If the user clicked on the input_box rect.
-            if self.rect.collidepoint(event.pos):
-                # Toggle the active variable.
-                self.active = not self.active
+            if self.rect.collidepoint(event.pos):  # On input box click
+                self.active = not self.active  # Toggle the active variable to highlight the box
             else:
                 self.active = False
-        if type == 1:
+        if box_type == 1:  # On normal box type
             if event.type == pg.KEYDOWN:  # Whenever a key is pressed display
                 # the name of the key in the input box
-                if self.active:
+                if self.active:  # If the box has been clicked on (is active)
                     if event.key == pg.K_BACKSPACE:
                         self.text = self.text[:-1]
                     else:
@@ -69,46 +70,46 @@ class InputBox:
                             self.text = 'Asterisk'
                         else:
                             self.text = event.unicode.upper()
-
-                        # Update boxes list
-                        InputBox.boxes[self.id_num] = self.text
                         self.active = False
-                # Re-render the text.
-                self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(self.text, True, WHITE)
-        if type == 2:
-            # A method to populate player names from user input and display them on the screen
-            if event.type == pygame.KEYDOWN and self.active:
+        if box_type == 2:  # On hidden symbols box type
+            if event.type == pygame.KEYDOWN and self.active:  # If the box has been clicked on and a key is pressed
                 # If the pressed button corresponds to a alphabetical char (a,b,c,d...,x,y,z)
                 if event.unicode.isalnum() and len(self.text) < 16:
                     self.text += event.unicode
                 # If the user would like to delete a char from the screen
                 elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
                     self.text = self.text[:-1]
-                # Re-render the text.
-                self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(self.text, True, WHITE)
-
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Toggle off the highlight (activity)
                 self.active = False
+        # Re-render the text.
+        self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(self.text, True, WHITE)
         # Change the current color of the input box.
         self.color = CYAN if self.active else BRIGHT_PURPLE
 
     def update(self):
-        # Resize the box if the text is too long.
+        """Update input box. (resize if the input is too long)"""
         width = max(50, self.txt_surface.get_width()+10)
         self.rect.w = width
 
     def draw(self, screen, hidden=False):
-        if not hidden:
-            # Blit the text.
-            screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
-        else:
+        """
+        Draw the input box text on the screen.
+        :param screen: current scene screen
+        :param hidden: True when drawing passwords
+        """
+        if not hidden:  # If the box does not contain a password
+            screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))  # Blit the text.
+        else:  # Replace symbols with '*' and blit
             hidden_text = '*' * len(self.text)
             txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(hidden_text, True, WHITE)
             screen.blit(txt_surface, (self.rect.x+5, self.rect.y+5))
-
-        # Blit the rect.
-        pg.draw.rect(screen, self.color, self.rect, 3)
+        pg.draw.rect(screen, self.color, self.rect, 3)  # Blit the text rectangle
 
     def respond_to_resolution(self, new_x, new_y):
+        """
+        Adjust the input box position according to the screen resolution.
+        :param new_x: new x-axis coordinate of the input box rectangle
+        :param new_y: new y-axis coordinate of the input box rectangle
+        """
         self.rect.x = new_x
         self.rect.y = new_y

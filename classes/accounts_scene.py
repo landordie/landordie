@@ -1,5 +1,6 @@
 """
-accounts_scene module.
+'accounts_scene.py' module.
+Used in instantiating the Accounts scene.
 """
 from .menu_scene import MenuScene
 from .game_scene import *
@@ -11,7 +12,6 @@ import pymysql.cursors
 
 class AccountsScene(SceneBase):
     """Accounts scene (window) singleton class."""
-
     __instance = None
 
     @staticmethod
@@ -193,7 +193,7 @@ class AccountsScene(SceneBase):
     def connect_db(self, command, username, pw):
         """
         The method is used to connect to a local database and make checks or register new users in it.
-        :param command:
+        :param command: login or register
         :param username: player username
         :param pw: player password
         """
