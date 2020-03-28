@@ -92,7 +92,7 @@ class AccountsScene(SceneBase):
 
         self.status = ''  # This variable indicates the status of the DB connection
         self.cool_down = 0  # Status container cool down
-        self.scores = {}
+        self.scores = {}  # This dictionary contains the scores for each player
 
     def process_input(self, events, pressed_keys):
         for event in events:
@@ -104,8 +104,10 @@ class AccountsScene(SceneBase):
                 if self.menu_button.on_click(event):  # Go back to menu
                     menu = MenuScene.get_instance()
                     self.switch_to_scene(menu)
+                # If the score table is initialized, do not check for the buttons behind the score contaioner
                 if self.scores:
                     if self.score_cont_button.on_click(event):
+                        # If close container is clicked, empty the scores
                         self.scores = {}
                 else:
                     if self.reg_sc_button.on_click(event):  # Register user with DB
@@ -213,7 +215,8 @@ class AccountsScene(SceneBase):
 
         # Update buttons
         self.menu_button.update(display)
-        if self.scores:
+        if self.scores:  # If scores are initialized display them on screen and do not update the buttons
+            # Behind the container of the scores
             display.blit(self.score_cont,
                          (self.score_cont_x, self.score_cont_y, self.score_cont_w, self.score_cont_h))
             self.draw_text(screen, "Name | Spacecraft | Anti-spacecraft | Games",
@@ -223,12 +226,11 @@ class AccountsScene(SceneBase):
             increment = 0.5
             for entry in self.scores:
                 margin += increment
-                self.draw_text(screen, (entry + "     " + str(self.scores[entry][0]) + "     " +
-                                        str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
-                               (self.screen_width / 2, self.score_cont_y * margin),
-                               self.font_medium, WHITE)
-
+                self.draw_text(screen, (entry + "     " + str(self.scores[entry][0]) + "     "
+                                        + str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
+                               (self.screen_width / 2, self.score_cont_y * margin), self.font_medium, WHITE)
             self.score_cont_button.update(display)
+        # If no scores are being displayed on screen update buttons
         else:
             self.log_in_sc_button.update(display)
             self.reg_sc_button.update(display)
