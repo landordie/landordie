@@ -263,6 +263,7 @@ class AccountsScene(SceneBase):
                             for score_tuple in scores:
                                 a_sc_score += int(score_tuple[0])
                                 sc_score += int(score_tuple[1])
+                            # Add entry to the dictionary
                             self.scores[self.credentials[0][0]] = (sc_score, a_sc_score, len(scores))
                         if self.logged_in[1]:
                             # Create the SQL statement to get the users with the given credentials
