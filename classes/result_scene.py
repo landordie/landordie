@@ -156,16 +156,18 @@ class ResultScene(SceneBase):
                 with connection.cursor() as cursor:  # Create a cursor object
                     if self.accounts.logged_in[0]:
                         # Write SQL statement, execute and commit the changes
-                        sql = "INSERT INTO `scores`(`Username`, `Spacecraft Score`) " \
-                              "VALUES ('" + self.accounts.credentials[0][0] + "'," + str(self.player1_pts) + ")"
+                        sql = "INSERT INTO `scores`(`Username`, `Spacecraft Score`, `Date`) " \
+                              "VALUES ('" + self.accounts.credentials[0][0] + "'," + str(self.player1_pts) + \
+                              ",CURDATE()" + ")"
 
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[0][0]
                     if self.accounts.logged_in[1]:
                         # Write SQL statement, execute and commit the changes
-                        sql = "INSERT INTO `scores`(`Username`, `Anti-spacecraft Score`) " \
-                              "VALUES ('" + self.accounts.credentials[1][0] + "'," + str(self.player2_pts) + ")"
+                        sql = "INSERT INTO `scores`(`Username`, `Anti-spacecraft Score`, `Date`) " \
+                              "VALUES ('" + self.accounts.credentials[1][0] + "'," + str(self.player2_pts) + \
+                              ",CURDATE()" + ")"
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[1][0]
