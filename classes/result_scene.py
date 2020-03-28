@@ -34,7 +34,8 @@ class ResultScene(SceneBase):
         self.status = ''
         from classes import AccountsScene  # Avoiding circular dependencies
         self.accounts = AccountsScene.get_instance()
-        if self.accounts.logged_in[0] or self.accounts.logged_in[1]:  # If we are logged in and the game has finished, save the scores to the DB)
+        if self.accounts.logged_in[0] or self.accounts.logged_in[1]:
+            # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
     # A method to populate player names from user input and display them on the screen
@@ -155,19 +156,22 @@ class ResultScene(SceneBase):
                 with connection.cursor() as cursor:  # Create a cursor object
                     if self.accounts.logged_in[0]:
                         # Write SQL statement, execute and commit the changes
-                        sql = "UPDATE `users` SET `Spacecraft Score`=" + str(self.player1_pts) + " WHERE Username='" + \
-                              str(self.accounts.credentials[0][0]) + "'"
+                        sql = "INSERT INTO `scores`(`Username`, `Spacecraft Score`) " \
+                              "VALUES ('" + self.accounts.credentials[0][0] + "'," + str(self.player1_pts) + ")"
+
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[0][0]
                     if self.accounts.logged_in[1]:
                         # Write SQL statement, execute and commit the changes
-                        sql = "UPDATE `users` SET `Anti-spacecraft Score`=" + str(
-                            self.player2_pts) + " WHERE Username='" + \
-                              str(self.accounts.credentials[1][0]) + "'"
+                        sql = "INSERT INTO `scores`(`Username`, `Anti-spacecraft Score`) " \
+                              "VALUES ('" + self.accounts.credentials[1][0] + "'," + str(self.player2_pts) + ")"
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[1][0]
+                    if self.accounts.logged_in[0] and self.accounts.logged_in[1]:
+                        self.status = 'Scores for players [%s] and [%s] updated successfully!' % \
+                                      (self.accounts.credentials[0][0], self.accounts.credentials[1][0])
             finally:
                 connection.close()  # Always close the connection
         except pymysql.err.OperationalError:  # If error occurs with the connection to the DB, notify user
