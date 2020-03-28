@@ -66,6 +66,15 @@ class AccountsScene(SceneBase):
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
+        # Container for scores
+        self.score_cont_w, self.score_cont_h = self.screen_width / 1.5, self.screen_height / 1.5
+        self.score_cont_x, self.score_cont_y = (self.screen_width / 2 - (self.score_cont_w / 2)), \
+                                                 (self.screen_height * 0.15)
+        self.score_cont = pygame.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
+        self.score_cont.fill(BLACK_HIGHLIGHT3)
+        self.score_cont_button = Button((self.screen_width / 2 - BUTTON_WIDTH / 2, self.screen_height / 1.55,
+                                         BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Close')
+
         # Container for the database response
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
@@ -83,6 +92,7 @@ class AccountsScene(SceneBase):
 
         self.status = ''  # This variable indicates the status of the DB connection
         self.cool_down = 0  # Status container cool down
+        self.scores = {}
 
     def process_input(self, events, pressed_keys):
         for event in events:
@@ -94,16 +104,20 @@ class AccountsScene(SceneBase):
                 if self.menu_button.on_click(event):  # Go back to menu
                     menu = MenuScene.get_instance()
                     self.switch_to_scene(menu)
-                elif self.reg_sc_button.on_click(event):  # Register user with DB
-                    self.connect_db("register", self.input_box1.text, self.input_box2.text)
-                elif self.log_in_sc_button.on_click(event):  # Check if user in DB and sign them in if True
-                    self.connect_db("login_sc", self.input_box1.text, self.input_box2.text)
-                elif self.reg_a_sc_button.on_click(event):  # Register user with DB
-                    self.connect_db("register", self.input_box3.text, self.input_box4.text)
-                elif self.log_in_a_sc_button.on_click(event):  # Check if user in DB and sign them in if True
-                    self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
-                elif self.scores_button.on_click(event):
-                    self.connect_db("get_scores", '', '')
+                if self.scores:
+                    if self.score_cont_button.on_click(event):
+                        self.scores = {}
+                else:
+                    if self.reg_sc_button.on_click(event):  # Register user with DB
+                        self.connect_db("register", self.input_box1.text, self.input_box2.text)
+                    elif self.log_in_sc_button.on_click(event):  # Check if user in DB and sign them in if True
+                        self.connect_db("login_sc", self.input_box1.text, self.input_box2.text)
+                    elif self.reg_a_sc_button.on_click(event):  # Register user with DB
+                        self.connect_db("register", self.input_box3.text, self.input_box4.text)
+                    elif self.log_in_a_sc_button.on_click(event):  # Check if user in DB and sign them in if True
+                        self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
+                    elif self.scores_button.on_click(event):
+                        self.connect_db("get_scores", '', '')
 
     def update(self):
         """Recalculate and update relative positions of all buttons and input boxes."""
@@ -120,6 +134,10 @@ class AccountsScene(SceneBase):
                                                  (self.screen_height / 15)
         self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
 
+        self.score_cont_x, self.score_cont_y = (self.screen_width / 2 - (self.score_cont_w / 2)), \
+                                               (self.screen_height * 0.15)
+        self.score_cont = pygame.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
+
         # Update button positions
         self.menu_button.rect.x, self.menu_button.rect.y = \
             self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2
@@ -134,6 +152,9 @@ class AccountsScene(SceneBase):
         self.reg_a_sc_button.rect.x, self.reg_a_sc_button.rect.y = self.screen_width / 1.51, self.screen_height / 1.6
 
         self.scores_button.rect.x, self.scores_button.rect.y = self.screen_width / 2.38, self.screen_height / 1.85
+
+        self.score_cont_button.rect.x, self.score_cont_button.rect.y = \
+            self.screen_width / 2 - BUTTON_WIDTH / 2, self.screen_height / 1.55
 
         # Update input box positions
         self.input_box1.rect.x, self.input_box1.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.3
@@ -155,14 +176,6 @@ class AccountsScene(SceneBase):
         if rel_x < self.screen_width:
             display.blit(self.background, (rel_x, 0))
         self.x -= 1  # This decrement is what makes the image "move"
-
-        # Update buttons
-        self.menu_button.update(display)
-        self.log_in_sc_button.update(display)
-        self.reg_sc_button.update(display)
-        self.log_in_a_sc_button.update(display)
-        self.reg_a_sc_button.update(display)
-        self.scores_button.update(display)
 
         # Display containers and container and field names
         display.blit(self.button_cont,
@@ -198,6 +211,31 @@ class AccountsScene(SceneBase):
         self.input_box3.draw(display)
         self.input_box4.draw(display, True)
 
+        # Update buttons
+        self.menu_button.update(display)
+        if self.scores:
+            display.blit(self.score_cont,
+                         (self.score_cont_x, self.score_cont_y, self.score_cont_w, self.score_cont_h))
+            self.draw_text(screen, "Name | Spacecraft | Anti-spacecraft | Games",
+                           (self.screen_width / 2, self.score_cont_y * 1.2), self.font_medium, WHITE)
+
+            margin = 1.4
+            increment = 0.5
+            for entry in self.scores:
+                margin += increment
+                self.draw_text(screen, (entry + "     " + str(self.scores[entry][0]) + "     " +
+                                        str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
+                               (self.screen_width / 2, self.score_cont_y * margin),
+                               self.font_medium, WHITE)
+
+            self.score_cont_button.update(display)
+        else:
+            self.log_in_sc_button.update(display)
+            self.reg_sc_button.update(display)
+            self.log_in_a_sc_button.update(display)
+            self.reg_a_sc_button.update(display)
+            self.scores_button.update(display)
+
     def connect_db(self, command, username, pw):
         """
         The method is used to connect to a local database and make checks or register new users in it.
@@ -207,6 +245,38 @@ class AccountsScene(SceneBase):
         """
         try:  # Try Except is used to handle cases where the DB is offline
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')  # Create a connection
+
+            if command == "get_scores" and not self.scores:
+                try:
+                    # Create a cursor object which will be used to execute commands on the DB
+                    with connection.cursor() as cursor:
+                        if self.logged_in[0]:
+                            # Create the SQL statement to get the users with the given credentials
+                            sql = "SELECT `Anti-spacecraft Score`, `Spacecraft Score` FROM `scores` WHERE " \
+                                  "(Username='{0}')".format(self.credentials[0][0])
+                            cursor.execute(sql)  # Execute statement
+                            scores = cursor.fetchall()  # And get the result of the query
+                            a_sc_score = 0
+                            sc_score = 0
+                            for score_tuple in scores:
+                                a_sc_score += int(score_tuple[0])
+                                sc_score += int(score_tuple[1])
+                            self.scores[self.credentials[0][0]] = (sc_score, a_sc_score, len(scores))
+                        if self.logged_in[1]:
+                            # Create the SQL statement to get the users with the given credentials
+                            sql = "SELECT `Anti-spacecraft Score`, `Spacecraft Score` FROM `scores` WHERE " \
+                                  "(Username='{0}')".format(self.credentials[1][0])
+                            cursor.execute(sql)  # Execute statement
+                            scores = cursor.fetchall()  # And get the result of the query
+                            a_sc_score = 0
+                            sc_score = 0
+                            for score_tuple in scores:
+                                a_sc_score += int(score_tuple[0])
+                                sc_score += int(score_tuple[1])
+                            self.scores[self.credentials[1][0]] = (sc_score, a_sc_score, len(scores))
+                finally:  # Always close the connection
+                    connection.close()
+                return
 
             for field in [username, pw]:  # Check if the credential fields are empty. If so notify user and abort action
                 if field == '':
