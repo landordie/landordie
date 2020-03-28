@@ -371,7 +371,7 @@ class GameScene(SceneBase):
         :param data: data to be manipulated
         :return: True when two shapes are in contact
         """
-        if self.pymunk_landing_pad and self.spacecraft.shape in arbiter.shapes:  # On spacecraft-landing pad collision
+        if self.pymunk_landing_pad in arbiter.shapes and self.spacecraft.shape in arbiter.shapes:  # On spacecraft-landing pad collision
             # Generate an impulse that makes it bounce in the air
             self.spacecraft.body.apply_impulse_at_world_point((0, 250), self.spacecraft.body.position)
         return True

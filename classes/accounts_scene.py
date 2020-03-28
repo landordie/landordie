@@ -52,6 +52,9 @@ class AccountsScene(SceneBase):
         self.reg_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 1.6,
                                        BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Register')
 
+        self.scores_button = Button((self.screen_width / 2.1, self.screen_height / 1.85,
+                                     BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Get scores')
+
         self.background = pygame.image.load("frames/BG.png")  # Initialize the background
         self.x = 0  # Attribute to simulate the x-axis position of the background image
 
@@ -99,6 +102,8 @@ class AccountsScene(SceneBase):
                     self.connect_db("register", self.input_box3.text, self.input_box4.text)
                 elif self.log_in_a_sc_button.on_click(event):  # Check if user in DB and sign them in if True
                     self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
+                elif self.scores_button.on_click(event):
+                    self.connect_db("get_scores", '', '')
 
     def update(self):
         """Recalculate and update relative positions of all buttons and input boxes."""
@@ -128,6 +133,8 @@ class AccountsScene(SceneBase):
 
         self.reg_a_sc_button.rect.x, self.reg_a_sc_button.rect.y = self.screen_width / 1.51, self.screen_height / 1.6
 
+        self.scores_button.rect.x, self.scores_button.rect.y = self.screen_width / 2.38, self.screen_height / 1.85
+
         # Update input box positions
         self.input_box1.rect.x, self.input_box1.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.3
         self.input_box2.rect.x, self.input_box2.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.9
@@ -155,6 +162,7 @@ class AccountsScene(SceneBase):
         self.reg_sc_button.update(display)
         self.log_in_a_sc_button.update(display)
         self.reg_a_sc_button.update(display)
+        self.scores_button.update(display)
 
         # Display containers and container and field names
         display.blit(self.button_cont,
@@ -162,13 +170,13 @@ class AccountsScene(SceneBase):
         display.blit(self.button_cont,
                      (self.button_cont2_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
 
-        self.draw_text(screen, "Spacecraft player", (self.button_cont_x * 2.9, self.button_cont_y * 0.9),
+        self.draw_text(screen, "Spacecraft player", (self.button_cont_x * 3.9, self.button_cont_y * 0.9),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05),
                        self.font_medium, WHITE)
-        self.draw_text(screen, "Anti-spacecraft player", (self.button_cont_x * 1.15, self.button_cont_y * 0.9),
+        self.draw_text(screen, "Anti-spacecraft player", (self.button_cont2_x * 1.3, self.button_cont_y * 0.9),
                        self.font_medium, WHITE)
         self.draw_text(screen, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45),
                        self.font_medium, WHITE)
