@@ -2,10 +2,11 @@
 'anti_spacecraft.py' module.
 Used in instantiating the game anti-spacecraft.
 """
-from classes.missile import Missile
-from constants import *
 import pymunk
+from constants import *
+from .missile import Missile
 from .sprite_class import Sprite
+from .helper import flipy
 
 
 class AntiSpaceCraft:

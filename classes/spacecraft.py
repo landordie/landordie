@@ -2,10 +2,11 @@
 'spacecraft.py' module.
 Used in instantiating the game spacecraft.
 """
+import pymunk
+from math import degrees, sqrt, pow
 from constants import *
 from .sprite_class import Sprite
-import pymunk
-from math import degrees
+from .helper import flipy, draw_text
 
 
 class Spacecraft(Sprite):
@@ -75,9 +76,10 @@ class Spacecraft(Sprite):
                      flipy((self.body.position[0] + 75 - self.damage,
                             self.body.position[1] - 45), height), 10)
 
-    def show_stats(self):
-        self.draw
-        print(abs(self.body.velocity[1]) // 10)
+    def show_stats(self, display, position):
+        x_velocity, y_velocity = self.body.velocity
+        sc_velocity = int(sqrt(pow(x_velocity, 2) + pow(y_velocity, 2)) // 50)
+        draw_text(display, f"Downward Velocity: {sc_velocity}", position, pg.font.Font(DEFAULT_FONT, 15), CYAN)
 
     def apply_thrust(self):
         """Apply thrust force to the spacecraft (make it fly)."""

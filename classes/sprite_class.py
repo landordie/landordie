@@ -3,8 +3,8 @@
 """
 import pygame
 from math import degrees
-from pymunk import Vec2d
-from help
+from pymunk.vec2d import Vec2d
+from .helper import flipy
 
 
 class Sprite(pygame.sprite.Sprite):

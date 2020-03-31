@@ -3,10 +3,9 @@ Landing pad class
 """
 import pygame as pg
 import pymunk as pm
-from classes.sprite_class import Sprite
 import random
-
-from constants import flipy
+from .sprite_class import Sprite
+from .helper import flipy
 
 
 class LandingPad(Sprite):

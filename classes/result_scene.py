@@ -5,9 +5,11 @@ Used in instantiation of a Result scene (window).
 import csv
 from datetime import date
 import pymysql
-from .scene_base import *
-from .button import *
+from constants import *
+from .scene_base import SceneBase
+from .button import Button
 from .star_field import StarField
+from .helper import draw_text
 
 
 class ResultScene(SceneBase):
@@ -20,7 +22,7 @@ class ResultScene(SceneBase):
 
         self.player1_pts = player1_pts
         self.player2_pts = player2_pts
-        self.background = pygame.image.load('frames/splash_BG.jpg')
+        self.background = pg.image.load('frames/splash_BG.jpg')
         self.star_field = StarField(self.screen_width, self.screen_height)
 
         self.menu_button = Button(
@@ -32,7 +34,7 @@ class ResultScene(SceneBase):
         # Holds a value to determine which player's name is being received as input
         self.player_no = 1
         self.status = ''
-        from classes import AccountsScene  # Avoiding circular dependencies
+        from .accounts_scene import AccountsScene  # Avoiding circular dependencies
         self.accounts = AccountsScene.get_instance()
         if self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']:
             # If we are logged in and the game has finished, save the scores to the DB)
@@ -40,9 +42,9 @@ class ResultScene(SceneBase):
 
     # A method to populate player names from user input and display them on the screen
     def get_player_name(self, event):
-        if event.type == pygame.KEYDOWN:
+        if event.type == pg.KEYDOWN:
             # If a player has finished writing their name
-            if event.key == pygame.K_RETURN and self.player_no < 3:
+            if event.key == pg.K_RETURN and self.player_no < 3:
                 if self.player_no == 1 and len(self.player1_name) == 0:
                     self.player1_name = "DEFAULT_PLAYER1"
                 elif self.player_no == 2 and len(self.player2_name) == 0:
@@ -54,13 +56,13 @@ class ResultScene(SceneBase):
                 if event.unicode.isalnum() and len(self.player1_name) < 16:
                     self.player1_name += event.unicode
                 # If the user would like to delete a char from the screen
-                elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
+                elif event.key == pg.K_BACKSPACE or event.key == pg.K_DELETE:
                     self.player1_name = self.player1_name[:-1]
             # If player two is writing
             elif self.player_no == 2:
                 if event.unicode.isalnum() and len(self.player2_name) < 16:
                     self.player2_name += event.unicode
-                elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
+                elif event.key == pg.K_BACKSPACE or event.key == pg.K_DELETE:
                     self.player2_name = self.player2_name[:-1]
 
     def store_result(self):  # This method saves the current scores to a local .csv file
@@ -75,8 +77,8 @@ class ResultScene(SceneBase):
     def process_input(self, events, pressed_keys):
         for event in events:
             # Check for the menu button click
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
-                from classes import MenuScene
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.menu_button.on_click(event):
+                from .menu_scene import MenuScene
                 self.switch_to_scene(MenuScene.get_instance())
             else:
                 # Otherwise get player names if local storage will be used
@@ -91,41 +93,38 @@ class ResultScene(SceneBase):
 
     def render(self, screen):
         # Render the background and star field
-        screen.set_mode((self.screen_width, self.screen_height))
-        screen.get_surface().blit(self.background, (0, 0))
-        self.star_field.draw_stars(screen.get_surface())
+        display = self.adjust_screen(screen)
+        display.blit(self.background, (0, 0))
+        self.star_field.draw_stars(display)
 
-        self.display_scene(screen)  # Display the scene specific content (depends on the storage to be used)
+        self.display_scene(display)  # Display the scene specific content (depends on the storage to be used)
 
         # Handle the menu button
-        self.menu_button.update(screen.get_surface())
+        self.menu_button.update(display)
 
-    def display_scene(self, screen):
+    def display_scene(self, display):
         # Display main messages
-        self.draw_text(screen, "GAME RESULTS",
-                       (self.screen_width / 2, self.screen_height / 5),
-                       self.press2s, CYAN)
+        draw_text(display, "GAME RESULTS",
+                  (self.screen_width / 2, self.screen_height / 7), self.press2s, CYAN)
 
-        self.draw_text(screen, f"Player 1 Score = {self.player1_pts} points",
-                       (self.screen_width / 2, self.screen_height / 2.5),
-                       self.press2s, CYAN)
+        draw_text(display, f"Player 1 Score = {self.player1_pts} points",
+                  (self.screen_width / 2, self.screen_height / 2.5), self.press2s, CYAN)
 
-        self.draw_text(screen, f"Player 2 Score = {self.player2_pts} points",
-                       (self.screen_width / 2, self.screen_height / 1.5),
-                       self.press2s, CYAN)
+        draw_text(display, f"Player 2 Score = {self.player2_pts} points",
+                  (self.screen_width / 2, self.screen_height / 1.5), self.press2s, CYAN)
 
         # If not logged in ask for user names for both players for the .cvs safe
         if not (self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']):
-            self.draw_text(screen, "Please type your name or initials.",
-                           (self.screen_width / 2, self.screen_height / 4), self.font_medium, CYAN)
-            self.draw_text(screen, "As you start typing, your name will appear on the screen",
-                           (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
-            self.draw_text(screen, "To confirm press ENTER | To delete a character use BACKSPACE",
-                           (self.screen_width / 2, self.screen_height / 2.85), self.font_medium, CYAN)
-            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15),
-                           self.font_medium, CYAN)
-            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35),
-                           self.font_medium, CYAN)
+            draw_text(display, "Please type your name or initials.",
+                      (self.screen_width / 2, self.screen_height / 4), self.font_medium, CYAN)
+            draw_text(display, "As you start typing, your name will appear on the screen",
+                      (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
+            draw_text(display, "To confirm press ENTER | To delete a character use BACKSPACE",
+                      (self.screen_width / 2, self.screen_height / 2.85), self.font_medium, CYAN)
+            draw_text(display, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15),
+                      self.font_medium, CYAN)
+            draw_text(display, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35),
+                      self.font_medium, CYAN)
 
             # Two blocks displaying the names of the players
             block = self.font_medium.render(self.player1_name, True, CYAN)
@@ -138,8 +137,8 @@ class ResultScene(SceneBase):
             rect2.left = self.screen_width / 2.15
             rect2.top = self.screen_height / 1.38
 
-            screen.get_surface().blit(block, rect)
-            screen.get_surface().blit(block2, rect2)
+            display.blit(block, rect)
+            display.blit(block2, rect2)
 
             # Variable player_no changes on every press of the button Enter until it is equal to 4
             if self.player_no == 3:
@@ -147,8 +146,8 @@ class ResultScene(SceneBase):
                 self.player_no += 1
         else:
             # If the user decides to save scores to the DB, blit status
-            self.draw_text(screen, self.status,
-                           (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
+            draw_text(display, self.status,
+                      (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
 
     def connect_DB(self):  # Method to connect to the database and update the score of the current user
         try:  # Try to connect to DB
@@ -179,5 +178,3 @@ class ResultScene(SceneBase):
                 connection.close()  # Always close the connection
         except pymysql.err.OperationalError:  # If error occurs with the connection to the DB, notify user
             self.status = 'The server is currently offline. Please try again later.'
-
-

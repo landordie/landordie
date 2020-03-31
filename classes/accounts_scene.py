@@ -2,12 +2,12 @@
 'accounts_scene.py' module.
 Used in instantiating the Accounts scene.
 """
+import pymysql.cursors
 from .menu_scene import MenuScene
 from .game_scene import *
 from .button import Button
-import pygame
 from .input_box import InputBox
-import pymysql.cursors
+from .helper import draw_text
 
 
 class AccountsScene(SceneBase):
@@ -59,21 +59,21 @@ class AccountsScene(SceneBase):
         self.scores_button = Button((self.screen_width / 2.1, self.screen_height / 1.85,
                                      BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Get scores')
 
-        self.background = pygame.image.load("frames/BG.png")  # Initialize the background
+        self.background = pg.image.load("frames/BG.png")  # Initialize the background
 
         # Container for credential fields
         self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
         self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
                                                  (self.screen_height * 0.15)
         self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
-        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+        self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
         self.button_cont.fill(BLACK_HIGHLIGHT2)
 
         # Container for scores
         self.score_cont_w, self.score_cont_h = self.screen_width / 1.5, self.screen_height / 1.5
         self.score_cont_x, self.score_cont_y = (self.screen_width / 2 - (self.score_cont_w / 2)), \
                                                (self.screen_height * 0.15)
-        self.score_cont = pygame.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
+        self.score_cont = pg.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
         self.score_cont.fill(BLACK_HIGHLIGHT3)
         self.score_cont_button = Button((self.screen_width / 2 - BUTTON_WIDTH / 2, self.screen_height / 1.55,
                                          BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Close')
@@ -82,7 +82,7 @@ class AccountsScene(SceneBase):
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
                                                  (self.screen_height / 15)
-        self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
+        self.status_cont = pg.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
         self.status_cont.fill(BLACK_HIGHLIGHT2)
 
         # Input boxes to handle input for username and password
@@ -101,9 +101,9 @@ class AccountsScene(SceneBase):
         for event in events:
             for input_box in self.fields:  # Pass each event to the input boxes for handling
                 input_box.handle_event(event, 2)
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:  # Exit program on 'Esc' button
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:  # Exit program on 'Esc' button
                 self.terminate()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
                 if self.menu_button.on_click(event):  # Go back to menu
                     menu = MenuScene.get_instance()
                     self.switch_to_scene(menu)
@@ -131,17 +131,17 @@ class AccountsScene(SceneBase):
         self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
                                                  (self.screen_height * 0.15)
         self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
-        self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+        self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
 
         # Adjust database response container position
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
                                                  (self.screen_height / 15)
-        self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
+        self.status_cont = pg.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
 
         self.score_cont_x, self.score_cont_y = (self.screen_width / 2 - (self.score_cont_w / 2)), \
                                                (self.screen_height * 0.15)
-        self.score_cont = pygame.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
+        self.score_cont = pg.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
 
         # Update button positions
         self.menu_button.rect.x, self.menu_button.rect.y = \
@@ -172,31 +172,26 @@ class AccountsScene(SceneBase):
         self.parallax_effect(display)  # Initialize the parallax effect
 
         # Display containers and container and field names
-        display.blit(self.button_cont,
-                     (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
+        display.blit(self.button_cont, (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
         display.blit(self.button_cont,
                      (self.button_cont2_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
 
-        self.draw_text(screen, "Spacecraft player", (self.button_cont_x * 3.9, self.button_cont_y * 0.9),
-                       self.font_medium, WHITE)
-        self.draw_text(screen, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45),
-                       self.font_medium, WHITE)
-        self.draw_text(screen, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05),
-                       self.font_medium, WHITE)
-        self.draw_text(screen, "Anti-spacecraft player", (self.button_cont2_x * 1.3, self.button_cont_y * 0.9),
-                       self.font_medium, WHITE)
-        self.draw_text(screen, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45),
-                       self.font_medium, WHITE)
-        self.draw_text(screen, "Password:", (self.button_cont2_x * 1.15, self.button_cont_y * 2.05),
-                       self.font_medium, WHITE)
+        draw_text(display, "Spacecraft player", (self.button_cont_x * 3.9, self.button_cont_y * 0.9),
+                  self.font_medium, WHITE)
+        draw_text(display, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45), self.font_medium, WHITE)
+        draw_text(display, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05), self.font_medium, WHITE)
+        draw_text(display, "Anti-spacecraft player", (self.button_cont2_x * 1.3, self.button_cont_y * 0.9),
+                  self.font_medium, WHITE)
+        draw_text(display, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45), self.font_medium, WHITE)
+        draw_text(display, "Password:", (self.button_cont2_x * 1.15, self.button_cont_y * 2.05), self.font_medium, WHITE)
 
         # If the status variable is changed (the value not equal to the initial one)
         if self.status != '' and self.cool_down <= 120:
             # Show the status on screen
             display.blit(self.status_cont,
                          (self.status_cont_x, self.status_cont_y, self.status_cont_w, self.status_cont_h))
-            self.draw_text(screen, self.status, (self.screen_width / 2, self.screen_height / 10),
-                           self.font_player_num, WHITE)
+            draw_text(display, self.status, (self.screen_width / 2, self.screen_height / 10),
+                      self.font_player_num, WHITE)
             self.cool_down += 1
 
         # Draw credential fields on screen and reflect any changes to their content
@@ -211,16 +206,16 @@ class AccountsScene(SceneBase):
             # Behind the container of the scores
             display.blit(self.score_cont,
                          (self.score_cont_x, self.score_cont_y, self.score_cont_w, self.score_cont_h))
-            self.draw_text(screen, "Name | Spacecraft | Anti-spacecraft | Games",
-                           (self.screen_width / 2, self.score_cont_y * 1.2), self.font_medium, WHITE)
+            draw_text(display, "Name | Spacecraft | Anti-spacecraft | Games",
+                      (self.screen_width / 2, self.score_cont_y * 1.2), self.font_medium, WHITE)
 
             margin = 1.4
             increment = 0.5
             for entry in self.scores:
                 margin += increment
-                self.draw_text(screen, (entry + "     " + str(self.scores[entry][0]) + "     "
-                                        + str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
-                               (self.screen_width / 2, self.score_cont_y * margin), self.font_medium, WHITE)
+                draw_text(display, (entry + "     " + str(self.scores[entry][0]) + "     "
+                                   + str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
+                          (self.screen_width / 2, self.score_cont_y * margin), self.font_medium, WHITE)
             self.score_cont_button.update(display)
         # If no scores are being displayed on screen update buttons
         else:

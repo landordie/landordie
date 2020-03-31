@@ -5,7 +5,6 @@ Used in instantiation of the Menu scene (window).
 from .button import Button
 from .scene_base import *
 from .splash_scene import SplashScene
-from .input_box import InputBox
 
 
 class MenuScene(SceneBase):
@@ -45,19 +44,19 @@ class MenuScene(SceneBase):
         self.quit_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.18,
                                    BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
 
-        self.background = pygame.image.load("frames/BG.png")
+        self.background = pg.image.load("frames/BG.png")
 
         # Set the background glowing title logo
-        self.logos = [pygame.image.load("frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]
+        self.logos = [pg.image.load("frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]
         self.logo_counter = 1
         self.current_logo = self.logos[0]
         self.x = 0  # Variable used in simulating the x-axis 'movement' of the background image
 
     def process_input(self, events, pressed_keys):
         for event in events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:  # Terminate on 'Esc' key
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:  # Terminate on 'Esc' key
                 self.terminate()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
                 if self.start_button.on_click(event):  # Switch to Splash scene
                     self.switch_to_scene(SplashScene())
                 elif self.accounts_button.on_click(event):  # Update scene and switch

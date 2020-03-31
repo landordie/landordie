@@ -4,21 +4,22 @@ Used in instantiation of the Game scene (window).
 """
 from math import pi, radians
 import random
-import pymunk
+import pymunk as pm
 from pymunk import pygame_util
-from classes.landing_pad import LandingPad
-from classes.spacecraft import Spacecraft
-from .scene_base import *
+from pygame.time import Clock as GameClock
+from .landing_pad import LandingPad
+from .spacecraft import Spacecraft
+from .scene_base import SceneBase
 from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
 from .controls import Controls
-from pygame.time import Clock as GameClock
 from .star_field import StarField
+from constants import *
 
 
 class GameScene(SceneBase):
     """GameScene subclass implementation."""
-    border_sf = pymunk.ShapeFilter(group=2)  # Game borders filter which allows shape grouping for collision avoidance
+    border_sf = pm.ShapeFilter(group=2)  # Game borders filter which allows shape grouping for collision avoidance
 
     def __init__(self):
         # TODO: !!! EXPLAIN ALL THE TODO's in this file in the report !!!
@@ -39,7 +40,7 @@ class GameScene(SceneBase):
 
         # Initialize the environment and all the objects except the players objects:
         # terrain, borders, landing pad, stars, background, etc.
-        self.space = pymunk.Space()  # Pymunk space - the active game environment
+        self.space = pm.Space()  # Pymunk space - the active game environment
         self.space.gravity = EARTH_GRAVITY  # Adjust the environment characteristics
         self.borders()  # Create the solid borders encapsulating the space
         self.random_terrain()  # Generate the random terrain of the space
@@ -49,7 +50,7 @@ class GameScene(SceneBase):
 
         # Pymunk representation - A Pymunk segment object that is created based on the position of
         # the Pygame sprite
-        self.pymunk_landing_pad = self.landing_pad.pymunk_pad(self.space, self.screen_height)
+        self.pm_landing_pad = self.landing_pad.pymunk_pad(self.space, self.screen_height)
         self.game_controls = Controls.get_controls()  # Fetch the game controls
         self.star_field = StarField(self.screen_width, self.screen_height)  # The stars moving in the background
         self.background = pg.image.load("frames/splash_BG.jpg")  # A background image
@@ -92,7 +93,7 @@ class GameScene(SceneBase):
         # This block responds to the user input for controlling the vehicles. A dictionary (CONTROL_DICT) located in
         # constants.py is used to provide changeability of the default controls. It  maps all the available Pygame.KEY
         # objects to Strings (the key names), so when user changes a control in the OptionsScene the game updates
-        keys = pygame.key.get_pressed()  # Get the pressed keys (a list that has 0 or 1 next to each keyboard key)
+        keys = pg.key.get_pressed()  # Get the pressed keys (a list that has 0 or 1 next to each keyboard key)
 
         # Controls of the anti-spacecraft except shooting (it is handled separately further down)
         # Get the key object mapped to the description at index 5 in the # user-defined controls list
@@ -133,7 +134,7 @@ class GameScene(SceneBase):
         # Check each event that has been passed to the process_input() method
         for event in events:
             # This stop displaying the thrust once the key responsible for activating spacecraft engines is released
-            if event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.game_controls[1]]:
+            if event.type == pg.KEYUP and event.key == CONTROL_DICT[self.game_controls[1]]:
                 self.spacecraft.image = self.spacecraft.normal
 
             # -----------------------------------------Start of block---------------------------------------------------
@@ -141,7 +142,7 @@ class GameScene(SceneBase):
             # If the cooldown is 0 ( hasn't shot in the last 2 seconds)
             # Check if the shooting button is pressed and initialize the mechanism
             if self.release_time <= 0:
-                if pygame.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]]\
+                if pg.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]]\
                         and self.anti_spacecraft.missile.collided:
                     # Create new Pymunk missile and add its shape to the space, body will be added later
                     # It has to be created away from the space so that it doesn't collide with anything.
@@ -151,17 +152,17 @@ class GameScene(SceneBase):
 
                     # This variable records when the 'shoot' button is pressed
                     # (it will be used to calculate the strength of the impulse that shoots the bullet)
-                    self.start_time = pygame.time.get_ticks()
+                    self.start_time = pg.time.get_ticks()
                     self.anti_spacecraft.missile.launched = False
                     self.anti_spacecraft.missile.collided = False
 
                 # On releasing the 'shoot' key calculate the time difference, launch the missile
                 # and add the Pymunk body of the missile to the space (only when the previously
                 # launched missile is already removed from the space)
-                elif event.type == pygame.KEYUP and event.key == CONTROL_DICT[self.game_controls[7]]\
+                elif event.type == pg.KEYUP and event.key == CONTROL_DICT[self.game_controls[7]]\
                         and self.anti_spacecraft.missile.body not in self.space.bodies:
 
-                    self.end_time = pygame.time.get_ticks()  # Get the current time
+                    self.end_time = pg.time.get_ticks()  # Get the current time
                     diff = self.end_time - self.start_time  # Calculate time difference
                     self.anti_spacecraft.missile.launch(diff)  # Call launch method
                     self.space.add(self.anti_spacecraft.missile.body)  # Add the missile body to the space
@@ -187,7 +188,7 @@ class GameScene(SceneBase):
         # These three statements are responsible for updating the Pymunk space on each frame
         # They also stabilise the connection b/w Pygame and Pymunk objects on the screen
         self.space.step(1. / FPS)
-        draw_options = pymunk.pygame_util.DrawOptions(display)
+        draw_options = pm.pygame_util.DrawOptions(display)
         self.space.debug_draw(draw_options)
 
         # This block renders the missiles on the screen. While there is a cooldown active
@@ -195,22 +196,22 @@ class GameScene(SceneBase):
         # cooldown time
         if self.release_time > 0:
             self.release_time -= 1
-            self.start_time = pygame.time.get_ticks()
+            self.start_time = pg.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
             loc = (self.screen_width * .9, self.screen_height * .95)  # location coordinates
-            pygame.draw.line(display, RED, loc, (loc[0], loc[1] - cooldown), 10)
+            pg.draw.line(display, RED, loc, (loc[0], loc[1] - cooldown), 10)
         else:
             # When the cannon is on cooldown and the 'shoot' key is pressed, the missile is being
             # positioned relative to the position of the cannon and a yellow line is drawn on the screen
             # that indicates the strength of the impulse
-            if pygame.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]] and self.anti_spacecraft.missile.body:
+            if pg.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]] and self.anti_spacecraft.missile.body:
                 # Position the missile relative to the current cannon position
                 # Adjust the Pymunk missile's rotation angle to be exactly the same the cannon's
                 self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
                                                                 self.anti_spacecraft.cannon_s)
 
                 # Display power bar (yellow)
-                loc = tuple(x * .95 for x in (self.screen_width, self.screen_height)) # location coordinates
+                loc = tuple(x * .95 for x in (self.screen_width, self.screen_height))  # location coordinates
                 self.anti_spacecraft.power_bar(self.start_time, loc, YELLOW, 10, display)
 
         # This piece of code is displaying the Pygame sprite (the image) for the missile
@@ -227,7 +228,9 @@ class GameScene(SceneBase):
             # If there isn't a collision display the image on screen and the missile is launched
             if self.anti_spacecraft.missile.ready_to_blit():
                 display.blit(missile_img, self.anti_spacecraft.missile.rect)
-        # --------------------------------------------End of block -----------------------------------------------------
+
+        # ----------------------------------------------End of block----------------------------------------------------
+
         # Attach the sprite of the anti-spacecraft to its Pymunk body object
         p, rotated_body_img = self.anti_spacecraft.body_sprite.\
             get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
@@ -245,7 +248,8 @@ class GameScene(SceneBase):
         # Spacecraft health bar - it is green, and as the health of the craft drops its
         # colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
-        self.spacecraft.show_stats()
+        pos = tuple(x * .1 for x in (self.screen_width, self.screen_height))  # location coordinates
+        self.spacecraft.show_stats(display, pos)
 
         # Attach the spacecraft sprite to the Pymunk shape
         p, sc_sprite = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
@@ -271,7 +275,7 @@ class GameScene(SceneBase):
         # If a landing attempt is performed and the conditions passes (e.g velocity is not too high,
         # the position is correct, the angle of rotation is not too big, etc.) increment the score
         # of the craft player and stop game
-        if pygame.sprite.collide_mask(self.landing_pad, self.spacecraft):
+        if pg.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
                 if paused:
@@ -289,7 +293,7 @@ class GameScene(SceneBase):
         """
         self.anti_spacecraft.add_to_space(self.space)  # Anti-spacecraft Parts (represent the whole vehicle)
         self.space.add(self.spacecraft.body, self.spacecraft.shape)  # Spacecraft body and shape
-        self.space.add(self.pymunk_landing_pad)  # Landing pad
+        self.space.add(self.pm_landing_pad)  # Landing pad
 
     def start_collision_handlers(self):
         """Initialize all the collision handlers between different Pymunk objects."""
@@ -370,7 +374,7 @@ class GameScene(SceneBase):
         :param data: data to be manipulated
         :return: True when two shapes are in contact
         """
-        if self.pymunk_landing_pad in arbiter.shapes and self.spacecraft.shape in arbiter.shapes:  # On spacecraft-landing pad collision
+        if self.pm_landing_pad in arbiter.shapes and self.spacecraft.shape in arbiter.shapes:  # On spacecraft-landing pad collision
             # Generate an impulse that makes it bounce in the air
             self.spacecraft.body.apply_impulse_at_world_point((0, 250), self.spacecraft.body.position)
         return True
@@ -415,14 +419,14 @@ class GameScene(SceneBase):
 
         while True:
             # Enter an infinite loop which can be interrupted by quitting or pressing Return key on keyboard
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:  # Quit program on 'X' button click
+            for event in pg.event.get():
+                if event.type == pg.QUIT:  # Quit program on 'X' button click
                     return True
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
                     # Checks if any key is pressed - Resumes the game
                     return False
 
-            pygame.display.update()
+            pg.display.update()
             GameClock().tick(FPS)
 
     def random_terrain(self):
@@ -435,10 +439,10 @@ class GameScene(SceneBase):
 
         # Loop through the point tuples and populate the 'terrain' list
         for i in range(1, len(points)):
-            floor = pymunk.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
+            floor = pm.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
                                    (points[i][0], points[i][1]), TERRAIN_THICKNESS)
             floor.friction = TERRAIN_FRICTION
-            floor.filter = pymunk.ShapeFilter(group=0)
+            floor.filter = pm.ShapeFilter(group=0)
             floor.collision_type = 4
             floor.filter = GameScene.border_sf
             terrain_segments.append(floor)
@@ -446,12 +450,12 @@ class GameScene(SceneBase):
 
     def borders(self):
         """Create and place the Game scene borders (Pymunk segments)."""
-        border_left = pymunk.Segment(self.space.static_body, (-5, 0), (-5, self.screen_height), 10)
-        border_right = pymunk.Segment(self.space.static_body, (self.screen_width + 5, 0),
+        border_left = pm.Segment(self.space.static_body, (-5, 0), (-5, self.screen_height), 10)
+        border_right = pm.Segment(self.space.static_body, (self.screen_width + 5, 0),
                                       (self.screen_width + 5, self.screen_height), 10)
-        border_top = pymunk.Segment(self.space.static_body, (0, self.screen_height + 5),
+        border_top = pm.Segment(self.space.static_body, (0, self.screen_height + 5),
                                     (self.screen_width, self.screen_height + 5), 10)
-        border_bottom = pymunk.Segment(self.space.static_body, (0, 0), (self.screen_width, 0), 75)
+        border_bottom = pm.Segment(self.space.static_body, (0, 0), (self.screen_width, 0), 75)
         border_bottom.friction = TERRAIN_FRICTION  # Set the bottom border friction
         border_bottom.color = DARK_GREY  # Set the bottom border color
 

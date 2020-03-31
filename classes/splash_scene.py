@@ -7,6 +7,7 @@ from .game_scene import GameScene
 from .button import Button
 from .controls import Controls
 from .star_field import StarField
+from .helper import draw_text
 
 
 class SplashScene(SceneBase):
@@ -24,10 +25,10 @@ class SplashScene(SceneBase):
         self.splash_w, self.splash_h = self.screen_width / 1.4, self.screen_height / 1.3
         self.splash_x, self.splash_y = (self.screen_width / 2) - (self.splash_w / 2), \
                                        (self.screen_height / 2) - (self.splash_h / 2)
-        self.controls_background = pygame.Surface((self.splash_w, self.splash_h)).convert_alpha()
+        self.controls_background = pg.Surface((self.splash_w, self.splash_h)).convert_alpha()
         self.controls_background.fill(BLACK_HIGHLIGHT)
 
-        self.background = pygame.image.load('frames/splash_BG.jpg')  # Load the background image
+        self.background = pg.image.load('frames/splash_BG.jpg')  # Load the background image
         # https://images.wallpaperscraft.com/image/texture_surface_dark_128260_1920x1080.jpg
 
         # Create the 'Continue' button
@@ -48,23 +49,23 @@ class SplashScene(SceneBase):
         :return: player control images
         """
         if player_num == 1:  # Load spacecraft control images
-            rotate_left = pygame.image.load(
+            rotate_left = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[0]}.png')
-            thrust = pygame.image.load(
+            thrust = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[1]}.png')
-            rotate_right = pygame.image.load(
+            rotate_right = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[2]}.png')
             return rotate_left, rotate_right, thrust
         elif player_num == 2:  # Load anti-spacecraft control images
-            move_left = pygame.image.load(
+            move_left = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[3]}.png')
-            move_right = pygame.image.load(
+            move_right = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[5]}.png')
-            shoot = pygame.image.load(
+            shoot = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[7]}.png')
-            cannon_left = pygame.image.load(
+            cannon_left = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[6]}.png')
-            cannon_right = pygame.image.load(
+            cannon_right = pg.image.load(
                 f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{self.controls[4]}.png')
             return move_left, move_right, shoot, cannon_left, cannon_right
         else:
@@ -72,10 +73,10 @@ class SplashScene(SceneBase):
 
     def process_input(self, events, pressed_keys):
         for event in events:
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:  # Terminate on 'Esc' button
+            if event.type == pg.KEYDOWN and event.key == pg.K_ESCAPE:  # Terminate on 'Esc' button
                 self.terminate()
             # On left mouse button click and if the mouse is on the 'Continue' button
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1 and self.continue_button.on_click(event):
+            if event.type == pg.MOUSEBUTTONDOWN and event.button == 1 and self.continue_button.on_click(event):
                 self.switch_to_scene(GameScene())  # Switch to a GameScene instance
 
     def update(self):
@@ -90,43 +91,37 @@ class SplashScene(SceneBase):
         display.blit(self.controls_background, (self.splash_x, self.splash_y, self.splash_w, self.splash_h))
 
         # Draw Splash scene section indicators
-        self.draw_text(screen, "Game Controls", (self.splash_x + self.splash_w / 2,
-                                                 self.splash_y * 1.5), self.font_header, LIGHT_PURPLE)
-        self.draw_text(screen, "Spacecraft: ", (self.splash_x * 2,
-                                                self.splash_y + 100), self.font_player_num, WHITE)
-        self.draw_text(screen, "Anti-spacecraft: ", (self.splash_x * 5,
-                                                     self.splash_y + 100), self.font_player_num, WHITE)
+        draw_text(display, "Game Controls", (self.splash_x + self.splash_w / 2, self.splash_y * 1.5), self.font_header,
+                  LIGHT_PURPLE)
+        draw_text(display, "Spacecraft: ", (self.splash_x * 2, self.splash_y + 100), self.font_player_num, WHITE)
+        draw_text(display, "Anti-spacecraft: ", (self.splash_x * 5, self.splash_y + 100), self.font_player_num, WHITE)
 
         # Display the controls for the spacecraft player
         # on the splash screen
         display.blit(self.spacecraft_thrust, (self.splash_x * 2, self.splash_y + 150))
-        self.draw_text(screen, "Thruster On", (self.splash_x * 1.5,
-                                               self.splash_y + 200), self.font_freesans_bold, WHITE)
+        draw_text(display, "Thruster On", (self.splash_x * 1.5, self.splash_y + 200), self.font_freesans_bold, WHITE)
 
         display.blit(self.spacecraft_left, (self.splash_x * 2, self.splash_y + 250))
-        self.draw_text(screen, "Rotate Left", (self.splash_x * 1.5,
-                                               self.splash_y + 300), self.font_freesans_bold, WHITE)
+        draw_text(display, "Rotate Left", (self.splash_x * 1.5, self.splash_y + 300), self.font_freesans_bold, WHITE)
 
         display.blit(self.spacecraft_right, (self.splash_x * 2, self.splash_y + 350))
-        self.draw_text(screen, "Rotate Right", (self.splash_x * 1.5,
-                                                self.splash_y + 400), self.font_freesans_bold, WHITE)
+        draw_text(display, "Rotate Right", (self.splash_x * 1.5, self.splash_y + 400), self.font_freesans_bold, WHITE)
 
         # Display the controls for the anti-spacecraft player
         # on the splash screen
         display.blit(self.a_spacecraft_cannon_right, (self.splash_x * 5, self.splash_y + 125))
-        self.draw_text(screen, "Cannon Right", (self.splash_x * 4.5,
-                                                self.splash_y + 175), self.font_freesans_bold, WHITE)
+        draw_text(display, "Cannon Right", (self.splash_x * 4.5, self.splash_y + 175), self.font_freesans_bold, WHITE)
+
         display.blit(self.a_spacecraft_cannon_left, (self.splash_x * 5, self.splash_y + 200))
-        self.draw_text(screen, "Cannon Left", (self.splash_x * 4.5,
-                                               self.splash_y + 250), self.font_freesans_bold, WHITE)
-        display.blit(self.a_spacecraft_left, (self.splash_x * 5, self.splash_y + 350))  # 350
-        self.draw_text(screen, "Move Left", (self.splash_x * 4.5,
-                                             self.splash_y + 400), self.font_freesans_bold, WHITE)  # 400
+        draw_text(display, "Cannon Left", (self.splash_x * 4.5, self.splash_y + 250), self.font_freesans_bold, WHITE)
+
+        display.blit(self.a_spacecraft_left, (self.splash_x * 5, self.splash_y + 350))
+        draw_text(display, "Move Left", (self.splash_x * 4.5, self.splash_y + 400), self.font_freesans_bold, WHITE)
+
         display.blit(self.a_spacecraft_right, (self.splash_x * 5, self.splash_y + 275))
-        self.draw_text(screen, "Move Right", (self.splash_x * 4.5,
-                                              self.splash_y + 325), self.font_freesans_bold, WHITE)
+        draw_text(display, "Move Right", (self.splash_x * 4.5, self.splash_y + 325), self.font_freesans_bold, WHITE)
+
         display.blit(self.a_spacecraft_shoot, (self.splash_x * 5, self.splash_y + 425))
-        self.draw_text(screen, "Shoot", (self.splash_x * 4.5,
-                                         self.splash_y + 475), self.font_freesans_bold, WHITE)
+        draw_text(display, "Shoot", (self.splash_x * 4.5, self.splash_y + 475), self.font_freesans_bold, WHITE)
 
         self.continue_button.update(display)  # Update the 'Continue' button

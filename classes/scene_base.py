@@ -2,16 +2,16 @@
 'scene_base.py' module.
 Contains SceneBase abstract superclass.
 """
-import pygame
+import pygame as pg
 from constants import *
-pygame.font.init()  # Initialize the Pygame font objects
+pg.font.init()  # Initialize the Pygame font objects
 
 
 class SceneBase:
     """
     This class is the superclass of all the other scene classes - MenuScene, SplashScene, AccountsScene
     GameScene and ResultScene. It defines 7 abstract methods - process_input(), update(), render(),
-    switch_to_scene(), terminate(), adjust_screen() and draw_text(). Each method is inherited by the
+    switch_to_scene(), terminate(), adjust_screen(). Each method is inherited by the
     above classes and overwritten with the functionality required by the particular class.
     """
     screen_width = DEFAULT_WIDTH
@@ -21,12 +21,12 @@ class SceneBase:
         """Virtually private constructor which initializes the SceneBase superclass."""
         self.next = self
         # Fonts:
-        self.font_medium = pygame.font.Font(DEFAULT_FONT, 18)
-        self.font_player_num = pygame.font.Font(DEFAULT_FONT, 17)
-        self.font_header = pygame.font.Font(DEFAULT_FONT, 50)
-        self.font_warning = pygame.font.Font(DEFAULT_FONT, 27)
-        self.font_freesans_bold = pygame.font.Font(DEFAULT_FONT, 15)
-        self.press2s = pygame.font.Font("PressStart2P.ttf", 14)
+        self.font_medium = pg.font.Font(DEFAULT_FONT, 18)
+        self.font_player_num = pg.font.Font(DEFAULT_FONT, 17)
+        self.font_header = pg.font.Font(DEFAULT_FONT, 50)
+        self.font_warning = pg.font.Font(DEFAULT_FONT, 27)
+        self.font_freesans_bold = pg.font.Font(DEFAULT_FONT, 15)
+        self.press2s = pg.font.Font("PressStart2P.ttf", 14)
         self.background = None  # The background image
         self.x = 0  # Attribute to simulate the x-axis position of the background image
         # (parallax effect in some scenes)
@@ -98,16 +98,3 @@ class SceneBase:
             display.blit(self.background, (rel_x, 0))
         self.x -= 1  # This decrement is what makes the image "move"
 
-    @staticmethod
-    def draw_text(screen, message, position, font, color=(0, 0, 0)):
-        """
-        Draw text on the given screen surface
-        :param screen: screen
-        :param message: text message to draw
-        :param position: position of the text message
-        :param font: font of text message
-        :param color: color of text message
-        """
-        text = font.render(message, False, color)
-        text_rect = text.get_rect(center=position)
-        screen.get_surface().blit(text, text_rect)

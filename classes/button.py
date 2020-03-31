@@ -6,7 +6,7 @@ from constants import *
 
 
 class Button:
-    """Button instance class."""
+    """Button instance class implementation."""
 
     def __init__(self, rect_size, color, text):
         """
