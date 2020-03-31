@@ -17,7 +17,7 @@ from .star_field import StarField
 
 
 class GameScene(SceneBase):
-    """GameScene subclass."""
+    """GameScene subclass implementation."""
     border_sf = pymunk.ShapeFilter(group=2)  # Game borders filter which allows shape grouping for collision avoidance
 
     def __init__(self):
@@ -197,23 +197,21 @@ class GameScene(SceneBase):
             self.release_time -= 1
             self.start_time = pygame.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
-            pygame.draw.line(display, pygame.color.THECOLORS["blue"], (1125, 750), (1125, 750 - cooldown), 10)
-        # When the cooldown is not active and a shooting key is pressed, the missile is being
-        # positioned relative to the position of the cannon and a red line is drawn on the screen
-        # that indicates the strength of the impulse
+            loc = (self.screen_width * .9, self.screen_height * .95)  # location coordinates
+            pygame.draw.line(display, RED, loc, (loc[0], loc[1] - cooldown), 10)
         else:
+            # When the cannon is on cooldown and the 'shoot' key is pressed, the missile is being
+            # positioned relative to the position of the cannon and a yellow line is drawn on the screen
+            # that indicates the strength of the impulse
             if pygame.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]] and self.anti_spacecraft.missile.body:
                 # Position the missile relative to the current cannon position
                 # Adjust the Pymunk missile's rotation angle to be exactly the same the cannon's
                 self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
                                                                 self.anti_spacecraft.cannon_s)
 
-                # Display a red line on the screen, which increases as the 'shoot' key is held pressed
-                current_time = pygame.time.get_ticks()
-                diff = current_time - self.start_time
-                power = max(min(diff, 750), 0)
-                h = power / 4
-                pygame.draw.line(display, pygame.color.THECOLORS["red"], (1150, 750), (1150, 750 - h), 10)
+                # Display power bar (yellow)
+                loc = tuple(x * .95 for x in (self.screen_width, self.screen_height)) # location coordinates
+                self.anti_spacecraft.power_bar(self.start_time, loc, YELLOW, 10, display)
 
         # This piece of code is displaying the Pygame sprite (the image) for the missile
         if self.anti_spacecraft.missile.shape:
@@ -247,6 +245,7 @@ class GameScene(SceneBase):
         # Spacecraft health bar - it is green, and as the health of the craft drops its
         # colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
+        self.spacecraft.show_stats()
 
         # Attach the spacecraft sprite to the Pymunk shape
         p, sc_sprite = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)

@@ -1,10 +1,10 @@
 """
-Sprite class
+'sprite_class.py' module.
 """
 import pygame
 from math import degrees
 from pymunk import Vec2d
-from constants import flipy
+from help
 
 
 class Sprite(pygame.sprite.Sprite):

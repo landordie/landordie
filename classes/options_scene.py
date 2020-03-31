@@ -12,7 +12,7 @@ import pygame
 
 
 class OptionsScene(SceneBase):
-    """OptionsScene singleton subclass."""
+    """OptionsScene singleton subclass implementation."""
     __instance = None
 
     @staticmethod
@@ -38,7 +38,6 @@ class OptionsScene(SceneBase):
             OptionsScene.__instance = self
 
         self.background = pygame.image.load("frames/BG.png")  # Initialize the background
-        self.x = 0  # Attribute to simulate the x-axis position of the background image
 
         # Create button allowing the user to return to main menu
         self.menu_button = Button((self.screen_width * 0.2, self.screen_height * 0.8, BUTTON_WIDTH, BUTTON_HEIGHT),
@@ -132,18 +131,7 @@ class OptionsScene(SceneBase):
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
-        # Background parallax effect
-        # It works the same way as in the MenuScene instance
-        image_width = self.background.get_rect().width
-        rel_x = self.x % image_width  # The relative x-axis position of the image used for the parallax effect
-        # Displaying the image based on the relative x-axis position and the image width
-        display.blit(self.background, (rel_x - image_width, 0))
-
-        # When the right end of the image reaches the right side of the screen
-        # a new image starts displaying so we do not have any black spaces
-        if rel_x < self.screen_width:
-            display.blit(self.background, (rel_x, 0))
-        self.x -= 1  # This decrement is what makes the image "move"
+        self.parallax_effect(display)  # Initialize the parallax effect
 
         # Drawing the containers and displaying info text
         # (!) Containers are displayed relative to the screen size;

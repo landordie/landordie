@@ -11,7 +11,7 @@ import pymysql.cursors
 
 
 class AccountsScene(SceneBase):
-    """Accounts scene (window) singleton class."""
+    """Accounts scene (window) singleton class implementation."""
     __instance = None
 
     @staticmethod
@@ -33,7 +33,11 @@ class AccountsScene(SceneBase):
         else:
             AccountsScene.__instance = self
 
-        self.logged_in = [False, False]  # This variable indicates if a player has logged in.
+        # Dictionary to show which player is logged in
+        self.logged_in = {
+            'Spacecraft': False,
+            'Anti-spacecraft': False
+        }
         self.credentials = [[], []]  # This list contains the credentials of the currently logged in user
 
         # Initialize buttons in the interface (menu, log in and register buttons)
@@ -56,11 +60,10 @@ class AccountsScene(SceneBase):
                                      BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Get scores')
 
         self.background = pygame.image.load("frames/BG.png")  # Initialize the background
-        self.x = 0  # Attribute to simulate the x-axis position of the background image
 
         # Container for credential fields
         self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w),\
+        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
                                                  (self.screen_height * 0.15)
         self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
         self.button_cont = pygame.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
@@ -69,7 +72,7 @@ class AccountsScene(SceneBase):
         # Container for scores
         self.score_cont_w, self.score_cont_h = self.screen_width / 1.5, self.screen_height / 1.5
         self.score_cont_x, self.score_cont_y = (self.screen_width / 2 - (self.score_cont_w / 2)), \
-                                                 (self.screen_height * 0.15)
+                                               (self.screen_height * 0.15)
         self.score_cont = pygame.Surface((self.score_cont_w, self.score_cont_h)).convert_alpha()
         self.score_cont.fill(BLACK_HIGHLIGHT3)
         self.score_cont_button = Button((self.screen_width / 2 - BUTTON_WIDTH / 2, self.screen_height / 1.55,
@@ -77,7 +80,7 @@ class AccountsScene(SceneBase):
 
         # Container for the database response
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
-        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
                                                  (self.screen_height / 15)
         self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
         self.status_cont.fill(BLACK_HIGHLIGHT2)
@@ -104,7 +107,7 @@ class AccountsScene(SceneBase):
                 if self.menu_button.on_click(event):  # Go back to menu
                     menu = MenuScene.get_instance()
                     self.switch_to_scene(menu)
-                # If the score table is initialized, do not check for the buttons behind the score contaioner
+                # If the score table is initialized, do not check for the buttons behind the score container
                 if self.scores:
                     if self.score_cont_button.on_click(event):
                         # If close container is clicked, empty the scores
@@ -132,7 +135,7 @@ class AccountsScene(SceneBase):
 
         # Adjust database response container position
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
-        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2),\
+        self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
                                                  (self.screen_height / 15)
         self.status_cont = pygame.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
 
@@ -166,18 +169,7 @@ class AccountsScene(SceneBase):
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
-
-        # Background parallax effect
-        # It works the same way as in the MenuScene instance
-        image_width = self.background.get_rect().width
-        rel_x = self.x % image_width  # The relative x of the image used for the parallax effect
-        # Displaying the image based on the relative x and the image width
-        display.blit(self.background, (rel_x - image_width, 0))
-        # When the right end of the image reaches the right side of the screen
-        # a new image starts displaying so we do not have any black spaces
-        if rel_x < self.screen_width:
-            display.blit(self.background, (rel_x, 0))
-        self.x -= 1  # This decrement is what makes the image "move"
+        self.parallax_effect(display)  # Initialize the parallax effect
 
         # Display containers and container and field names
         display.blit(self.button_cont,
@@ -252,10 +244,10 @@ class AccountsScene(SceneBase):
                 try:
                     # Create a cursor object which will be used to execute commands on the DB
                     with connection.cursor() as cursor:
-                        if self.logged_in[0]:
+                        if self.logged_in['Spacecraft']:
                             # Create the SQL statement to get the users with the given credentials
                             sql = "SELECT `Anti-spacecraft Score`, `Spacecraft Score` FROM `scores` WHERE " \
-                                  "(Username='{0}')".format(self.credentials[0][0])
+                                  f"(Username='{self.credentials[0][0]}')"
                             cursor.execute(sql)  # Execute statement
                             scores = cursor.fetchall()  # And get the result of the query
                             a_sc_score = 0
@@ -265,10 +257,10 @@ class AccountsScene(SceneBase):
                                 sc_score += int(score_tuple[1])
                             # Add entry to the dictionary
                             self.scores[self.credentials[0][0]] = (sc_score, a_sc_score, len(scores))
-                        if self.logged_in[1]:
+                        if self.logged_in['Anti-spacecraft']:
                             # Create the SQL statement to get the users with the given credentials
                             sql = "SELECT `Anti-spacecraft Score`, `Spacecraft Score` FROM `scores` WHERE " \
-                                  "(Username='{0}')".format(self.credentials[1][0])
+                                  f"(Username='{self.credentials[1][0]}')"
                             cursor.execute(sql)  # Execute statement
                             scores = cursor.fetchall()  # And get the result of the query
                             a_sc_score = 0
@@ -281,35 +273,18 @@ class AccountsScene(SceneBase):
                     connection.close()
                 return
 
-            for field in [username, pw]:  # Check if the credential fields are empty. If so notify user and abort action
+            # Check if the credential fields are empty. If so notify user and abort action
+            for field in [username, pw]:
                 if field == '':
                     self.cool_down = 0
                     self.status = 'You cannot submit an empty field. Please try again!'
                     return
 
+            player = None  # To indicate which player is trying to log in
             if command == "login_sc":  # If the request asks the DB to check if user exists
-                if not self.logged_in[0]:  # and another user is not currently logged in from the session
-                    try:
-                        # Create a cursor object which will be used to execute commands on the DB
-                        with connection.cursor() as cursor:
-                            # Create the SQL statement to get the users with the given credentials
-                            sql = "SELECT `Username`, `Password` FROM `users` WHERE (Username='{0}') " \
-                                  "AND (Password='{1}')".format(username, pw)
-                            cursor.execute(sql)  # Execute statement
-                            player = cursor.fetchone()  # And get the result of the query
-                            if player:  # If the check was successful (a table entry is returned)
-                                self.status = 'Spacecraft player signed in as [{0}]! Enjoy the game.'.format(username)
-                                self.credentials[0] = [username, pw]  # Update the state
-                                self.logged_in[0] = True
-                            else:
-                                self.status = 'Wrong credentials entered. Please check the input again.'
-                            self.cool_down = 0
-                    finally:  # Always close the connection
-                        connection.close()
-                else:
-                    self.status = 'You are already signed in! Please log out first.'
-                    self.cool_down = 0
-
+                player = 'Spacecraft'
+            elif command == "login_asc":
+                player = 'Anti-spacecraft'
             elif command == "register":  # If the DB has to register a new user
                 try:
                     with connection.cursor() as cursor:  # Create a cursor object
@@ -327,22 +302,22 @@ class AccountsScene(SceneBase):
                         self.cool_down = 0
                 finally:  # Always close the connection
                     connection.close()
+                return
 
-            elif command == "login_asc":  # If the request asks the DB to check if user exists
-                if not self.logged_in[1]:  # and another user is not currently logged in from the session
+            if player:  # Check if the player is specified
+                if not self.logged_in[player]:  # and another user is not currently logged in from the session
                     try:
                         # Create a cursor object which will be used to execute commands on the DB
                         with connection.cursor() as cursor:
                             # Create the SQL statement to get the users with the given credentials
-                            sql = "SELECT `Username`, `Password` FROM `users` WHERE (Username='{0}') " \
-                                  "AND (Password='{1}')".format(username, pw)
+                            sql = f"SELECT `Username`, `Password` FROM `users` WHERE (Username='{username}') " \
+                                  f"AND (Password='{pw}')"
                             cursor.execute(sql)  # Execute statement
-                            player = cursor.fetchone()  # And get the result of the query
-                            if player:  # If the check was successful (a table entry is returned)
-                                self.status = 'Anti-spacecraft player signed in as [{0}]! Enjoy the game.'.format(
-                                    username)
-                                self.credentials[1] = [username, pw]  # Update the state
-                                self.logged_in[1] = True
+                            fetch_result = cursor.fetchone()  # And get the result of the query
+                            if fetch_result:  # If the check was successful (a table entry is returned)
+                                self.status = f'{player} player signed in as [{username}]! Enjoy the game.'
+                                self.credentials[0] = [username, pw]  # Update the state
+                                self.logged_in[player] = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again.'
                             self.cool_down = 0
@@ -351,6 +326,8 @@ class AccountsScene(SceneBase):
                 else:
                     self.status = 'You are already signed in! Please log out first.'
                     self.cool_down = 0
+            else:
+                print('Player not specified!')
         except pymysql.err.OperationalError:
             self.status = 'The server is currently offline. Please try again later.'
             self.cool_down = 0

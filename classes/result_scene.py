@@ -11,7 +11,7 @@ from .star_field import StarField
 
 
 class ResultScene(SceneBase):
-    """ResultScene subclass."""
+    """ResultScene subclass implementation."""
 
     def __init__(self, player1_pts, player2_pts):
         super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
@@ -34,7 +34,7 @@ class ResultScene(SceneBase):
         self.status = ''
         from classes import AccountsScene  # Avoiding circular dependencies
         self.accounts = AccountsScene.get_instance()
-        if self.accounts.logged_in[0] or self.accounts.logged_in[1]:
+        if self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']:
             # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
@@ -80,7 +80,7 @@ class ResultScene(SceneBase):
                 self.switch_to_scene(MenuScene.get_instance())
             else:
                 # Otherwise get player names if local storage will be used
-                if not (self.accounts.logged_in[0] or self.accounts.logged_in[1]):
+                if not (self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']):
                     if self.player_no == 1:
                         self.get_player_name(event)
                     elif self.player_no == 2:
@@ -115,16 +115,17 @@ class ResultScene(SceneBase):
                        self.press2s, CYAN)
 
         # If not logged in ask for user names for both players for the .cvs safe
-        if not (self.accounts.logged_in[0] or self.accounts.logged_in[1]):
-            self.draw_text(screen, "Please type your name or initials.", (self.screen_width / 2, self.screen_height / 4),
-                           self.font_medium, CYAN)
-            self.draw_text(screen, "As you start typing, your name will appear "
-                                   "on the screen", (self.screen_width / 2, self.screen_height / 3.33), self.font_medium,
-                           CYAN)
+        if not (self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']):
+            self.draw_text(screen, "Please type your name or initials.",
+                           (self.screen_width / 2, self.screen_height / 4), self.font_medium, CYAN)
+            self.draw_text(screen, "As you start typing, your name will appear on the screen",
+                           (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
             self.draw_text(screen, "To confirm press ENTER | To delete a character use BACKSPACE",
                            (self.screen_width / 2, self.screen_height / 2.85), self.font_medium, CYAN)
-            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15), self.font_medium, CYAN)
-            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35), self.font_medium, CYAN)
+            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15),
+                           self.font_medium, CYAN)
+            self.draw_text(screen, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35),
+                           self.font_medium, CYAN)
 
             # Two blocks displaying the names of the players
             block = self.font_medium.render(self.player1_name, True, CYAN)

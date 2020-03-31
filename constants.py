@@ -125,8 +125,3 @@ CONTROL_DICT = {
         'Tab': pg.K_TAB,
         'Enter': pg.K_RETURN
 }
-
-
-def flipy(p, h):
-    """Convert chipmunk coordinates to Pygame coordinates."""
-    return Vec2d(p[0], -p[1] + h)

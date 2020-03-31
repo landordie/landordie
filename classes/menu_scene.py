@@ -85,18 +85,7 @@ class MenuScene(SceneBase):
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
         # TODO: Write test to make sure self.background is not NONE
-        # Background parallax effect
-        # It works the same way as in the MenuScene instance
-        image_width = self.background.get_rect().width
-        rel_x = self.x % image_width  # The relative x-axis position of the image used for the parallax effect
-        # Displaying the image based on the relative x-axis position and the image width
-        display.blit(self.background, (rel_x - image_width, 0))
-
-        # When the right end of the image reaches the right side of the screen
-        # a new image starts displaying so we do not have any black spaces
-        if rel_x < self.screen_width:
-            display.blit(self.background, (rel_x, 0))
-        self.x -= 1  # This decrement is what makes the image "move"
+        self.parallax_effect(display)  # Initialize the parallax effect
 
         self.control_logo()
         display.blit(self.current_logo, ((self.screen_width / 2 - self.current_logo.get_size()[0] / 2),

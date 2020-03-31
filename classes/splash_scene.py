@@ -10,7 +10,7 @@ from .star_field import StarField
 
 
 class SplashScene(SceneBase):
-    """SplashScene subclass."""
+    """SplashScene subclass implementation."""
 
     def __init__(self):
         """Virtually private constructor which initializes the Splash scene."""
@@ -19,24 +19,27 @@ class SplashScene(SceneBase):
         # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
         # resolutions, text fonts, general text drawing methods and so on.
 
-        self.star_field = StarField(self.screen_width, self.screen_height)
-        self.splash_w, self.splash_h = self.screen_width / 1.4, self.screen_height / 1.3
-        self.splash_x, self.splash_y = (self.screen_width / 2) - (self.splash_w / 2),\
-                                       (self.screen_height / 2) - (self.splash_h / 2)
+        self.star_field = StarField(self.screen_width, self.screen_height)  # Initialize the dynamic background
 
+        self.splash_w, self.splash_h = self.screen_width / 1.4, self.screen_height / 1.3
+        self.splash_x, self.splash_y = (self.screen_width / 2) - (self.splash_w / 2), \
+                                       (self.screen_height / 2) - (self.splash_h / 2)
         self.controls_background = pygame.Surface((self.splash_w, self.splash_h)).convert_alpha()
         self.controls_background.fill(BLACK_HIGHLIGHT)
-        self.background = pygame.image.load('frames/splash_BG.jpg')
+
+        self.background = pygame.image.load('frames/splash_BG.jpg')  # Load the background image
         # https://images.wallpaperscraft.com/image/texture_surface_dark_128260_1920x1080.jpg
 
-        # Continue button
+        # Create the 'Continue' button
         self.continue_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2),
                                        self.splash_h, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
         self.controls = Controls.get_controls()  # Fetch the game controls
-        self.player1_left, self.player1_right, self.player1_thrust = self.load_controls_images(1)
-        self.player2_left, self.player2_right, self.player2_shoot, self.player2_cannon_left, self.player2_cannon_right \
-            = self.load_controls_images(2)
+
+        # Set the spacecraft and anti-spacecraft controls accordingly using the fetched controls
+        self.spacecraft_left, self.spacecraft_right, self.spacecraft_thrust = self.load_controls_images(1)
+        self.a_spacecraft_left, self.a_spacecraft_right, self.a_spacecraft_shoot, self.a_spacecraft_cannon_left,\
+            self.a_spacecraft_cannon_right = self.load_controls_images(2)
 
     def load_controls_images(self, player_num):
         """
@@ -79,14 +82,14 @@ class SplashScene(SceneBase):
         self.star_field.set_params(self.screen_width, self.screen_height)  # Update the background image
 
     def render(self, screen):
-        screen.set_mode((self.screen_width, self.screen_height))
+        display = self.adjust_screen(screen)  # Adjust the Splash scene screen (height and width) and get the surface
+        display.blit(self.background, (0, 0))  # Display the background image
+        self.star_field.draw_stars(display)  # Display the dynamic background image
 
-        screen.get_surface().blit(self.background, (0, 0))
-        self.star_field.draw_stars(screen.get_surface())
+        # Display the control button images' black background rectangle
+        display.blit(self.controls_background, (self.splash_x, self.splash_y, self.splash_w, self.splash_h))
 
-        screen.get_surface().blit(self.controls_background,
-                                  (self.splash_x, self.splash_y, self.splash_w, self.splash_h))
-
+        # Draw Splash scene section indicators
         self.draw_text(screen, "Game Controls", (self.splash_x + self.splash_w / 2,
                                                  self.splash_y * 1.5), self.font_header, LIGHT_PURPLE)
         self.draw_text(screen, "Spacecraft: ", (self.splash_x * 2,
@@ -94,39 +97,36 @@ class SplashScene(SceneBase):
         self.draw_text(screen, "Anti-spacecraft: ", (self.splash_x * 5,
                                                      self.splash_y + 100), self.font_player_num, WHITE)
 
-        # Display the controls for Player 1 (controlling the ship)
+        # Display the controls for the spacecraft player
         # on the splash screen
-
-        screen.get_surface().blit(self.player1_thrust, (self.splash_x * 2, self.splash_y + 150))
+        display.blit(self.spacecraft_thrust, (self.splash_x * 2, self.splash_y + 150))
         self.draw_text(screen, "Thruster On", (self.splash_x * 1.5,
                                                self.splash_y + 200), self.font_freesans_bold, WHITE)
 
-        screen.get_surface().blit(self.player1_left, (self.splash_x * 2, self.splash_y + 250))
+        display.blit(self.spacecraft_left, (self.splash_x * 2, self.splash_y + 250))
         self.draw_text(screen, "Rotate Left", (self.splash_x * 1.5,
                                                self.splash_y + 300), self.font_freesans_bold, WHITE)
 
-        screen.get_surface().blit(self.player1_right, (self.splash_x * 2, self.splash_y + 350))
+        display.blit(self.spacecraft_right, (self.splash_x * 2, self.splash_y + 350))
         self.draw_text(screen, "Rotate Right", (self.splash_x * 1.5,
                                                 self.splash_y + 400), self.font_freesans_bold, WHITE)
 
-        # Display the controls for Player 2 (controlling the tank)
+        # Display the controls for the anti-spacecraft player
         # on the splash screen
-
-        screen.get_surface().blit(self.player2_cannon_right, (self.splash_x * 5, self.splash_y + 125))
+        display.blit(self.a_spacecraft_cannon_right, (self.splash_x * 5, self.splash_y + 125))
         self.draw_text(screen, "Cannon Right", (self.splash_x * 4.5,
                                                 self.splash_y + 175), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_cannon_left, (self.splash_x * 5, self.splash_y + 200))
+        display.blit(self.a_spacecraft_cannon_left, (self.splash_x * 5, self.splash_y + 200))
         self.draw_text(screen, "Cannon Left", (self.splash_x * 4.5,
                                                self.splash_y + 250), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_left, (self.splash_x * 5, self.splash_y + 350))  # 350
+        display.blit(self.a_spacecraft_left, (self.splash_x * 5, self.splash_y + 350))  # 350
         self.draw_text(screen, "Move Left", (self.splash_x * 4.5,
                                              self.splash_y + 400), self.font_freesans_bold, WHITE)  # 400
-        screen.get_surface().blit(self.player2_right, (self.splash_x * 5, self.splash_y + 275))
+        display.blit(self.a_spacecraft_right, (self.splash_x * 5, self.splash_y + 275))
         self.draw_text(screen, "Move Right", (self.splash_x * 4.5,
                                               self.splash_y + 325), self.font_freesans_bold, WHITE)
-        screen.get_surface().blit(self.player2_shoot, (self.splash_x * 5, self.splash_y + 425))
+        display.blit(self.a_spacecraft_shoot, (self.splash_x * 5, self.splash_y + 425))
         self.draw_text(screen, "Shoot", (self.splash_x * 4.5,
                                          self.splash_y + 475), self.font_freesans_bold, WHITE)
 
-        self.continue_button.update(screen.get_surface())
-        pygame.display.update()
+        self.continue_button.update(display)  # Update the 'Continue' button

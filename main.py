@@ -1,5 +1,6 @@
 """
-Game class
+'main.py' module.
+Runs the game loop.
 """
 # ------------------------------------------#
 
@@ -13,33 +14,41 @@ from classes import *
 
 
 class Game:
+    """Game class implementation."""
+
     def __init__(self):
-        self.menu = MenuScene()
-        self.run_game(60, self.menu)
+        """Virtually private constructor which initializes the Game class instance."""
+        self.menu = MenuScene()  # Initialize the Menu scene for our starting scene
+        self.run_game(60, self.menu)  # Run the game on 60 fps
 
     @staticmethod
     def run_game(fps, starting_scene):
-        """Function to run the program"""
-        # Initialize pygame objects
+        """
+        Run the main loop of the program.
+        :param fps: frames per second
+        :param starting_scene: the starting scene of the game
+        """
+        # Initialize Pygame objects
         pygame.init()
         screen = pygame.display
         clock = pygame.time.Clock()
         pygame.display.set_caption('LAND OR DIE')
 
-        # Set the active scene
+        # Set the active scene to the starting scene
         active_scene = starting_scene
 
         # If there is an active scene start program loop
         while active_scene is not None:
+            # Variable to check for keys being pressed or held down
             pressed_keys = pygame.key.get_pressed()
 
-            # Event filtering
-            filtered_events = []
+            filtered_events = []  # Event filtering
             for event in pygame.event.get():
                 quit_attempt = False
-                # If a quit is attempted
-                if event.type == pygame.QUIT:
+                if event.type == pygame.QUIT:  # If the player presses the 'X' button
                     quit_attempt = True
+                # If the player presses the 'Esc' button
+                # or tries the 'Alt+F4' key combination
                 elif event.type == pygame.KEYDOWN:
                     alt_pressed = pressed_keys[pygame.K_LALT] or \
                                   pressed_keys[pygame.K_RALT]
@@ -47,15 +56,14 @@ class Game:
                         quit_attempt = True
                     elif event.key == pygame.K_F4 and alt_pressed:
                         quit_attempt = True
-
-                if quit_attempt:
-                    active_scene.terminate()
+                if quit_attempt:  # On player trying to quit
+                    active_scene.terminate()  # Terminate the program loop
                 else:
-                    # If not quitting add events into list
-                    filtered_events.append(event)
+                    filtered_events.append(event)  # Add the events into the filtered list
 
             # Pass the list of events and pressed keys for processing by the current scene
             active_scene.process_input(filtered_events, pressed_keys)
+
             # Render current scene's objects to the screen
             active_scene.render(screen)
 

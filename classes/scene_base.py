@@ -27,6 +27,9 @@ class SceneBase:
         self.font_warning = pygame.font.Font(DEFAULT_FONT, 27)
         self.font_freesans_bold = pygame.font.Font(DEFAULT_FONT, 15)
         self.press2s = pygame.font.Font("PressStart2P.ttf", 14)
+        self.background = None  # The background image
+        self.x = 0  # Attribute to simulate the x-axis position of the background image
+        # (parallax effect in some scenes)
 
     def process_input(self, events, pressed_keys):
         """
@@ -78,6 +81,22 @@ class SceneBase:
         """
         screen.set_mode((self.screen_width, self.screen_height))  # Set the screen size
         return screen.get_surface()  # Get the surface of the screen
+
+    def parallax_effect(self, display):
+        """
+        Introduce a background parallax effect. (MenuScene, OptionsScene, AccountsScene)
+        :param display: current scene screen surface
+        """
+        img_width = self.background.get_rect().width
+        rel_x = self.x % img_width  # The relative x-axis position of the image used for the parallax effect
+        # Displaying the image based on the relative x-axis position and the image width
+        display.blit(self.background, (rel_x - img_width, 0))
+
+        # When the right end of the image reaches the right side of the screen
+        # a new image starts displaying so we do not have any black spaces
+        if rel_x < self.screen_width:
+            display.blit(self.background, (rel_x, 0))
+        self.x -= 1  # This decrement is what makes the image "move"
 
     @staticmethod
     def draw_text(screen, message, position, font, color=(0, 0, 0)):

@@ -156,10 +156,26 @@ class AntiSpaceCraft:
         """
         fuel = max(self.fuel, 0)
         # Red bar underneath to make the fuel drop visible
-        pg.draw.line(display, RED, flipy((self.chassis_b.position - (80, 45)), height),
+        pg.draw.line(display, WHITE_HIGHLIGHT, flipy((self.chassis_b.position - (80, 45)), height),
                      flipy((self.chassis_b.position[0] + 87,
                             self.chassis_b.position[1] - 45), height), 10)
         # Actual fuel bar
-        pg.draw.line(display, GREEN, flipy((self.chassis_b.position - (80, 45)), height),
+        pg.draw.line(display, CYAN, flipy((self.chassis_b.position - (80, 45)), height),
                      flipy((self.chassis_b.position[0] - 79 + fuel / 3,
                             self.chassis_b.position[1] - 45), height), 10)
+
+    @staticmethod
+    def power_bar(start_time, loc, color, thickness, display):
+        """
+        Display the anti-spacecraft power bar.
+        :param start_time: 'shoot' button keydown time
+        :param loc: power bar location
+        :param color: power bar color
+        :param thickness: power bar thickness
+        :param display: Pygame screen surface
+        """
+        current_time = pg.time.get_ticks()
+        diff = current_time - start_time  # Calculate the time difference
+        power = max(min(diff, 750), 0)  # Set the power bar max height
+        h = power / 4  # Calculate the height from the time difference
+        pg.draw.line(display, color, loc, (loc[0], loc[1] - h), thickness)  # Draw the bar

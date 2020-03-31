@@ -6,7 +6,7 @@ from constants import  DEFAULT_CONTROLS
 
 
 class Controls:
-    """Controls instance class."""
+    """Controls instance class implementation."""
     controls = DEFAULT_CONTROLS  # Initially set to default ones
 
     @staticmethod
