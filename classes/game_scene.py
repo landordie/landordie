@@ -16,6 +16,9 @@ from .controls import Controls
 from .star_field import StarField
 from constants import *
 
+# TODO: NO GAMEPLAY INSTRUCTIONS WHATSOEVER... TRIAL AND ERROR - FUNDAMENTAL METHOD OF PROBLEM SOLVING
+#  ( INCLUDE IN REP!)
+
 
 class GameScene(SceneBase):
     """GameScene subclass implementation."""
