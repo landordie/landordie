@@ -60,17 +60,17 @@ class Spacecraft(Sprite):
         :param display: current scene screen surface
         :param height: current scene height
         """
-        if self.health >= 75:
-            health_color = GREEN
-        elif self.health >= 50:
-            health_color = YELLOW
-        elif self.health <= 0:
-            health_color = WHITE
-        else:
-            health_color = RED
+        # if self.health >= 75:
+        #     health_color = GREEN
+        # elif self.health >= 50:
+        #     health_color = YELLOW
+        # elif self.health <= 0:
+        #     health_color = WHITE
+        # else:
+        health_color = RED
 
         # White bar underneath to make the health drop visible
-        pg.draw.line(display, WHITE_HIGHLIGHT, flipy((self.body.position - (80, 45)), height),
+        pg.draw.line(display, (156, 12, 12), flipy((self.body.position - (80, 45)), height),
                      flipy((self.body.position[0] + 75,
                             self.body.position[1] - 45), height), 10)
 
@@ -79,7 +79,11 @@ class Spacecraft(Sprite):
                      flipy((self.body.position[0] + 75 - self.damage,
                             self.body.position[1] - 45), height), 10)
 
-        display.blit(self.health_bar_img, flipy((self.body.position - (100, 45)), height - self.health_bar_img.get_size()[1] // 2))
+        x, y = flipy((self.body.position - (80, 45)), height)
+        pg.draw.rect(display, BLACK, (x, y-5, 157, 12), 3)  # width = 3
+
+        display.blit(self.health_bar_img, flipy((self.body.position - (100, 45)),
+                                                height - self.health_bar_img.get_size()[1] // 2))
 
     def show_stats(self, display, position):
         x_velocity, y_velocity = self.body.velocity

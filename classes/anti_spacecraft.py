@@ -69,6 +69,7 @@ class AntiSpaceCraft:
         self.cannon_mt = pymunk.SimpleMotor(self.cannon_b, self.chassis_b, 0)
 
         self.missile = Missile()  # Create missile instance
+        self.fuel_bar_img = pg.image.load("frames/lightning.png")
 
     @staticmethod
     def create_body(mass, position, shape_type, friction=TERRAIN_FRICTION):
@@ -157,13 +158,19 @@ class AntiSpaceCraft:
         """
         fuel = max(self.fuel, 0)
         # Red bar underneath to make the fuel drop visible
-        pg.draw.line(display, WHITE_HIGHLIGHT, flipy((self.chassis_b.position - (80, 45)), height),
+        pg.draw.line(display, (13, 191, 191), flipy((self.chassis_b.position - (80, 45)), height),
                      flipy((self.chassis_b.position[0] + 87,
                             self.chassis_b.position[1] - 45), height), 10)
         # Actual fuel bar
         pg.draw.line(display, CYAN, flipy((self.chassis_b.position - (80, 45)), height),
                      flipy((self.chassis_b.position[0] - 79 + fuel / 3,
                             self.chassis_b.position[1] - 45), height), 10)
+
+        x, y = flipy((self.chassis_b.position - (80, 45)), height)
+        pg.draw.rect(display, BLACK, (x, y - 5, 170, 12), 3)  # width = 3
+
+        display.blit(self.fuel_bar_img, flipy((self.chassis_b.position - (100, 45)),
+                                              height - self.fuel_bar_img.get_size()[1] // 2))
 
     @staticmethod
     def power_bar(start_time, loc, color, thickness, display):
