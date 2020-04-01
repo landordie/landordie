@@ -52,24 +52,25 @@ class Spacecraft(Sprite):
         self.shape.collision_type = 2  # Set the shape collision type for the collision handler
         self.body.position = 600, 700
 
-        self.health_bar_img = pg.image.load("frames/heart.png")
+        self.health_bar_img = pg.image.load("frames/heart.png") # Load the health bar image
+        self.velocity = 0
 
     def health_bar(self, display, height):
         """
-        Change health bar color as the health drops.
+        Draw the health bar.
         :param display: current scene screen surface
         :param height: current scene height
         """
 
         health_color = RED
 
-        # White bar underneath to make the health drop visible
+        # Dark red bar underneath to make the health drop visible
         pg.draw.line(display, (156, 12, 12), flipy((self.body.position - (80, 45)), height),
                      flipy((self.body.position[0] + 75,
                             self.body.position[1] - 45), height), 10)
 
-        # Actual health bar (green)
-        pg.draw.line(display, health_color, flipy((self.body.position - (80, 45)), height),
+        # Actual health bar (red)
+        pg.draw.line(display, RED, flipy((self.body.position - (80, 45)), height),
                      flipy((self.body.position[0] + 75 - self.damage,
                             self.body.position[1] - 45), height), 10)
 
@@ -81,8 +82,8 @@ class Spacecraft(Sprite):
 
     def show_stats(self, display, position):
         x_velocity, y_velocity = self.body.velocity
-        sc_velocity = int(sqrt(pow(x_velocity, 2) + pow(y_velocity, 2)) // 50)
-        draw_text(display, f"Downward Velocity: {sc_velocity}", position, pg.font.Font(DEFAULT_FONT, 15), CYAN)
+        self.velocity = int(sqrt(pow(x_velocity, 2) + pow(y_velocity, 2)) // 50)
+        draw_text(display, f"Spacecraft velocity: {self.velocity}", position, pg.font.Font(DEFAULT_FONT, 13), CYAN)
 
     def apply_thrust(self):
         """Apply thrust force to the spacecraft (make it fly)."""
@@ -106,4 +107,4 @@ class Spacecraft(Sprite):
         :return:
         """
         return (self.health > 0 and (-10 <= degrees(self.body.angle) <= 10) and
-                (-300 < self.body.velocity.y < 20))
+                (self.velocity < 5))

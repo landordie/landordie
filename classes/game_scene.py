@@ -102,9 +102,9 @@ class GameScene(SceneBase):
 
         if self.anti_spacecraft.fuel:  # If the anti-spacecraft still has some fuel left
             # Apply force on the wheels accordingly
-            if keys[CONTROL_DICT[self.game_controls[5]]]:
+            if keys[self.game_controls[5]]:
                 self.anti_spacecraft.force_right()  # If
-            elif keys[CONTROL_DICT[self.game_controls[3]]]:
+            elif keys[self.game_controls[3]]:
                 self.anti_spacecraft.force_left()
             else:
                 self.anti_spacecraft.force = DEFAULT_FORCE
@@ -112,10 +112,10 @@ class GameScene(SceneBase):
             self.anti_spacecraft.force = DEFAULT_FORCE
 
         # Anti-spacecraft cannon rotation (in radians)
-        if keys[CONTROL_DICT[self.game_controls[6]]] \
+        if keys[self.game_controls[6]] \
                 and self.anti_spacecraft.cannon_b.angle < radians(-10):
             self.anti_spacecraft.cannon_mt.rate = 2
-        elif keys[CONTROL_DICT[self.game_controls[4]]] \
+        elif keys[self.game_controls[4]] \
                 and self.anti_spacecraft.cannon_b.angle >= -pi + radians(10):
             self.anti_spacecraft.cannon_mt.rate = -2
         else:
@@ -124,18 +124,18 @@ class GameScene(SceneBase):
         # Controls of spacecraft (it is controllable only if it hasn't crashed)
         if not self.spacecraft.crashed:
             # Rotate spacecraft (in radians)
-            if keys[CONTROL_DICT[self.game_controls[0]]]:
+            if keys[self.game_controls[0]]:
                 self.spacecraft.body.angle += radians(2)
-            if keys[CONTROL_DICT[self.game_controls[2]]]:
+            if keys[self.game_controls[2]]:
                 self.spacecraft.body.angle -= radians(2)
-            if keys[CONTROL_DICT[self.game_controls[1]]]:
+            if keys[self.game_controls[1]]:
                 self.spacecraft.apply_thrust()
         # ---------------------------------------------End of block ----------------------------------------------------
 
         # Check each event that has been passed to the process_input() method
         for event in events:
             # This stop displaying the thrust once the key responsible for activating spacecraft engines is released
-            if event.type == pg.KEYUP and event.key == CONTROL_DICT[self.game_controls[1]]:
+            if event.type == pg.KEYUP and event.key == self.game_controls[1]:
                 self.spacecraft.image = self.spacecraft.normal
 
             # -----------------------------------------Start of block---------------------------------------------------
@@ -143,8 +143,7 @@ class GameScene(SceneBase):
             # If the cooldown is 0 ( hasn't shot in the last 2 seconds)
             # Check if the shooting button is pressed and initialize the mechanism
             if self.release_time <= 0:
-                if pg.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]]\
-                        and self.anti_spacecraft.missile.collided:
+                if keys[self.game_controls[7]] and self.anti_spacecraft.missile.collided:
                     # Create new Pymunk missile and add its shape to the space, body will be added later
                     # It has to be created away from the space so that it doesn't collide with anything.
                     # It will be positioned in the Render method
@@ -160,7 +159,7 @@ class GameScene(SceneBase):
                 # On releasing the 'shoot' key calculate the time difference, launch the missile
                 # and add the Pymunk body of the missile to the space (only when the previously
                 # launched missile is already removed from the space)
-                elif event.type == pg.KEYUP and event.key == CONTROL_DICT[self.game_controls[7]]\
+                elif event.type == pg.KEYUP and event.key == self.game_controls[7]\
                         and self.anti_spacecraft.missile.body not in self.space.bodies:
 
                     self.end_time = pg.time.get_ticks()  # Get the current time
@@ -193,30 +192,29 @@ class GameScene(SceneBase):
         self.space.debug_draw(draw_options)
 
         # This block renders the missiles on the screen. While there is a cooldown active
-        # (the if statement), a blue line is drawn on the screen which shows the remaining
-        # cooldown time
+        # (the if statement), a blue line is drawn on the screen which shows the remaining cooldown time
         if self.release_time > 0:
             self.release_time -= 1
             self.start_time = pg.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
-            loc = (self.screen_width * .9, self.screen_height * .95)  # location coordinates
+            loc = (self.screen_width * .9, self.screen_height * .95)  # Location coordinates
             display.blit(self.clock_img, (loc[0] - self.clock_img.get_size()[0] // 2,  # Display a clock icon
                                           loc[1] - 190 - self.clock_img.get_size()[1]))
             pg.draw.rect(display, LIGHT_BLUE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # Draw a border for the bar
-            pg.draw.line(display, BLUE, loc, (loc[0], loc[1] - cooldown), 10)  # Draw cool down bar
-        else:
-            # When the cannon is on cooldown and the 'shoot' key is pressed, the missile is being
-            # positioned relative to the position of the cannon and a yellow line is drawn on the screen
-            # that indicates the strength of the impulse
-            if pg.key.get_pressed()[CONTROL_DICT[self.game_controls[7]]] and self.anti_spacecraft.missile.body:
-                # Position the missile relative to the current cannon position
-                # Adjust the Pymunk missile's rotation angle to be exactly the same the cannon's
-                self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
-                                                                self.anti_spacecraft.cannon_s)
+            pg.draw.line(display, BLUE, loc, (loc[0], loc[1] - cooldown), 10)  # Draw the cooldown bar
 
-                # Display power bar (yellow)
-                loc = tuple(x * .95 for x in (self.screen_width, self.screen_height))  # location coordinates
-                self.anti_spacecraft.power_bar(self.start_time, loc, 10, display)
+        # When the cannon is on cooldown and the 'shoot' key is pressed, the missile is being
+        # positioned relative to the position of the cannon and a yellow line is drawn on the screen
+        # that indicates the strength of the impulse
+        elif pg.key.get_pressed()[self.game_controls[7]] and self.anti_spacecraft.missile.body:
+            # Position the missile relative to the current cannon position
+            # Adjust the Pymunk missile's rotation angle to be exactly the same the cannon's
+            self.anti_spacecraft.missile.prepare_for_launch(self.anti_spacecraft.cannon_b,
+                                                            self.anti_spacecraft.cannon_s)
+
+            # Display power bar (yellow)
+            loc = tuple(x * .95 for x in (self.screen_width, self.screen_height))  # location coordinates
+            self.anti_spacecraft.power_bar(self.start_time, loc, 10, display)
 
         # This piece of code is displaying the Pygame sprite (the image) for the missile
         if self.anti_spacecraft.missile.shape:
@@ -252,7 +250,7 @@ class GameScene(SceneBase):
         # Spacecraft health bar - it is green, and as the health of the craft drops its
         # colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
-        pos = tuple(x * .1 for x in (self.screen_width, self.screen_height))  # location coordinates
+        pos = (self.screen_width * .12, self.screen_height * .05)  # location coordinates
         self.spacecraft.show_stats(display, pos)
 
         # Attach the spacecraft sprite to the Pymunk shape
@@ -269,13 +267,6 @@ class GameScene(SceneBase):
             self.spacecraft.terrain_collision = True
             self.spacecraft.terrain_collision_cd = 0
 
-        # If the spacecraft has no health left, pause the game and display a notification
-        if self.spacecraft.health <= 0:
-            paused = self.pause_game('no HP', display)
-            if paused:
-                self.terminate()
-            else:
-                self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
         # If a landing attempt is performed and the conditions passes (e.g velocity is not too high,
         # the position is correct, the angle of rotation is not too big, etc.) increment the score
         # of the craft player and stop game
@@ -283,8 +274,8 @@ class GameScene(SceneBase):
             c = GREEN
         else:
             c = RED
-
         self.landing_pad.show_landing_conditions(display, self.font_warning, c)
+
         if pg.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
@@ -293,6 +284,14 @@ class GameScene(SceneBase):
                 else:
                     self.spacecraft_pts += 50
                     self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
+
+        # If the spacecraft has no health left, pause the game and display a notification
+        if self.spacecraft.health <= 0:
+            paused = self.pause_game('no HP', display)
+            if paused:
+                self.terminate()
+            else:
+                self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
     # ==================================================================================================================
     # Helper methods below
 

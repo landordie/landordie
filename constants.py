@@ -61,7 +61,7 @@ DEFAULT_CONTROLS = ['A', 'W', 'D', 'Left', 'Up', 'Right', 'Down', 'Space']
 # Constant used in calculating mid-air velocity of missiles every frame (air resistance effect)
 MISSILE_DRAG_CONSTANT = 0.0002
 
-CONTROL_DICT = {
+CONTROLS_DICT = {
         'Q': pg.K_q,
         'W': pg.K_w,
         'E': pg.K_e,
