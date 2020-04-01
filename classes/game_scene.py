@@ -159,7 +159,7 @@ class GameScene(SceneBase):
                 # On releasing the 'shoot' key calculate the time difference, launch the missile
                 # and add the Pymunk body of the missile to the space (only when the previously
                 # launched missile is already removed from the space)
-                elif event.type == pg.KEYUP and event.key == self.game_controls[7]\
+                elif event.type == pg.KEYUP and event.key == self.game_controls[7] \
                         and self.anti_spacecraft.missile.body not in self.space.bodies:
 
                     self.end_time = pg.time.get_ticks()  # Get the current time
@@ -223,7 +223,7 @@ class GameScene(SceneBase):
             # object must be placed at. It converts Pymunk coordinates into Pygame ones and also
             # ensures that the image of the missile is rotated in the same angle as its Pymunk body.
             # The angles in Pymunk are in radians in Pygame in degrees.
-            m, missile_img = self.anti_spacecraft.missile.\
+            m, missile_img = self.anti_spacecraft.missile. \
                 get_attachment_coordinates(self.anti_spacecraft.missile.body, self.screen_height)
             self.anti_spacecraft.missile.rect = missile_img.get_rect(left=m[0], top=m[1])
 
@@ -234,7 +234,7 @@ class GameScene(SceneBase):
         # ----------------------------------------------End of block----------------------------------------------------
 
         # Attach the sprite of the anti-spacecraft to its Pymunk body object
-        p, rotated_body_img = self.anti_spacecraft.body_sprite.\
+        p, rotated_body_img = self.anti_spacecraft.body_sprite. \
             get_attachment_coordinates(self.anti_spacecraft.chassis_b, self.screen_height)
         self.anti_spacecraft.body_sprite.rect = rotated_body_img.get_rect(left=p[0], top=p[1] - 15)
         display.blit(rotated_body_img, self.anti_spacecraft.body_sprite.rect)
@@ -292,6 +292,7 @@ class GameScene(SceneBase):
                 self.terminate()
             else:
                 self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
+
     # ==================================================================================================================
     # Helper methods below
 
@@ -449,7 +450,7 @@ class GameScene(SceneBase):
         # Loop through the point tuples and populate the 'terrain' list
         for i in range(1, len(points)):
             floor = pm.Segment(self.space.static_body, (points[i - 1][0], points[i - 1][1]),
-                                   (points[i][0], points[i][1]), TERRAIN_THICKNESS)
+                               (points[i][0], points[i][1]), TERRAIN_THICKNESS)
             floor.friction = TERRAIN_FRICTION
             floor.filter = pm.ShapeFilter(group=0)
             floor.collision_type = 4
@@ -461,10 +462,11 @@ class GameScene(SceneBase):
         """Create and place the Game scene borders (Pymunk segments)."""
         border_left = pm.Segment(self.space.static_body, (-5, 0), (-5, self.screen_height), 10)
         border_right = pm.Segment(self.space.static_body, (self.screen_width + 5, 0),
-                                      (self.screen_width + 5, self.screen_height), 10)
+                                  (self.screen_width + 5, self.screen_height), 10)
         border_top = pm.Segment(self.space.static_body, (0, self.screen_height + 5),
-                                    (self.screen_width, self.screen_height + 5), 10)
-        border_bottom = pm.Segment(self.space.static_body, (0, 0), (self.screen_width, 0), 75)
+                                (self.screen_width, self.screen_height + 5), 10)
+        border_bottom = pm.Segment(self.space.static_body, (0, 0), (self.screen_width, 0),
+                                   self.screen_height * 0.1)
         border_bottom.friction = TERRAIN_FRICTION  # Set the bottom border friction
         border_bottom.color = DARK_GREY  # Set the bottom border color
 
