@@ -260,6 +260,7 @@ class AccountsScene(SceneBase):
                             scores = cursor.fetchall()  # And get the result of the query
                             a_sc_score = 0
                             sc_score = 0
+
                             for score_tuple in scores:
                                 a_sc_score += int(score_tuple[0])
                                 sc_score += int(score_tuple[1])
@@ -276,10 +277,13 @@ class AccountsScene(SceneBase):
                     return
 
             player = None  # To indicate which player is trying to log in
+            id = -1  # To identify which player credentials to save
             if command == "login_sc":  # If the request asks the DB to check if user exists
                 player = 'Spacecraft'
+                id = 0
             elif command == "login_asc":
                 player = 'Anti-spacecraft'
+                id = 1
             elif command == "register":  # If the DB has to register a new user
                 try:
                     with connection.cursor() as cursor:  # Create a cursor object
@@ -311,7 +315,7 @@ class AccountsScene(SceneBase):
                             fetch_result = cursor.fetchone()  # And get the result of the query
                             if fetch_result:  # If the check was successful (a table entry is returned)
                                 self.status = f'{player} player signed in as [{username}]! Enjoy the game.'
-                                self.credentials[0] = [username, pw]  # Update the state
+                                self.credentials[id] = [username, pw]  # Update the state
                                 self.logged_in[player] = True
                             else:
                                 self.status = 'Wrong credentials entered. Please check the input again.'
