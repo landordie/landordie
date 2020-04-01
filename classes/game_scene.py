@@ -200,10 +200,10 @@ class GameScene(SceneBase):
             self.start_time = pg.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
             loc = (self.screen_width * .9, self.screen_height * .95)  # location coordinates
-            display.blit(self.clock_img, (loc[0] - self.clock_img.get_size()[0] // 2,
+            display.blit(self.clock_img, (loc[0] - self.clock_img.get_size()[0] // 2,  # Display a clock icon
                                           loc[1] - 190 - self.clock_img.get_size()[1]))
-            pg.draw.rect(display, LIGHT_BLUE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # width = 3
-            pg.draw.line(display, BLUE, loc, (loc[0], loc[1] - cooldown), 10)
+            pg.draw.rect(display, LIGHT_BLUE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # Draw a border for the bar
+            pg.draw.line(display, BLUE, loc, (loc[0], loc[1] - cooldown), 10)  # Draw cool down bar
         else:
             # When the cannon is on cooldown and the 'shoot' key is pressed, the missile is being
             # positioned relative to the position of the cannon and a yellow line is drawn on the screen
