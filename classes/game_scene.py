@@ -212,7 +212,7 @@ class GameScene(SceneBase):
 
                 # Display power bar (yellow)
                 loc = tuple(x * .95 for x in (self.screen_width, self.screen_height))  # location coordinates
-                self.anti_spacecraft.power_bar(self.start_time, loc, YELLOW, 10, display)
+                self.anti_spacecraft.power_bar(self.start_time, loc, 10, display)
 
         # This piece of code is displaying the Pygame sprite (the image) for the missile
         if self.anti_spacecraft.missile.shape:

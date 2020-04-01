@@ -173,7 +173,7 @@ class AntiSpaceCraft:
                                               height - self.fuel_bar_img.get_size()[1] // 2))
 
     @staticmethod
-    def power_bar(start_time, loc, color, thickness, display):
+    def power_bar(start_time, loc, thickness, display):
         """
         Display the anti-spacecraft power bar.
         :param start_time: 'shoot' button keydown time
@@ -186,4 +186,10 @@ class AntiSpaceCraft:
         diff = current_time - start_time  # Calculate the time difference
         power = max(min(diff, 750), 0)  # Set the power bar max height
         h = power / 4  # Calculate the height from the time difference
+        if h >= 170:
+            color = RED
+        elif 75 < h < 169:
+            color = YELLOW
+        else:
+            color = GREEN
         pg.draw.line(display, color, loc, (loc[0], loc[1] - h), thickness)  # Draw the bar

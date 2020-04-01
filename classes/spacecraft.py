@@ -60,13 +60,7 @@ class Spacecraft(Sprite):
         :param display: current scene screen surface
         :param height: current scene height
         """
-        # if self.health >= 75:
-        #     health_color = GREEN
-        # elif self.health >= 50:
-        #     health_color = YELLOW
-        # elif self.health <= 0:
-        #     health_color = WHITE
-        # else:
+
         health_color = RED
 
         # White bar underneath to make the health drop visible
