@@ -193,6 +193,8 @@ class AntiSpaceCraft:
             color = GREEN
 
         pg.draw.line(display, color, loc, (loc[0], loc[1] - h), thickness)  # Draw the bar
+
+    def draw_power_bar_outline(self, display, loc):
         pg.draw.rect(display, LIGHT_PURPLE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # width = 3
         display.blit(self.power_bar_img, (loc[0] - self.power_bar_img.get_size()[0] // 2
                                           , loc[1] - 187.5 - self.power_bar_img.get_size()[1]))
