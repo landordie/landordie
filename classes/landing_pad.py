@@ -14,6 +14,7 @@ class LandingPad(Sprite):
         self.rect.top = random.randint(height // 1.7, height // 1.5)
         self.rect.right = random.randint(155, width - 100)
         self.mask = pg.mask.from_surface(self.image)
+        self.landable = True
 
     # This method generates and returns a pymunk segment object which is used to
     # detect physics based collision between the spaceship and the landing pad
@@ -31,3 +32,9 @@ class LandingPad(Sprite):
                 spacecraft.rect.left > self.rect.left and spacecraft.rect.bottom <= self.rect.top + 15 \
                 and spacecraft.get_landing_condition():
             return True
+
+    def show_landing_conditions(self, display, font, c):
+        msg = font.render("|    |", False, c)
+        msg_rect = msg.get_rect()
+        msg_rect.center = (self.rect.center[0], self.rect.y)
+        display.blit(msg, msg_rect)

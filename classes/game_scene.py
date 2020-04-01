@@ -279,6 +279,12 @@ class GameScene(SceneBase):
         # If a landing attempt is performed and the conditions passes (e.g velocity is not too high,
         # the position is correct, the angle of rotation is not too big, etc.) increment the score
         # of the craft player and stop game
+        if self.spacecraft.get_landing_condition():
+            c = GREEN
+        else:
+            c = RED
+
+        self.landing_pad.show_landing_conditions(display, self.font_warning, c)
         if pg.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
                 paused = self.pause_game('landed', display)
