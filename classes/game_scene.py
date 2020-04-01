@@ -253,8 +253,8 @@ class GameScene(SceneBase):
         # Spacecraft health bar - it is green, and as the health of the craft drops its
         # colour changes to yellow and red
         self.spacecraft.health_bar(display, self.screen_height)
-        pos = (self.screen_width * .12, self.screen_height * .05)  # location coordinates
-        self.spacecraft.show_stats(display, pos)
+        pos = (self.screen_width * .07, self.screen_height * .04)  # location coordinates
+        self.spacecraft.show_stats(display, pos)  # Display the spacecraft stats (velocity and angle)
 
         # Attach the spacecraft sprite to the Pymunk shape
         p, sc_sprite = self.spacecraft.get_attachment_coordinates(self.spacecraft.body, self.screen_height)
