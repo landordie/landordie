@@ -52,6 +52,8 @@ class Spacecraft(Sprite):
         self.shape.collision_type = 2  # Set the shape collision type for the collision handler
         self.body.position = 600, 700
 
+        self.health_bar_img = pg.image.load("frames/heart.png")
+
     def health_bar(self, display, height):
         """
         Change health bar color as the health drops.
@@ -71,10 +73,13 @@ class Spacecraft(Sprite):
         pg.draw.line(display, WHITE_HIGHLIGHT, flipy((self.body.position - (80, 45)), height),
                      flipy((self.body.position[0] + 75,
                             self.body.position[1] - 45), height), 10)
+
         # Actual health bar (green)
         pg.draw.line(display, health_color, flipy((self.body.position - (80, 45)), height),
                      flipy((self.body.position[0] + 75 - self.damage,
                             self.body.position[1] - 45), height), 10)
+
+        display.blit(self.health_bar_img, flipy((self.body.position - (100, 45)), height - self.health_bar_img.get_size()[1] // 2))
 
     def show_stats(self, display, position):
         x_velocity, y_velocity = self.body.velocity
