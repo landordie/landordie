@@ -70,6 +70,7 @@ class AntiSpaceCraft:
 
         self.missile = Missile()  # Create missile instance
         self.fuel_bar_img = pg.image.load("frames/lightning.png")
+        self.power_bar_img = pg.image.load("frames/power_bar.png")
 
     @staticmethod
     def create_body(mass, position, shape_type, friction=TERRAIN_FRICTION):
@@ -172,13 +173,11 @@ class AntiSpaceCraft:
         display.blit(self.fuel_bar_img, flipy((self.chassis_b.position - (100, 45)),
                                               height - self.fuel_bar_img.get_size()[1] // 2))
 
-    @staticmethod
-    def power_bar(start_time, loc, thickness, display):
+    def power_bar(self, start_time, loc, thickness, display):
         """
         Display the anti-spacecraft power bar.
-        :param start_time: 'shoot' button keydown time
+        :param start_time: 'shoot' button key press time
         :param loc: power bar location
-        :param color: power bar color
         :param thickness: power bar thickness
         :param display: Pygame screen surface
         """
@@ -192,4 +191,8 @@ class AntiSpaceCraft:
             color = YELLOW
         else:
             color = GREEN
+
         pg.draw.line(display, color, loc, (loc[0], loc[1] - h), thickness)  # Draw the bar
+        pg.draw.rect(display, LIGHT_PURPLE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # width = 3
+        display.blit(self.power_bar_img, (loc[0] - self.power_bar_img.get_size()[0] // 2
+                                          , loc[1] - 187.5 - self.power_bar_img.get_size()[1]))

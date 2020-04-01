@@ -82,6 +82,7 @@ class GameScene(SceneBase):
         # Clock attributes to calculate the impulse strength to be applied to the missile
         self.end_time = 0
         self.start_time = 0
+        self.clock_img = pg.image.load("frames/timer.png")
 
     # TODO: !!! THIS IS IMPORTANT, TOO !!!
     # The next sequence of 5 methods (process_input(), update(), render(), switch_to_scene(),
@@ -199,7 +200,10 @@ class GameScene(SceneBase):
             self.start_time = pg.time.get_ticks()
             cooldown = max(self.release_time, 0) * 1.5
             loc = (self.screen_width * .9, self.screen_height * .95)  # location coordinates
-            pg.draw.line(display, RED, loc, (loc[0], loc[1] - cooldown), 10)
+            display.blit(self.clock_img, (loc[0] - self.clock_img.get_size()[0] // 2,
+                                          loc[1] - 190 - self.clock_img.get_size()[1]))
+            pg.draw.rect(display, LIGHT_BLUE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # width = 3
+            pg.draw.line(display, BLUE, loc, (loc[0], loc[1] - cooldown), 10)
         else:
             # When the cannon is on cooldown and the 'shoot' key is pressed, the missile is being
             # positioned relative to the position of the cannon and a yellow line is drawn on the screen
