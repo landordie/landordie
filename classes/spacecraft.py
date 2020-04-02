@@ -52,7 +52,7 @@ class Spacecraft(Sprite):
         self.shape.collision_type = 2  # Set the shape collision type for the collision handler
         self.body.position = 600, 700
 
-        self.health_bar_img = pg.image.load("frames/heart.png") # Load the health bar image
+        self.health_bar_img = pg.image.load("frames/heart.png")  # Load the health bar image
         self.velocity = 0
 
     def health_bar(self, display, height):
@@ -61,8 +61,6 @@ class Spacecraft(Sprite):
         :param display: current scene screen surface
         :param height: current scene height
         """
-
-        health_color = RED
 
         # Dark red bar underneath to make the health drop visible
         pg.draw.line(display, (156, 12, 12), flipy((self.body.position - (80, 45)), height),

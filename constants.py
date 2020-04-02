@@ -67,7 +67,7 @@ DEFAULT_FRICTION = .5
 DEFAULT_CONTROLS = ['A', 'W', 'D', 'Left', 'Up', 'Right', 'Down', 'Space']
 
 # Constant used in calculating mid-air velocity of missiles every frame (air resistance effect)
-MISSILE_DRAG_CONSTANT = 0.0002
+MISSILE_DRAG_CONSTANT = 0.0001
 
 CONTROLS_DICT = {
         'Q': pg.K_q,

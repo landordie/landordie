@@ -8,7 +8,7 @@ import pygame
 
 
 class InputBox:
-    """InputBox instance class."""
+    """InputBox instance class implementation."""
 
     def __init__(self, x, y, text='', w=100, h=35):
         """Virtually private constructor which initializes the input box for player input."""
