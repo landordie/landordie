@@ -20,13 +20,6 @@ class SceneBase:
     def __init__(self):
         """Virtually private constructor which initializes the SceneBase superclass."""
         self.next = self
-        # Fonts:
-        self.font_medium = pg.font.Font(DEFAULT_FONT, 18)
-        self.font_player_num = pg.font.Font(DEFAULT_FONT, 17)
-        self.font_header = pg.font.Font(DEFAULT_FONT, 50)
-        self.font_warning = pg.font.Font(DEFAULT_FONT, 27)
-        self.font_freesans_bold = pg.font.Font(DEFAULT_FONT, 15)
-        self.press2s = pg.font.Font("PressStart2P.ttf", 14)
         self.background = None  # The background image
         self.x = 0  # Attribute to simulate the x-axis position of the background image
         # (parallax effect in some scenes)

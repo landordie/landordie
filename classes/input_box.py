@@ -15,7 +15,7 @@ class InputBox:
         self.rect = pg.Rect(x, y, w, h)  # Set the rectangle coordinates along with its size
         self.color = BRIGHT_PURPLE  # Set the rectangle color (outline)
         self.text = text  # Set the text string inside the box
-        self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(text, True, WHITE)  # Set the text font and color
+        self.txt_surface = FONT_BIG.render(text, True, WHITE)  # Set the text font and color
         self.active = False  # Boolean attribute for showing activity of a box (highlighting)
 
     def handle_event(self, event, box_type=1):
@@ -82,7 +82,7 @@ class InputBox:
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Toggle off the highlight (activity)
                 self.active = False
         # Re-render the text.
-        self.txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(self.text, True, WHITE)
+        self.txt_surface = FONT_BIG.render(self.text, True, WHITE)
         # Change the current color of the input box.
         self.color = CYAN if self.active else BRIGHT_PURPLE
 
@@ -101,7 +101,7 @@ class InputBox:
             screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))  # Blit the text.
         else:  # Replace symbols with '*' and blit
             hidden_text = '*' * len(self.text)
-            txt_surface = pg.font.Font(DEFAULT_FONT, 18).render(hidden_text, True, WHITE)
+            txt_surface = FONT_BIG.render(hidden_text, True, WHITE)
             screen.blit(txt_surface, (self.rect.x+5, self.rect.y+5))
         pg.draw.rect(screen, self.color, self.rect, 3)  # Blit the text rectangle
 

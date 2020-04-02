@@ -32,8 +32,8 @@ class SplashScene(SceneBase):
         # https://images.wallpaperscraft.com/image/texture_surface_dark_128260_1920x1080.jpg
 
         # Create the 'Continue' button
-        self.continue_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2),
-                                       self.splash_h, BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
+        self.continue_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.splash_h - (BUTTON_HEIGHT/4),
+                                       BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Continue')
 
         # Set the spacecraft and anti-spacecraft controls accordingly using the fetched controls
         self.spacecraft_left, self.spacecraft_right, self.spacecraft_thrust = self.load_controls_images(1)
@@ -91,37 +91,36 @@ class SplashScene(SceneBase):
         display.blit(self.controls_background, (self.splash_x, self.splash_y, self.splash_w, self.splash_h))
 
         # Draw Splash scene section indicators
-        draw_text(display, "Game Controls", (self.splash_x + self.splash_w / 2, self.splash_y * 1.5), self.font_header,
+        draw_text(display, "Game Controls", (self.splash_x + self.splash_w / 2, self.splash_y * 1.5), FONT_HEADER,
                   LIGHT_PURPLE)
-        draw_text(display, "Spacecraft: ", (self.splash_x * 2, self.splash_y + 100), self.font_player_num, WHITE)
-        draw_text(display, "Anti-spacecraft: ", (self.splash_x * 5, self.splash_y + 100), self.font_player_num, WHITE)
+        draw_text(display, "Spacecraft: ", (self.splash_x * 2, self.splash_y * 2.25), FONT_MEDIUM_PLUS, WHITE)
+        draw_text(display, "Anti-spacecraft: ", (self.splash_x * 4.85, self.splash_y * 2.25), FONT_MEDIUM_PLUS, WHITE)
 
-        # Display the controls for the spacecraft player
-        # on the splash screen
-        display.blit(self.spacecraft_thrust, (self.splash_x * 2, self.splash_y + 150))
-        draw_text(display, "Thruster On", (self.splash_x * 1.5, self.splash_y + 200), self.font_freesans_bold, WHITE)
+        # Display the controls for the spacecraft player on the splash screen
+        display.blit(self.spacecraft_thrust, (self.splash_x * 2.3, self.splash_y * 2.6))
+        draw_text(display, "Thruster On", (self.splash_x * 1.75, self.splash_y * 3.15), FONT_MEDIUM, WHITE)
 
-        display.blit(self.spacecraft_left, (self.splash_x * 2, self.splash_y + 250))
-        draw_text(display, "Rotate Left", (self.splash_x * 1.5, self.splash_y + 300), self.font_freesans_bold, WHITE)
+        display.blit(self.spacecraft_left, (self.splash_x * 2.3, self.splash_y * 3.7))
+        draw_text(display, "Rotate Left", (self.splash_x * 1.75, self.splash_y * 4.25), FONT_MEDIUM, WHITE)
 
-        display.blit(self.spacecraft_right, (self.splash_x * 2, self.splash_y + 350))
-        draw_text(display, "Rotate Right", (self.splash_x * 1.5, self.splash_y + 400), self.font_freesans_bold, WHITE)
+        display.blit(self.spacecraft_right, (self.splash_x * 2.3, self.splash_y * 4.8))
+        draw_text(display, "Rotate Right", (self.splash_x * 1.75, self.splash_y * 5.35), FONT_MEDIUM, WHITE)
 
         # Display the controls for the anti-spacecraft player
         # on the splash screen
-        display.blit(self.a_spacecraft_cannon_right, (self.splash_x * 5, self.splash_y + 125))
-        draw_text(display, "Cannon Right", (self.splash_x * 4.5, self.splash_y + 175), self.font_freesans_bold, WHITE)
+        display.blit(self.a_spacecraft_cannon_right, (self.splash_x * 5.2, self.splash_y * 2.35))
+        draw_text(display, "Cannon Right", (self.splash_x * 4.65, self.splash_y * 2.9), FONT_MEDIUM, WHITE)
 
-        display.blit(self.a_spacecraft_cannon_left, (self.splash_x * 5, self.splash_y + 200))
-        draw_text(display, "Cannon Left", (self.splash_x * 4.5, self.splash_y + 250), self.font_freesans_bold, WHITE)
+        display.blit(self.a_spacecraft_cannon_left, (self.splash_x * 5.2, self.splash_y * 3.17))
+        draw_text(display, "Cannon Left", (self.splash_x * 4.65, self.splash_y * 3.72), FONT_MEDIUM, WHITE)
 
-        display.blit(self.a_spacecraft_left, (self.splash_x * 5, self.splash_y + 350))
-        draw_text(display, "Move Left", (self.splash_x * 4.5, self.splash_y + 400), self.font_freesans_bold, WHITE)
+        display.blit(self.a_spacecraft_left, (self.splash_x * 5.2, self.splash_y * 3.99))
+        draw_text(display, "Move Left", (self.splash_x * 4.65, self.splash_y * 4.54), FONT_MEDIUM, WHITE)
 
-        display.blit(self.a_spacecraft_right, (self.splash_x * 5, self.splash_y + 275))
-        draw_text(display, "Move Right", (self.splash_x * 4.5, self.splash_y + 325), self.font_freesans_bold, WHITE)
+        display.blit(self.a_spacecraft_right, (self.splash_x * 5.2, self.splash_y * 4.81))
+        draw_text(display, "Move Right", (self.splash_x * 4.65, self.splash_y * 5.36), FONT_MEDIUM, WHITE)
 
-        display.blit(self.a_spacecraft_shoot, (self.splash_x * 5, self.splash_y + 425))
-        draw_text(display, "Shoot", (self.splash_x * 4.5, self.splash_y + 475), self.font_freesans_bold, WHITE)
+        display.blit(self.a_spacecraft_shoot, (self.splash_x * 5.2, self.splash_y * 5.63))
+        draw_text(display, "Shoot", (self.splash_x * 4.65, self.splash_y * 6.18), FONT_MEDIUM, WHITE)
 
         self.continue_button.update(display)  # Update the 'Continue' button

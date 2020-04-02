@@ -105,34 +105,32 @@ class ResultScene(SceneBase):
     def display_scene(self, display):
         # Display main messages
         draw_text(display, "GAME RESULTS",
-                  (self.screen_width / 2, self.screen_height / 7), self.press2s, CYAN)
+                  (self.screen_width / 2, self.screen_height / 8), FONT_BIG, CYAN)
 
         draw_text(display, f"Player 1 Score = {self.player1_pts} points",
-                  (self.screen_width / 2, self.screen_height / 2.5), self.press2s, CYAN)
+                  (self.screen_width / 2, self.screen_height / 2.5), FONT_MEDIUM, CYAN)
 
         draw_text(display, f"Player 2 Score = {self.player2_pts} points",
-                  (self.screen_width / 2, self.screen_height / 1.5), self.press2s, CYAN)
+                  (self.screen_width / 2, self.screen_height / 1.5), FONT_MEDIUM, CYAN)
 
         # If not logged in ask for user names for both players for the .cvs safe
         if not (self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']):
-            draw_text(display, "Please type your name or initials.",
-                      (self.screen_width / 2, self.screen_height / 4), self.font_medium, CYAN)
-            draw_text(display, "As you start typing, your name will appear on the screen",
-                      (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
-            draw_text(display, "To confirm press ENTER | To delete a character use BACKSPACE",
-                      (self.screen_width / 2, self.screen_height / 2.85), self.font_medium, CYAN)
-            draw_text(display, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15),
-                      self.font_medium, CYAN)
-            draw_text(display, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35),
-                      self.font_medium, CYAN)
+            draw_text(display, "Please, type your name or initials!",
+                      (self.screen_width / 2, self.screen_height / 5.5), FONT_MEDIUM, CYAN)
+            draw_text(display, "As you start typing, your name will appear on the screen.",
+                      (self.screen_width / 2, self.screen_height / 4.3), FONT_MEDIUM, CYAN)
+            draw_text(display, "To confirm press ENTER | To delete a character use BACKSPACE!",
+                      (self.screen_width / 2, self.screen_height / 3.5), FONT_MEDIUM, CYAN)
+            draw_text(display, "Name >>", (self.screen_width / 2.45, self.screen_height / 2.15), FONT_MEDIUM, CYAN)
+            draw_text(display, "Name >>", (self.screen_width / 2.45, self.screen_height / 1.35), FONT_MEDIUM, CYAN)
 
             # Two blocks displaying the names of the players
-            block = self.font_medium.render(self.player1_name, True, CYAN)
+            block = FONT_MEDIUM.render(self.player1_name, True, CYAN)
             rect = block.get_rect()
             rect.left = self.screen_width / 2.15
             rect.top = self.screen_height / 2.21
 
-            block2 = self.font_medium.render(self.player2_name, True, CYAN)
+            block2 = FONT_MEDIUM.render(self.player2_name, True, CYAN)
             rect2 = block2.get_rect()
             rect2.left = self.screen_width / 2.15
             rect2.top = self.screen_height / 1.38
@@ -146,15 +144,17 @@ class ResultScene(SceneBase):
                 self.player_no += 1
         else:
             # If the user decides to save scores to the DB, blit status
-            draw_text(display, self.status,
-                      (self.screen_width / 2, self.screen_height / 3.33), self.font_medium, CYAN)
+            draw_text(display, self.status, (self.screen_width / 2, self.screen_height / 3.33), FONT_MEDIUM, CYAN)
 
     def connect_DB(self):  # Method to connect to the database and update the score of the current user
         try:  # Try to connect to DB
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
             try:
                 with connection.cursor() as cursor:  # Create a cursor object
-                    if self.accounts.logged_in['Spacecraft']:
+                    if self.accounts.logged_in['Spacecraft'] and self.accounts.logged_in['Anti-spacecraft']:
+                        self.status = 'Scores for players [%s] and [%s] updated successfully!' % \
+                                      (self.accounts.credentials[0][0], self.accounts.credentials[1][0])
+                    elif self.accounts.logged_in['Spacecraft']:
                         # Write SQL statement, execute and commit the changes
                         sql = "INSERT INTO `scores`(`Username`, `Spacecraft Score`, `Date`) " \
                               "VALUES ('" + self.accounts.credentials[0][0] + "'," + str(self.player1_pts) + \
@@ -163,7 +163,7 @@ class ResultScene(SceneBase):
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[0][0]
-                    if self.accounts.logged_in['Anti-spacecraft']:
+                    elif self.accounts.logged_in['Anti-spacecraft']:
                         # Write SQL statement, execute and commit the changes
                         sql = "INSERT INTO `scores`(`Username`, `Anti-spacecraft Score`, `Date`) " \
                               "VALUES ('" + self.accounts.credentials[1][0] + "'," + str(self.player2_pts) + \
@@ -171,9 +171,6 @@ class ResultScene(SceneBase):
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[1][0]
-                    if self.accounts.logged_in['Spacecraft'] and self.accounts.logged_in['Anti-spacecraft']:
-                        self.status = 'Scores for players [%s] and [%s] updated successfully!' % \
-                                      (self.accounts.credentials[0][0], self.accounts.credentials[1][0])
             finally:
                 connection.close()  # Always close the connection
         except pymysql.err.OperationalError:  # If error occurs with the connection to the DB, notify user

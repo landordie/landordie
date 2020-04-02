@@ -280,7 +280,7 @@ class GameScene(SceneBase):
             c = GREEN
         else:
             c = RED
-        self.landing_pad.show_landing_conditions(display, self.font_warning, c)
+        self.landing_pad.show_landing_conditions(display, FONT_WARNING, c)
 
         if pg.sprite.collide_mask(self.landing_pad, self.spacecraft):
             if self.landing_pad.check_for_landing_attempt(self.spacecraft):
@@ -415,17 +415,17 @@ class GameScene(SceneBase):
         msg = ''
 
         if msg_type == 'landed':
-            msg = self.font_warning.render("Successful Landing!", False, (13, 109, 24))
+            msg = FONT_WARNING.render("Successful Landing!", False, (13, 109, 24))
         elif msg_type == 'crashed':
-            msg = self.font_warning.render("The spacecraft has crashed!", False, (255, 0, 6))
+            msg = FONT_WARNING.render("The spacecraft has crashed!", False, (255, 0, 6))
         elif msg_type == 'no HP':
-            msg = self.font_warning.render("The spacecraft has been destroyed (0 HP left)", False, (255, 0, 6))
+            msg = FONT_WARNING.render("The spacecraft has been destroyed (0 HP left)", False, (255, 0, 6))
 
         # TODO: !!!EXPLAIN THE SCREEN HEIGHT AND WIDTH GLOBALITY (they are general for all and controlled by one)
         # Here the message position is adjusted, relative to the screen height and width
         msg_rect = msg.get_rect()
         msg_rect.center = ((self.screen_width / 2), (self.screen_height / 2.3))
-        instructions = self.font_warning.render("Game ended. Press ENTER to see results.", False, CYAN)
+        instructions = FONT_WARNING.render("Game ended. Press ENTER to see results.", False, CYAN)
         instructions_rect = instructions.get_rect()
         instructions_rect.center = ((self.screen_width / 2), (self.screen_height / 2))
 

@@ -177,13 +177,13 @@ class AccountsScene(SceneBase):
                      (self.button_cont2_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
 
         draw_text(display, "Spacecraft player", (self.button_cont_x * 3.9, self.button_cont_y * 0.9),
-                  self.font_medium, WHITE)
-        draw_text(display, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45), self.font_medium, WHITE)
-        draw_text(display, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05), self.font_medium, WHITE)
+                  FONT_MEDIUM, WHITE)
+        draw_text(display, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45), FONT_MEDIUM, WHITE)
+        draw_text(display, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05), FONT_MEDIUM, WHITE)
         draw_text(display, "Anti-spacecraft player", (self.button_cont2_x * 1.3, self.button_cont_y * 0.9),
-                  self.font_medium, WHITE)
-        draw_text(display, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45), self.font_medium, WHITE)
-        draw_text(display, "Password:", (self.button_cont2_x * 1.15, self.button_cont_y * 2.05), self.font_medium, WHITE)
+                  FONT_MEDIUM, WHITE)
+        draw_text(display, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45), FONT_MEDIUM, WHITE)
+        draw_text(display, "Password:", (self.button_cont2_x * 1.15, self.button_cont_y * 2.05), FONT_MEDIUM, WHITE)
 
         # If the status variable is changed (the value not equal to the initial one)
         if self.status != '' and self.cool_down <= 120:
@@ -191,7 +191,7 @@ class AccountsScene(SceneBase):
             display.blit(self.status_cont,
                          (self.status_cont_x, self.status_cont_y, self.status_cont_w, self.status_cont_h))
             draw_text(display, self.status, (self.screen_width / 2, self.screen_height / 10),
-                      self.font_player_num, WHITE)
+                      FONT_MEDIUM_PLUS, WHITE)
             self.cool_down += 1
 
         # Draw credential fields on screen and reflect any changes to their content
@@ -207,7 +207,7 @@ class AccountsScene(SceneBase):
             display.blit(self.score_cont,
                          (self.score_cont_x, self.score_cont_y, self.score_cont_w, self.score_cont_h))
             draw_text(display, "Name | Spacecraft | Anti-spacecraft | Games",
-                      (self.screen_width / 2, self.score_cont_y * 1.2), self.font_medium, WHITE)
+                      (self.screen_width / 2, self.score_cont_y * 1.2), FONT_MEDIUM, WHITE)
 
             margin = 1.4
             increment = 0.5
@@ -215,7 +215,7 @@ class AccountsScene(SceneBase):
                 margin += increment
                 draw_text(display, (entry + "     " + str(self.scores[entry][0]) + "     "
                                    + str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
-                          (self.screen_width / 2, self.score_cont_y * margin), self.font_medium, WHITE)
+                          (self.screen_width / 2, self.score_cont_y * margin), FONT_MEDIUM, WHITE)
             self.score_cont_button.update(display)
         # If no scores are being displayed on screen update buttons
         else:

@@ -90,15 +90,15 @@ class Spacecraft(Sprite):
         indicators = ["Spacecraft", "Velocity: ", "Angle:    "]
         for i in range(len(indicators)):
             current_ind = indicators[i]
-            draw_text(display, current_ind, (position[0], position[1] + i*30), pg.font.Font(DEFAULT_FONT, 13), CYAN)
+            draw_text(display, current_ind, (position[0], position[1] + i*30), FONT_SMALL, CYAN)
 
         # Calculate and display the velocity and spacecraft body angle
         x_velocity, y_velocity = self.body.velocity
         self.velocity = int(sqrt(pow(x_velocity, 2) + pow(y_velocity, 2)) // 50)
         draw_text(display, f"{self.velocity}", (position[0] + 60, position[1] + 30),
-                  pg.font.Font(DEFAULT_FONT, 13), YELLOW)
+                  FONT_SMALL, YELLOW)
         draw_text(display, f"{abs(int(degrees(self.body.angle))) % 360}", (position[0] + 35, position[1] + 60),
-                  pg.font.Font(DEFAULT_FONT, 13), YELLOW)
+                  FONT_SMALL, YELLOW)
 
     def apply_thrust(self):
         """Apply thrust force to the spacecraft (make it fly)."""

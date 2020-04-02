@@ -135,34 +135,34 @@ class OptionsScene(SceneBase):
         # (!) Buttons are displayed relative to the containers position
         display.blit(self.res_cont, (self.res_cont_x, self.res_cont_y, self.res_cont_w, self.res_cont_h))
         draw_text(display, "Resolution", (self.res_cont_x + self.res_cont_w / 2, self.res_cont_y / 1.1),
-                  self.font_medium, WHITE)
+                  FONT_MEDIUM, WHITE)
 
         display.blit(self.button_cont,
                      (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
         draw_text(display, "Controls", (self.button_cont_x + self.button_cont_w // 2, self.button_cont_y // 1.1),
-                  self.font_medium, WHITE)
+                  FONT_MEDIUM, WHITE)
         draw_text(display, "Spacecraft", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 1.2),
-                  self.font_medium, WHITE)
+                  FONT_MEDIUM, WHITE)
         draw_text(display, "Anti-Spacecraft",
-                  (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 2.6), self.font_medium, WHITE)
+                  (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 2.6), FONT_MEDIUM, WHITE)
 
         draw_text(display, "Thrust", (self.input_box1.rect.x * 0.8, self.input_box2.rect.y * 1.08),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
         draw_text(display, "Rotate Left", (self.input_box1.rect.x * 0.8, self.input_box1.rect.y * 1.08),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
         draw_text(display, "Rotate Right", (self.input_box1.rect.x * 0.8, self.input_box3.rect.y * 1.08),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
 
         draw_text(display, "Move Left", (self.input_box4.rect.x * 0.85, self.input_box4.rect.y * 1.04),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
         draw_text(display, "Cannon Right", (self.input_box5.rect.x * 0.85, self.input_box5.rect.y * 1.04),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
         draw_text(display, "Move Right", (self.input_box6.rect.x * 0.85, self.input_box6.rect.y * 1.04),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
         draw_text(display, "Cannon Left", (self.input_box7.rect.x * 0.85, self.input_box7.rect.y * 1.04),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
         draw_text(display, "Shoot", (self.input_box8.rect.x * 0.85, self.input_box8.rect.y * 1.04),
-                  self.font_medium, LIGHT_GREY)
+                  FONT_MEDIUM, LIGHT_GREY)
 
         self.menu_button.update(display)
         self._res1.update(display)
