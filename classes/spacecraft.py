@@ -118,4 +118,4 @@ class Spacecraft(Sprite):
         rotation angle must be at max 10 in both directions and its falling velocity must be less than
         300 pixels per sec.
         """
-        return self.health > 0 and abs(degrees(self.body.angle)) <= 10 and self.velocity <= 5
+        return self.health > 0 and abs(degrees(self.body.angle)) % 360 <= 10 and self.velocity <= 5
