@@ -151,10 +151,7 @@ class ResultScene(SceneBase):
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
             try:
                 with connection.cursor() as cursor:  # Create a cursor object
-                    if self.accounts.logged_in['Spacecraft'] and self.accounts.logged_in['Anti-spacecraft']:
-                        self.status = 'Scores for players [%s] and [%s] updated successfully!' % \
-                                      (self.accounts.credentials[0][0], self.accounts.credentials[1][0])
-                    elif self.accounts.logged_in['Spacecraft']:
+                    if self.accounts.logged_in['Spacecraft']:
                         # Write SQL statement, execute and commit the changes
                         sql = "INSERT INTO `scores`(`Username`, `Spacecraft Score`, `Date`) " \
                               "VALUES ('" + self.accounts.credentials[0][0] + "'," + str(self.player1_pts) + \
@@ -163,7 +160,7 @@ class ResultScene(SceneBase):
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[0][0]
-                    elif self.accounts.logged_in['Anti-spacecraft']:
+                    if self.accounts.logged_in['Anti-spacecraft']:
                         # Write SQL statement, execute and commit the changes
                         sql = "INSERT INTO `scores`(`Username`, `Anti-spacecraft Score`, `Date`) " \
                               "VALUES ('" + self.accounts.credentials[1][0] + "'," + str(self.player2_pts) + \
@@ -171,6 +168,9 @@ class ResultScene(SceneBase):
                         cursor.execute(sql)
                         connection.commit()
                         self.status = 'Scores for player [%s] updated successfully!' % self.accounts.credentials[1][0]
+                    if self.accounts.logged_in['Spacecraft'] and self.accounts.logged_in['Anti-spacecraft']:
+                        self.status = 'Scores for players [%s] and [%s] updated successfully!' % \
+                                      (self.accounts.credentials[0][0], self.accounts.credentials[1][0])
             finally:
                 connection.close()  # Always close the connection
         except pymysql.err.OperationalError:  # If error occurs with the connection to the DB, notify user
