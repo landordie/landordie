@@ -85,7 +85,7 @@ class GameScene(SceneBase):
         # Clock attributes to calculate the impulse strength to be applied to the missile
         self.end_time = 0
         self.start_time = 0
-        self.clock_img = pg.image.load("frames/timer.png")
+        self.clock_img = pg.image.load("frames/timer.png")  # Load the clock icon image
 
     # TODO: !!! THIS IS IMPORTANT, TOO !!!
     # The next sequence of 5 methods (process_input(), update(), render(), switch_to_scene(),
@@ -173,8 +173,8 @@ class GameScene(SceneBase):
             # ------------------------------------------End of block ---------------------------------------------------
 
             # Apply gravitational effects to the flying missile
-            if self.anti_spacecraft.missile.launched:
-                self.anti_spacecraft.missile.apply_gravity()
+        if self.anti_spacecraft.missile.launched:
+            self.anti_spacecraft.missile.apply_gravity()
 
     def render(self, screen):
         # A screen (Pygame surface object or the environment) is passed to the method from its
@@ -224,11 +224,6 @@ class GameScene(SceneBase):
 
         # This piece of code is displaying the Pygame sprite (the image) for the missile
         if self.anti_spacecraft.missile.shape:
-            # TODO: Make sure to explain this in report
-            # The method get_attachment_coordinates() determines the exact position the Pygame
-            # object must be placed at. It converts Pymunk coordinates into Pygame ones and also
-            # ensures that the image of the missile is rotated in the same angle as its Pymunk body.
-            # The angles in Pymunk are in radians in Pygame in degrees.
             m, missile_img = self.anti_spacecraft.missile. \
                 get_attachment_coordinates(self.anti_spacecraft.missile.body, self.screen_height)
             self.anti_spacecraft.missile.rect = missile_img.get_rect(left=m[0], top=m[1])

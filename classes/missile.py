@@ -1,11 +1,10 @@
 """
-Missile class
+'missile.py' module.
+Used in creating the cannon missile body and shape.
 """
-import math
-
+from math import pi, pow, degrees
 import pymunk as pm
-from pymunk import Vec2d
-
+from pymunk.vec2d import Vec2d
 from constants import MISSILE_DRAG_CONSTANT
 from .sprite_class import Sprite
 
@@ -43,26 +42,35 @@ class Missile(Sprite):
         :param cannon_shape: anti-spacecraft cannon shape
         """
         self.body.position = cannon_body.position + Vec2d(cannon_shape.radius - 30, 0).rotated(cannon_body.angle)
-        self.body.angle = cannon_body.angle + math.pi
+        self.body.angle = cannon_body.angle + pi
 
     def apply_gravity(self):
         """
-        Apply gravitational effects to the launched missile
+        Apply gravitational effects to the launched missile.
         """
         pointing_direction = Vec2d(1, 0).rotated(self.body.angle)
         flight_direction = Vec2d(self.body.velocity)
         flight_speed = flight_direction.normalize_return_length()
         dot = flight_direction.dot(pointing_direction)
 
-        drag_force_magnitude = (1 - abs(
-            dot)) * flight_speed ** 2 * MISSILE_DRAG_CONSTANT * self.body.mass
+        # Calculate (roughly) the air resistance effect force on the missile
+        drag_force_magnitude = (1 - abs(dot)) * pow(flight_speed, 2) * MISSILE_DRAG_CONSTANT * self.body.mass
+
+        # Apply impulse to the missile body
         self.body.apply_impulse_at_world_point(drag_force_magnitude * -flight_direction, self.body.position)
 
-        self.body.angular_velocity *= 0.5
+        # Rotate missile simulating (roughly) air resistance
+        if 90 <= degrees(self.body.angle) < 270:
+            self.body.angular_velocity += .025
+        elif 90 > degrees(self.body.angle) >= -90:
+            self.body.angular_velocity -= .025
+        else:
+            self.body.angular_velocity = 0
 
     def launch(self, difference):
         """
-        Launch the missile
+        Calculate impulse strength and launch the missile.
+        :param difference: the time between the 'shoot' key press and its release
         """
         power = max(min(difference, 1000), 10)
         impulse = power * Vec2d(1, 0)
@@ -80,6 +88,10 @@ class Missile(Sprite):
         return self.launched and not self.collided
 
     def remove_from_space(self, space):
+        """
+        Remove the body and shape of the missile and reset its attributes.
+        :param space: Pymunk object space
+        """
         space.remove(self.body)
         space.remove(self.shape)
         self.launched = False
