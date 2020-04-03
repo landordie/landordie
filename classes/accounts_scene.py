@@ -105,6 +105,8 @@ class AccountsScene(SceneBase):
                 self.terminate()
             if event.type == pg.MOUSEBUTTONDOWN and event.button == 1:  # On left mouse button click
                 if self.menu_button.on_click(event):  # Go back to menu
+                    for field in self.fields:  # Clear all fields
+                        field.text = ""
                     menu = MenuScene.get_instance()
                     self.switch_to_scene(menu)
                 # If the score table is initialized, do not check for the buttons behind the score container
@@ -134,9 +136,9 @@ class AccountsScene(SceneBase):
         self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
 
         # Adjust database response container position
-        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
+        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height * .05
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
-                                                 (self.screen_height / 15)
+                                                 (self.screen_height * .02)
         self.status_cont = pg.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
 
         self.score_cont_x, self.score_cont_y = (self.screen_width / 2 - (self.score_cont_w / 2)), \
@@ -190,7 +192,7 @@ class AccountsScene(SceneBase):
             # Show the status on screen
             display.blit(self.status_cont,
                          (self.status_cont_x, self.status_cont_y, self.status_cont_w, self.status_cont_h))
-            draw_text(display, self.status, (self.screen_width / 2, self.screen_height / 10),
+            draw_text(display, self.status, (self.screen_width / 2, self.screen_height * .05),
                       FONT_MEDIUM_PLUS, WHITE)
             self.cool_down += 1
 
@@ -214,7 +216,7 @@ class AccountsScene(SceneBase):
             for entry in self.scores:
                 margin += increment
                 draw_text(display, (entry + "     " + str(self.scores[entry][0]) + "     "
-                                   + str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
+                                    + str(self.scores[entry][1]) + "     " + str(self.scores[entry][2])),
                           (self.screen_width / 2, self.score_cont_y * margin), FONT_MEDIUM, WHITE)
             self.score_cont_button.update(display)
         # If no scores are being displayed on screen update buttons
@@ -276,14 +278,11 @@ class AccountsScene(SceneBase):
                     self.status = 'You cannot submit an empty field. Please try again!'
                     return
 
-            player = None  # To indicate which player is trying to log in
-            id = -1  # To identify which player credentials to save
+            player, player_id = None, -1  # To indicate which player is trying to log in and which credentials to save
             if command == "login_sc":  # If the request asks the DB to check if user exists
-                player = 'Spacecraft'
-                id = 0
+                player, player_id = 'Spacecraft', 0
             elif command == "login_asc":
-                player = 'Anti-spacecraft'
-                id = 1
+                player, player_id = 'Anti-spacecraft', 1
             elif command == "register":  # If the DB has to register a new user
                 try:
                     with connection.cursor() as cursor:  # Create a cursor object
@@ -314,19 +313,19 @@ class AccountsScene(SceneBase):
                             cursor.execute(sql)  # Execute statement
                             fetch_result = cursor.fetchone()  # And get the result of the query
                             if fetch_result:  # If the check was successful (a table entry is returned)
-                                self.status = f'{player} player signed in as [{username}]! Enjoy the game.'
-                                self.credentials[id] = [username, pw]  # Update the state
+                                self.status = f"{player} player signed in as [{username}]! Enjoy the game."
+                                self.credentials[player_id] = [username, pw]  # Update the state
                                 self.logged_in[player] = True
                             else:
-                                self.status = 'Wrong credentials entered. Please check the input again.'
+                                self.status = "Wrong credentials entered. Please check the input again."
                             self.cool_down = 0
                     finally:  # Always close the connection
                         connection.close()
                 else:
-                    self.status = 'You are already signed in! Please log out first.'
+                    self.status = "You are already signed in! Please log out first."
                     self.cool_down = 0
             else:
                 print('Player not specified!')
         except pymysql.err.OperationalError:
-            self.status = 'The server is currently offline. Please try again later.'
+            self.status = "The server is currently offline. Please try again later."
             self.cool_down = 0

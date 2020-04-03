@@ -125,14 +125,16 @@ class GameScene(SceneBase):
             self.anti_spacecraft.cannon_mt.rate = 0
 
         # Controls of spacecraft (it is controllable only if it hasn't crashed)
-        if not self.spacecraft.crashed:
+        if not self.spacecraft.crashed():
             # Rotate spacecraft (in radians)
             if keys[self.game_controls[0]]:
-                self.spacecraft.body.angle += radians(2)
+                self.spacecraft.rotate_left()
             if keys[self.game_controls[2]]:
-                self.spacecraft.body.angle -= radians(2)
+                self.spacecraft.rotate_right()
             if keys[self.game_controls[1]]:
                 self.spacecraft.apply_thrust()
+            self.spacecraft.malfunction()  # Check if spacecraft is prone to malfunctioning
+
         # ---------------------------------------------End of block ----------------------------------------------------
 
         # Check each event that has been passed to the process_input() method
@@ -287,7 +289,7 @@ class GameScene(SceneBase):
                     self.switch_to_scene(ResultScene(self.spacecraft_pts, self.anti_spacecraft_pts))
 
         # If the spacecraft has no health left, pause the game and display a notification
-        if self.spacecraft.health <= 0:
+        if self.spacecraft.crashed():
             paused = self.pause_game('no HP', display)
             if paused:
                 self.terminate()

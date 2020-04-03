@@ -3,7 +3,7 @@
 Used in instantiating the game spacecraft.
 """
 import pymunk
-from math import degrees, sqrt, pow
+from math import degrees, sqrt, pow, radians
 from constants import *
 from .sprite_class import Sprite
 from .helper import flipy, draw_text
@@ -29,11 +29,10 @@ class Spacecraft(Sprite):
         # This method takes the actual size of the image ignoring its transparent parts
         self.mask = pg.mask.from_surface(self.image)
 
-        # Initializing lander's attributes: the health, the damage percentage, boolean attribute
-        # to reflect if crashed, terrain collision cooldown and boolean to account for collision
+        # Initializing lander's attributes: the health, the damage percentage,
+        # terrain collision cooldown and boolean to account for collision
         self.health = 100
         self.damage = 0
-        self.crashed = False
         self.terrain_collision_cd = 0
         self.terrain_collision = True
 
@@ -78,6 +77,29 @@ class Spacecraft(Sprite):
         display.blit(self.health_bar_img, flipy((self.body.position - (100, 45)),
                                                 height - self.health_bar_img.get_size()[1] // 2))
 
+    def rotate_left(self):
+        """Rotate the spacecraft body to the left."""
+        self.body.angle += radians(2)
+
+    def rotate_right(self):
+        """Rotate the spacecraft body to the right."""
+        self.body.angle -= radians(2)
+
+    def malfunction(self):
+        """
+        Start malfunctioning (random side rotation) on boundary contact or hard landing attempt
+        if the spacecraft drops below half health.
+        """
+        if self.health >= 50:
+            self.body.angular_velocity = 0
+
+    def crashed(self):
+        """
+        Return True if the spacecraft's health has dropped to 0 or below.
+        :return: boolean
+        """
+        return self.health <= 0
+
     def show_stats(self, display, position):
         """
         Display the velocity and body angle of the spacecraft.
@@ -93,8 +115,7 @@ class Spacecraft(Sprite):
         # Calculate and display the velocity and spacecraft body angle
         x_velocity, y_velocity = self.body.velocity
         self.velocity = int(sqrt(pow(x_velocity, 2) + pow(y_velocity, 2)) // 50)
-        draw_text(display, f"{self.velocity}", (position[0] + 60, position[1] + 30),
-                  FONT_SMALL, YELLOW)
+        draw_text(display, f"{self.velocity}", (position[0] + 60, position[1] + 30), FONT_SMALL, YELLOW)
         draw_text(display, f"{abs(int(degrees(self.body.angle))) % 360}", (position[0] + 35, position[1] + 60),
                   FONT_SMALL, YELLOW)
 

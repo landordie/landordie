@@ -173,7 +173,8 @@ class AntiSpaceCraft:
         display.blit(self.fuel_bar_img, flipy((self.chassis_b.position - (100, 45)),
                                               height - self.fuel_bar_img.get_size()[1] // 2))
 
-    def power_bar(self, start_time, loc, thickness, display):
+    @staticmethod
+    def power_bar(start_time, loc, thickness, display):
         """
         Display the anti-spacecraft power bar.
         :param start_time: 'shoot' button key press time
@@ -195,6 +196,11 @@ class AntiSpaceCraft:
         pg.draw.line(display, color, loc, (loc[0], loc[1] - h), thickness)  # Draw the bar
 
     def draw_power_bar_outline(self, display, loc):
+        """
+        Show the power bar outline.
+        :param display: Pygame screen surface
+        :param loc: outline location
+        """
         pg.draw.rect(display, LIGHT_PURPLE, (loc[0] - 5, loc[1] - 187.5, 12, 190), 3)  # width = 3
         display.blit(self.power_bar_img, (loc[0] - self.power_bar_img.get_size()[0] // 2
                                           , loc[1] - 187.5 - self.power_bar_img.get_size()[1]))
