@@ -52,11 +52,12 @@ class Spacecraft(Sprite):
         self.body.position = 600, 700
 
         self.health_bar_img = pg.image.load("frames/heart.png")  # Load the health bar image
-        self.velocity = 0
+        self.velocity = 0  # Spacecraft velocity attribute
+        self.flicker_time = 90  # Used when displaying the malfunction text (90 frames or 1.5 seconds)
 
     def health_bar(self, display, height):
         """
-        Draw the health bar.
+        Draw the health bar, its border and heart icon.
         :param display: current scene screen surface
         :param height: current scene height
         """
@@ -71,9 +72,11 @@ class Spacecraft(Sprite):
                      flipy((self.body.position[0] + 75 - self.damage,
                             self.body.position[1] - 45), height), 10)
 
+        # Draw the health bar border
         x, y = flipy((self.body.position - (80, 45)), height)
         pg.draw.rect(display, BLACK, (x, y-5, 157, 12), 3)  # width = 3
 
+        # Display the health bar heart icon
         display.blit(self.health_bar_img, flipy((self.body.position - (100, 45)),
                                                 height - self.health_bar_img.get_size()[1] // 2))
 
@@ -92,6 +95,8 @@ class Spacecraft(Sprite):
         """
         if self.health >= 50:
             self.body.angular_velocity = 0
+            return False
+        return True
 
     def crashed(self):
         """
@@ -102,7 +107,7 @@ class Spacecraft(Sprite):
 
     def show_stats(self, display, position):
         """
-        Display the velocity and body angle of the spacecraft.
+        Display the velocity, body angle of the spacecraft and malfunction text.
         :param display: Pygame screen surface
         :param position: on-screen position of the texts
         """
@@ -115,9 +120,16 @@ class Spacecraft(Sprite):
         # Calculate and display the velocity and spacecraft body angle
         x_velocity, y_velocity = self.body.velocity
         self.velocity = int(sqrt(pow(x_velocity, 2) + pow(y_velocity, 2)) // 50)
-        draw_text(display, f"{self.velocity}", (position[0] + 60, position[1] + 30), FONT_SMALL, YELLOW)
+        draw_text(display, f"{self.velocity}", (position[0] + 70, position[1] + 30), FONT_SMALL, YELLOW)
         draw_text(display, f"{abs(int(degrees(self.body.angle))) % 360}", (position[0] + 35, position[1] + 60),
                   FONT_SMALL, YELLOW)
+
+        if self.malfunction():  # Check if spacecraft is prone to malfunctioning
+            self.flicker_time -= 1  # Decrement the time
+            if 90 >= self.flicker_time > 0:  # Show the text for 1.5 seconds
+                draw_text(display, "*SYSTEM MALFUNCTION*", (position[0] + 50, position[1] + 90), FONT_SMALLEST, RED)
+            elif self.flicker_time <= 0:  # Reset the malfunction text flicker time to 3 seconds
+                self.flicker_time = 180
 
     def apply_thrust(self):
         """Apply thrust force to the spacecraft (make it fly)."""

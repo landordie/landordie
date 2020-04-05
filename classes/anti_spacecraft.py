@@ -2,6 +2,7 @@
 'anti_spacecraft.py' module.
 Used in instantiating the game anti-spacecraft.
 """
+from math import radians, pi
 import pymunk
 from constants import *
 from .missile import Missile
@@ -133,6 +134,20 @@ class AntiSpaceCraft:
         """
         self.fuel -= 1
         self.force = (-ANTI_SPACECRAFT_MOVE_FORCE, 0)
+
+    def cannon_left(self):
+        """Rotate the cannon body to the left."""
+        if self.cannon_b.angle < radians(-10):
+            self.cannon_mt.rate = 2
+
+    def cannon_right(self):
+        """Rotate the cannon body to the left."""
+        if self.cannon_b.angle >= radians(10) - pi:
+            self.cannon_mt.rate = -2
+
+    def cannon_stop(self):
+        """Stop the cannon body rotation."""
+        self.cannon_mt.rate = 0
 
     @property
     def fuel(self):

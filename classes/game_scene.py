@@ -115,14 +115,12 @@ class GameScene(SceneBase):
             self.anti_spacecraft.force = DEFAULT_FORCE
 
         # Anti-spacecraft cannon rotation (in radians)
-        if keys[self.game_controls[6]] \
-                and self.anti_spacecraft.cannon_b.angle < radians(-10):
-            self.anti_spacecraft.cannon_mt.rate = 2
-        elif keys[self.game_controls[4]] \
-                and self.anti_spacecraft.cannon_b.angle >= -pi + radians(10):
-            self.anti_spacecraft.cannon_mt.rate = -2
+        if keys[self.game_controls[6]]:
+            self.anti_spacecraft.cannon_left()
+        elif keys[self.game_controls[4]]:
+            self.anti_spacecraft.cannon_right()
         else:
-            self.anti_spacecraft.cannon_mt.rate = 0
+            self.anti_spacecraft.cannon_stop()
 
         # Controls of spacecraft (it is controllable only if it hasn't crashed)
         if not self.spacecraft.crashed():
@@ -133,7 +131,6 @@ class GameScene(SceneBase):
                 self.spacecraft.rotate_right()
             if keys[self.game_controls[1]]:
                 self.spacecraft.apply_thrust()
-            self.spacecraft.malfunction()  # Check if spacecraft is prone to malfunctioning
 
         # ---------------------------------------------End of block ----------------------------------------------------
 

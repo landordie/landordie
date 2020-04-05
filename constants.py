@@ -12,6 +12,7 @@ FONT_MEDIUM_PLUS = pg.font.Font("PressStart2P.ttf", 17)
 FONT_MEDIUM = pg.font.Font("PressStart2P.ttf", 16)
 FONT_SMALL_PLUS = pg.font.Font("PressStart2P.ttf", 15)
 FONT_SMALL = pg.font.Font("PressStart2P.ttf", 14)
+FONT_SMALLEST = pg.font.Font("PressStart2P.ttf", 12)
 FONT_HEADER = pg.font.Font("PressStart2P.ttf", 50)
 FONT_WARNING = pg.font.Font("PressStart2P.ttf", 27)
 

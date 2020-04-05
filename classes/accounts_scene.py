@@ -44,30 +44,30 @@ class AccountsScene(SceneBase):
         self.menu_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2,
                                    BUTTON_WIDTH, BUTTON_HEIGHT), YELLOW, 'Main Menu')
 
-        self.log_in_sc_button = Button((self.screen_width / 5.5, self.screen_height / 2.1,
+        self.log_in_sc_button = Button((self.screen_width / 6, self.screen_height / 2.1,
                                         BUTTON_WIDTH, BUTTON_HEIGHT), GREEN, 'Log in')
 
-        self.reg_sc_button = Button((self.screen_width / 5.5, self.screen_height / 1.6,
+        self.reg_sc_button = Button((self.screen_width / 6, self.screen_height / 1.6,
                                      BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Register')
 
-        self.log_in_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 2.1,
+        self.log_in_a_sc_button = Button((self.screen_width / 1.525, self.screen_height / 2.1,
                                           BUTTON_WIDTH, BUTTON_HEIGHT), GREEN, 'Log in')
 
-        self.reg_a_sc_button = Button((self.screen_width / 1.51, self.screen_height / 1.6,
+        self.reg_a_sc_button = Button((self.screen_width / 1.525, self.screen_height / 1.6,
                                        BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Register')
 
-        self.scores_button = Button((self.screen_width / 2.1, self.screen_height / 1.85,
+        self.scores_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.85,
                                      BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Get scores')
 
         self.background = pg.image.load("frames/BG.png")  # Initialize the background
 
         # Container for credential fields
-        self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
-                                                 (self.screen_height * 0.15)
-        self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
-        self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
-        self.button_cont.fill(BLACK_HIGHLIGHT2)
+        self.cred_cont_w, self.cred_cont_h = self.screen_width / 2.3, self.screen_height / 4
+        self.cred_cont_x, self.cred_cont_y = (self.screen_width / 2.1 - self.cred_cont_w), \
+                                             (self.screen_height * 0.15)
+        self.cred_cont2_x = (self.screen_width / 1.05 - self.cred_cont_w)
+        self.cred_cont = pg.Surface((self.cred_cont_w, self.cred_cont_h)).convert_alpha()
+        self.cred_cont.fill(BLACK_HIGHLIGHT2)
 
         # Container for scores
         self.score_cont_w, self.score_cont_h = self.screen_width / 1.5, self.screen_height / 1.5
@@ -86,10 +86,10 @@ class AccountsScene(SceneBase):
         self.status_cont.fill(BLACK_HIGHLIGHT2)
 
         # Input boxes to handle input for username and password
-        self.input_box1 = InputBox(self.button_cont_x * 4.5, self.button_cont_y * 1.3, '', 350, 33)
-        self.input_box2 = InputBox(self.button_cont_x * 4.5, self.button_cont_y * 1.9, '', 350, 33)
-        self.input_box3 = InputBox(self.button_cont2_x * 1.28, self.button_cont_y * 1.3, '', 350, 33)
-        self.input_box4 = InputBox(self.button_cont2_x * 1.28, self.button_cont_y * 1.9, '', 350, 33)
+        self.input_box1 = InputBox(self.cred_cont_x * 4.5, self.cred_cont_y * 1.3, '', 350, 33)
+        self.input_box2 = InputBox(self.cred_cont_x * 4.5, self.cred_cont_y * 1.9, '', 350, 33)
+        self.input_box3 = InputBox(self.cred_cont2_x * 1.28, self.cred_cont_y * 1.3, '', 350, 33)
+        self.input_box4 = InputBox(self.cred_cont2_x * 1.28, self.cred_cont_y * 1.9, '', 350, 33)
         self.fields = [self.input_box1, self.input_box2, self.input_box3, self.input_box4]  # A list used to group the
         # input fields for cleaner code
 
@@ -129,11 +129,11 @@ class AccountsScene(SceneBase):
     def update(self):
         """Recalculate and update relative positions of all buttons and input boxes."""
         # Adjust credentials fields container position
-        self.button_cont_w, self.button_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 2.1 - self.button_cont_w), \
-                                                 (self.screen_height * 0.15)
-        self.button_cont2_x = (self.screen_width / 1.05 - self.button_cont_w)
-        self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+        self.cred_cont_w, self.cred_cont_h = self.screen_width / 2.3, self.screen_height / 4
+        self.cred_cont_x, self.cred_cont_y = (self.screen_width / 2.1 - self.cred_cont_w), \
+                                             (self.screen_height * 0.15)
+        self.cred_cont2_x = (self.screen_width / 1.05 - self.cred_cont_w)
+        self.cred_cont = pg.Surface((self.cred_cont_w, self.cred_cont_h)).convert_alpha()
 
         # Adjust database response container position
         self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height * .05
@@ -149,43 +149,44 @@ class AccountsScene(SceneBase):
         self.menu_button.rect.x, self.menu_button.rect.y = \
             self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2
 
-        self.log_in_sc_button.rect.x, self.log_in_sc_button.rect.y = self.screen_width / 5.5, self.screen_height / 2.1
+        self.log_in_sc_button.rect.x, self.log_in_sc_button.rect.y = self.screen_width / 5.7, self.screen_height / 2.1
 
-        self.reg_sc_button.rect.x, self.reg_sc_button.rect.y = self.screen_width / 5.5, self.screen_height / 1.6
+        self.reg_sc_button.rect.x, self.reg_sc_button.rect.y = self.screen_width / 5.7, self.screen_height / 1.6
 
         self.log_in_a_sc_button.rect.x, self.log_in_a_sc_button.rect.y = \
-            self.screen_width / 1.51, self.screen_height / 2.1
+            self.screen_width / 1.525, self.screen_height / 2.1
 
-        self.reg_a_sc_button.rect.x, self.reg_a_sc_button.rect.y = self.screen_width / 1.51, self.screen_height / 1.6
+        self.reg_a_sc_button.rect.x, self.reg_a_sc_button.rect.y = self.screen_width / 1.525, self.screen_height / 1.6
 
-        self.scores_button.rect.x, self.scores_button.rect.y = self.screen_width / 2.38, self.screen_height / 1.85
+        self.scores_button.rect.x, self.scores_button.rect.y = \
+            self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.85
 
         self.score_cont_button.rect.x, self.score_cont_button.rect.y = \
-            self.screen_width / 2 - BUTTON_WIDTH / 2, self.screen_height / 1.55
+            self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.55
 
         # Update input box positions
-        self.input_box1.rect.x, self.input_box1.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.3
-        self.input_box2.rect.x, self.input_box2.rect.y = self.button_cont_x * 4.5, self.button_cont_y * 1.9
-        self.input_box3.rect.x, self.input_box3.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.3
-        self.input_box4.rect.x, self.input_box4.rect.y = self.button_cont2_x * 1.28, self.button_cont_y * 1.9
+        self.input_box1.rect.x, self.input_box1.rect.y = self.cred_cont_x * 4.5, self.cred_cont_y * 1.3
+        self.input_box2.rect.x, self.input_box2.rect.y = self.cred_cont_x * 4.5, self.cred_cont_y * 1.9
+        self.input_box3.rect.x, self.input_box3.rect.y = self.cred_cont2_x * 1.28, self.cred_cont_y * 1.3
+        self.input_box4.rect.x, self.input_box4.rect.y = self.cred_cont2_x * 1.28, self.cred_cont_y * 1.9
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
         self.parallax_effect(display)  # Initialize the parallax effect
 
         # Display containers and container and field names
-        display.blit(self.button_cont, (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
-        display.blit(self.button_cont,
-                     (self.button_cont2_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
+        display.blit(self.cred_cont, (self.cred_cont_x, self.cred_cont_y, self.cred_cont_w, self.cred_cont_h))
+        display.blit(self.cred_cont,
+                     (self.cred_cont2_x, self.cred_cont_y, self.cred_cont_w, self.cred_cont_h))
 
-        draw_text(display, "Spacecraft player", (self.button_cont_x * 3.9, self.button_cont_y * 0.9),
+        draw_text(display, "Spacecraft player", (self.cred_cont_x * 3.9, self.cred_cont_y * 0.9),
                   FONT_MEDIUM, WHITE)
-        draw_text(display, "Username:", (self.button_cont_x * 2.9, self.button_cont_y * 1.45), FONT_MEDIUM, WHITE)
-        draw_text(display, "Password:", (self.button_cont_x * 2.9, self.button_cont_y * 2.05), FONT_MEDIUM, WHITE)
-        draw_text(display, "Anti-spacecraft player", (self.button_cont2_x * 1.3, self.button_cont_y * 0.9),
+        draw_text(display, "Username:", (self.cred_cont_x * 2.9, self.cred_cont_y * 1.45), FONT_MEDIUM, WHITE)
+        draw_text(display, "Password:", (self.cred_cont_x * 2.9, self.cred_cont_y * 2.05), FONT_MEDIUM, WHITE)
+        draw_text(display, "Anti-spacecraft player", (self.cred_cont2_x * 1.3, self.cred_cont_y * 0.9),
                   FONT_MEDIUM, WHITE)
-        draw_text(display, "Username:", (self.button_cont2_x * 1.15, self.button_cont_y * 1.45), FONT_MEDIUM, WHITE)
-        draw_text(display, "Password:", (self.button_cont2_x * 1.15, self.button_cont_y * 2.05), FONT_MEDIUM, WHITE)
+        draw_text(display, "Username:", (self.cred_cont2_x * 1.15, self.cred_cont_y * 1.45), FONT_MEDIUM, WHITE)
+        draw_text(display, "Password:", (self.cred_cont2_x * 1.15, self.cred_cont_y * 2.05), FONT_MEDIUM, WHITE)
 
         # If the status variable is changed (the value not equal to the initial one)
         if self.status != '' and self.cool_down <= 120:
