@@ -5,35 +5,36 @@ Used in creating the cannon missile body and shape.
 from math import pi, pow, degrees
 import pymunk as pm
 from pymunk.vec2d import Vec2d
-from src.constants import MISSILE_DRAG_CONSTANT
+from .constants import MISSILE_DRAG_CONSTANT
 from .sprite_class import Sprite
 
 
 class Missile(Sprite):
+    """Missile Sprite subclass implementation."""
 
     def __init__(self):
+        """Virtually private constructor which initializes the missile Sprite."""
         super().__init__('assets/frames/missile_small.gif')  # call Sprite initializer
-        self.body, self.shape = None, None
-        self.launched = False
-        self.collided = True
+
+        self.body, self.shape = None, None  # Pymunk body and shape of the missile
+        self.launched = False  # Boolean to check if the missile has been launched
+        self.collided = True  # Boolean to check if the missile has collided with another object
 
     def create(self, position):
         """
-        Create new missile body and shape at specified location
+        Create new missile body and shape at specified location.
+        :param position: new body and shape position coordinates
         """
-        vs = [(-30, 0), (0, 3), (10, 0), (0, -3)]
+        vs = [(-30, 0), (0, 3), (10, 0), (0, -3)]  # Polygon point coordinates
         mass = 0.5
         moment = pm.moment_for_poly(mass, vs)
-        self.body = pm.Body(mass, moment)
-        self.body.position = position
-
-        self.shape = pm.Poly(self.body, vs)
+        self.body = pm.Body(mass, moment)  # Create the body
+        self.body.position = position  # Position the body
+        self.shape = pm.Poly(self.body, vs)  # Create the shape
         self.shape.color = (115.0, 148.0, 107.0, 100.0)
-        self.shape.friction = .5
+        self.shape.friction = .5  # Set the shape friction with other objects
         self.shape.collision_type = 3
         self.shape.filter = pm.ShapeFilter(group=1)
-        # Setting the missile collision type so the handler can look for it and handle it
-        # self.shape.collision_type = 3
 
     def prepare_for_launch(self, cannon_body, cannon_shape):
         """
@@ -45,9 +46,7 @@ class Missile(Sprite):
         self.body.angle = cannon_body.angle + pi
 
     def apply_gravity(self):
-        """
-        Apply gravitational effects to the launched missile.
-        """
+        """Apply gravitational effects to the launched missile."""
         pointing_direction = Vec2d(1, 0).rotated(self.body.angle)
         flight_direction = Vec2d(self.body.velocity)
         flight_speed = flight_direction.normalize_return_length()

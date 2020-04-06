@@ -4,13 +4,13 @@ Used in instantiating the game spacecraft.
 """
 import pymunk
 from math import degrees, sqrt, pow, radians
-from src.constants import *
+from .constants import *
 from .sprite_class import Sprite
 from .helper import flipy, draw_text
 
 
 class Spacecraft(Sprite):
-    """Spacecraft instance subclass."""
+    """Spacecraft instance subclass implementation."""
 
     def __init__(self):
         # Call the Sprite initializer (this creates an image surface object, a Rectangle object

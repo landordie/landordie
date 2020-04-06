@@ -1,14 +1,13 @@
 """
 'scene_base.py' module.
-Contains SceneBase abstract superclass.
+Contains SceneBase abstract superclass implementation.
 """
-from src.constants import *
-pg.font.init()  # Initialize the Pygame font objects
+from .constants import DEFAULT_WIDTH, DEFAULT_HEIGHT
 
 
 class SceneBase:
     """
-    This class is the superclass of all the other scene src - MenuScene, SplashScene, AccountsScene
+    Superclass of all the other scene classes in src - MenuScene, SplashScene, AccountsScene
     GameScene and ResultScene. It defines 7 abstract methods - process_input(), update(), render(),
     switch_to_scene(), terminate(), adjust_screen(). Each method is inherited by the
     above src and overwritten with the functionality required by the particular class.

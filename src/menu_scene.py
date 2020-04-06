@@ -2,13 +2,14 @@
 'menu_scene.py' module.
 Used in instantiation of the Menu scene (window).
 """
+from .constants import BUTTON_WIDTH, BUTTON_HEIGHT, YELLOW, RED, GREEN, pg
 from .button import Button
-from .scene_base import *
+from .scene_base import SceneBase
 from .splash_scene import SplashScene
 
 
 class MenuScene(SceneBase):
-    """MenuScene singleton subclass."""
+    """MenuScene singleton subclass implementation."""
     __instance = None
 
     @staticmethod
@@ -23,10 +24,11 @@ class MenuScene(SceneBase):
 
     def __init__(self):
         """Virtually private constructor which initializes the Menu scene."""
-        super().__init__()  # Call the super class (SceneBase) initialization method. This
+        # Call the super class (SceneBase) initialization method. This
         # statement ensures that this class inherits its behaviour from its Superclass.
         # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
         # resolutions, text fonts, general text drawing methods and so on.
+        super().__init__()
 
         # Check if there are any instances of the class already created
         if MenuScene.__instance is not None:
@@ -83,7 +85,6 @@ class MenuScene(SceneBase):
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
-        # TODO: Write test to make sure self.background is not NONE
         self.parallax_effect(display)  # Initialize the parallax effect
 
         self.control_logo()

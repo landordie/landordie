@@ -2,7 +2,7 @@
 'controls.py' module
 Used to update control buttons if changed in the Options scene.
 """
-from src.constants import DEFAULT_CONTROLS, CONTROLS_DICT
+from .constants import DEFAULT_CONTROLS, CONTROLS_DICT
 
 
 class Controls:

@@ -3,9 +3,8 @@
 Used in creating a dynamic (moving dots (stars)) background image instance.
 Credits: https://gist.github.com/ogilviemt/9b05a89d023054e6279f
 """
-import pygame
 import random
-from src.constants import *
+from .constants import DARK_GREY, LIGHT_GREY, YELLOW, pg
 
 
 class StarField:
@@ -64,7 +63,7 @@ class StarField:
             if star[1] > self.height:
                 star[0] = random.randrange(0, self.width)
                 star[1] = random.randrange(-20, -5)
-            pygame.draw.circle(screen, DARK_GREY, star, 3)
+            pg.draw.circle(screen, DARK_GREY, star, 3)
 
         for star in self.star_field_medium:
             # Change the y-axis coordinate of the dot to achieve
@@ -75,7 +74,7 @@ class StarField:
             if star[1] > self.height:
                 star[0] = random.randrange(0, self.width)
                 star[1] = random.randrange(-20, -5)
-            pygame.draw.circle(screen, LIGHT_GREY, star, 2)
+            pg.draw.circle(screen, LIGHT_GREY, star, 2)
 
         for star in self.star_field_fast:
             # Change the y-axis coordinate of the dot to achieve
@@ -86,4 +85,4 @@ class StarField:
             if star[1] > self.height:
                 star[0] = random.randrange(0, self.width)
                 star[1] = random.randrange(-20, -5)
-            pygame.draw.circle(screen, YELLOW, star, 1)
+            pg.draw.circle(screen, YELLOW, star, 1)

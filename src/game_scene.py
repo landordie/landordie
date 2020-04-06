@@ -31,10 +31,12 @@ class GameScene(SceneBase):
         one combined environment. That way we can use the physics engine behind Pymunk (chipmunk)
         together with the images, surfaces and user-input handlers provided by Pygame.
         """
-        super().__init__()  # Call the super class (SceneBase) initialization method. This
+        # Call the super class (SceneBase) initialization method. This
         # statement ensures that this class inherits its behaviour from its Superclass.
         # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
         # resolutions, text fonts, general text drawing methods and so on.
+        super().__init__()
+
         # --------------------------------------------------------------------------------------------------------------
         # Pygame environment where all the sprites(images) are managed. This environment also displays
         # the text and is responsible for opening and closing new windows, checking button clicks and

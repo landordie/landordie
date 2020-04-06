@@ -1,8 +1,8 @@
 """
-Constants here
+'constants.py' module.
+Contains most program constants.
 """
 import pygame as pg
-from pymunk import Vec2d
 
 pg.font.init()
 

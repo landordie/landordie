@@ -1,10 +1,12 @@
 """
 'accounts_scene.py' module.
-Used in instantiating the Accounts scene.
+Used in instantiating the Accounts scene where logging in,
+registration and score fetching occur.
 """
 import pymysql.cursors
+from .constants import *
+from .scene_base import SceneBase
 from .menu_scene import MenuScene
-from .game_scene import *
 from .button import Button
 from .input_box import InputBox
 from .helper import draw_text
@@ -23,9 +25,11 @@ class AccountsScene(SceneBase):
 
     def __init__(self):
         """Virtually private constructor which initializes the Accounts scene."""
-        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
-        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
-        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
+        # Call the super class (SceneBase) initialization method. This
+        # statement ensures that this class inherits its behaviour from its Superclass.
+        # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
+        # resolutions, text fonts, general text drawing methods and so on.
+        super().__init__()
 
         # Check if there are any instances of the class already created
         if AccountsScene.__instance is not None:
@@ -63,8 +67,7 @@ class AccountsScene(SceneBase):
 
         # Container for credential fields
         self.cred_cont_w, self.cred_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.cred_cont_x, self.cred_cont_y = (self.screen_width / 2.1 - self.cred_cont_w), \
-                                             (self.screen_height * 0.15)
+        self.cred_cont_x, self.cred_cont_y = (self.screen_width / 2.1 - self.cred_cont_w), (self.screen_height * 0.15)
         self.cred_cont2_x = (self.screen_width / 1.05 - self.cred_cont_w)
         self.cred_cont = pg.Surface((self.cred_cont_w, self.cred_cont_h)).convert_alpha()
         self.cred_cont.fill(BLACK_HIGHLIGHT2)
@@ -79,19 +82,20 @@ class AccountsScene(SceneBase):
                                          BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Close')
 
         # Container for the database response
-        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height / 15
+        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height * .06
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
                                                  (self.screen_height / 15)
         self.status_cont = pg.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
         self.status_cont.fill(BLACK_HIGHLIGHT2)
 
         # Input boxes to handle input for username and password
-        self.input_box1 = InputBox(self.cred_cont_x * 4.5, self.cred_cont_y * 1.3, '', 350, 33)
-        self.input_box2 = InputBox(self.cred_cont_x * 4.5, self.cred_cont_y * 1.9, '', 350, 33)
-        self.input_box3 = InputBox(self.cred_cont2_x * 1.28, self.cred_cont_y * 1.3, '', 350, 33)
-        self.input_box4 = InputBox(self.cred_cont2_x * 1.28, self.cred_cont_y * 1.9, '', 350, 33)
-        self.fields = [self.input_box1, self.input_box2, self.input_box3, self.input_box4]  # A list used to group the
-        # input fields for cleaner code
+        self.sc_username = InputBox(self.cred_cont_x * 4.5, self.cred_cont_y * 1.3, '', 350, 33)
+        self.sc_pw = InputBox(self.cred_cont_x * 4.5, self.cred_cont_y * 1.9, '', 350, 33)
+        self.a_sc_username = InputBox(self.cred_cont2_x * 1.28, self.cred_cont_y * 1.3, '', 350, 33)
+        self.a_sc_pw = InputBox(self.cred_cont2_x * 1.28, self.cred_cont_y * 1.9, '', 350, 33)
+
+        # A list used to group the input fields for cleaner code
+        self.fields = [self.sc_username, self.sc_pw, self.a_sc_username, self.a_sc_pw]
 
         self.status = ''  # This variable indicates the status of the DB connection
         self.cool_down = 0  # Status container cool down
@@ -111,18 +115,21 @@ class AccountsScene(SceneBase):
                     self.switch_to_scene(menu)
                 # If the score table is initialized, do not check for the buttons behind the score container
                 if self.scores:
-                    if self.score_cont_button.on_click(event):
-                        # If close container is clicked, empty the scores
+                    if self.score_cont_button.on_click(event):  # If close container is clicked, empty the scores
                         self.scores = {}
                 else:
                     if self.reg_sc_button.on_click(event):  # Register user with DB
-                        self.connect_db("register", self.input_box1.text, self.input_box2.text)
+                        self.connect_db("register", self.sc_username.text, self.sc_pw.text)
+                        self.sc_pw.text = ''  # Clear the spacecraft player password field
                     elif self.log_in_sc_button.on_click(event):  # Check if user in DB and sign them in if True
-                        self.connect_db("login_sc", self.input_box1.text, self.input_box2.text)
+                        self.connect_db("login_sc", self.sc_username.text, self.sc_pw.text)
+                        self.sc_pw.text = ''  # Clear the spacecraft player password field
                     elif self.reg_a_sc_button.on_click(event):  # Register user with DB
-                        self.connect_db("register", self.input_box3.text, self.input_box4.text)
+                        self.connect_db("register", self.a_sc_username.text, self.a_sc_pw.text)
+                        self.a_sc_pw.text = ''  # Clear the anti-spacecraft player password field
                     elif self.log_in_a_sc_button.on_click(event):  # Check if user in DB and sign them in if True
-                        self.connect_db("login_asc", self.input_box3.text, self.input_box4.text)
+                        self.connect_db("login_asc", self.a_sc_username.text, self.a_sc_pw.text)
+                        self.a_sc_pw.text = ''  # Clear the anti-spacecraft player password field
                     elif self.scores_button.on_click(event):
                         self.connect_db("get_scores", '', '')
 
@@ -130,13 +137,12 @@ class AccountsScene(SceneBase):
         """Recalculate and update relative positions of all buttons and input boxes."""
         # Adjust credentials fields container position
         self.cred_cont_w, self.cred_cont_h = self.screen_width / 2.3, self.screen_height / 4
-        self.cred_cont_x, self.cred_cont_y = (self.screen_width / 2.1 - self.cred_cont_w), \
-                                             (self.screen_height * 0.15)
+        self.cred_cont_x, self.cred_cont_y = (self.screen_width / 2.1 - self.cred_cont_w), (self.screen_height * 0.15)
         self.cred_cont2_x = (self.screen_width / 1.05 - self.cred_cont_w)
         self.cred_cont = pg.Surface((self.cred_cont_w, self.cred_cont_h)).convert_alpha()
 
         # Adjust database response container position
-        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height * .05
+        self.status_cont_w, self.status_cont_h = self.screen_width, self.screen_height * .06
         self.status_cont_x, self.status_cont_y = (self.screen_width / 2 - self.status_cont_w / 2), \
                                                  (self.screen_height * .02)
         self.status_cont = pg.Surface((self.status_cont_w, self.status_cont_h)).convert_alpha()
@@ -165,10 +171,10 @@ class AccountsScene(SceneBase):
             self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.55
 
         # Update input box positions
-        self.input_box1.rect.x, self.input_box1.rect.y = self.cred_cont_x * 4.5, self.cred_cont_y * 1.3
-        self.input_box2.rect.x, self.input_box2.rect.y = self.cred_cont_x * 4.5, self.cred_cont_y * 1.9
-        self.input_box3.rect.x, self.input_box3.rect.y = self.cred_cont2_x * 1.28, self.cred_cont_y * 1.3
-        self.input_box4.rect.x, self.input_box4.rect.y = self.cred_cont2_x * 1.28, self.cred_cont_y * 1.9
+        self.sc_username.rect.x, self.sc_username.rect.y = self.cred_cont_x * 4.5, self.cred_cont_y * 1.3
+        self.sc_pw.rect.x, self.sc_pw.rect.y = self.cred_cont_x * 4.5, self.cred_cont_y * 1.9
+        self.a_sc_username.rect.x, self.a_sc_username.rect.y = self.cred_cont2_x * 1.28, self.cred_cont_y * 1.3
+        self.a_sc_pw.rect.x, self.a_sc_pw.rect.y = self.cred_cont2_x * 1.28, self.cred_cont_y * 1.9
 
     def render(self, screen):
         display = self.adjust_screen(screen)  # Surface
@@ -176,8 +182,7 @@ class AccountsScene(SceneBase):
 
         # Display containers and container and field names
         display.blit(self.cred_cont, (self.cred_cont_x, self.cred_cont_y, self.cred_cont_w, self.cred_cont_h))
-        display.blit(self.cred_cont,
-                     (self.cred_cont2_x, self.cred_cont_y, self.cred_cont_w, self.cred_cont_h))
+        display.blit(self.cred_cont, (self.cred_cont2_x, self.cred_cont_y, self.cred_cont_w, self.cred_cont_h))
 
         draw_text(display, "Spacecraft player", (self.cred_cont_x * 3.9, self.cred_cont_y * 0.9),
                   FONT_MEDIUM, WHITE)
@@ -198,10 +203,10 @@ class AccountsScene(SceneBase):
             self.cool_down += 1
 
         # Draw credential fields on screen and reflect any changes to their content
-        self.input_box1.draw(display)
-        self.input_box2.draw(display, True)  # True here indicates that the field must be hidden (with '*')
-        self.input_box3.draw(display)
-        self.input_box4.draw(display, True)
+        self.sc_username.draw(display)
+        self.sc_pw.draw(display, True)  # True here indicates that the field must be hidden (with '*')
+        self.a_sc_username.draw(display)
+        self.a_sc_pw.draw(display, True)
 
         # Update buttons
         self.menu_button.update(display)

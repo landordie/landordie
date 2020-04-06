@@ -3,8 +3,7 @@
 Used for player input when changing controls in the Options scene, logging in
 and registering in Accounts scene and storing results in the Result scene.
 """
-from src.constants import *
-import pygame
+from .constants import *
 
 
 class InputBox:
@@ -72,14 +71,14 @@ class InputBox:
                             self.text = event.unicode.upper()
                         self.active = False
         if box_type == 2:  # On hidden symbols box type
-            if event.type == pygame.KEYDOWN and self.active:  # If the box has been clicked on and a key is pressed
+            if event.type == pg.KEYDOWN and self.active:  # If the box has been clicked on and a key is pressed
                 # If the pressed button corresponds to a alphabetical char (a,b,c,d...,x,y,z)
                 if event.unicode.isalnum() and len(self.text) < 16:
                     self.text += event.unicode
                 # If the user would like to delete a char from the screen
-                elif event.key == pygame.K_BACKSPACE or event.key == pygame.K_DELETE:
+                elif event.key == pg.K_BACKSPACE or event.key == pg.K_DELETE:
                     self.text = self.text[:-1]
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:  # Toggle off the highlight (activity)
+            if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:  # Toggle off the highlight (activity)
                 self.active = False
         # Re-render the text.
         self.txt_surface = FONT_BIG.render(self.text, True, WHITE)

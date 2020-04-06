@@ -2,7 +2,8 @@
 'splash_scene.py' module.
 Used in creating a Splash scene (window).
 """
-from .scene_base import *
+from .constants import *
+from .scene_base import SceneBase
 from .game_scene import GameScene
 from .button import Button
 from .controls import Controls
@@ -15,10 +16,11 @@ class SplashScene(SceneBase):
 
     def __init__(self):
         """Virtually private constructor which initializes the Splash scene."""
-        super().__init__()  # Call the super class (SceneBase) initialization method. This
+        # Call the super class (SceneBase) initialization method. This
         # statement ensures that this class inherits its behaviour from its Superclass.
         # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
         # resolutions, text fonts, general text drawing methods and so on.
+        super().__init__()
 
         self.star_field = StarField(self.screen_width, self.screen_height)  # Initialize the dynamic background
 

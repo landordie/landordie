@@ -5,7 +5,7 @@ Used in instantiation of a Result scene (window).
 import csv
 from datetime import date
 import pymysql
-from src.constants import *
+from .constants import *
 from .scene_base import SceneBase
 from .button import Button
 from .star_field import StarField
@@ -16,32 +16,41 @@ class ResultScene(SceneBase):
     """ResultScene subclass implementation."""
 
     def __init__(self, sc_pts, a_sc_pts):
-        super().__init__()  # Call the super class (SceneBase) initialization method. This statement ensures that this
-        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
-        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
+        """Virtually private constructor which initializes the Result scene."""
+        # Call the super class (SceneBase) initialization method. This
+        # statement ensures that this class inherits its behaviour from its Superclass.
+        # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
+        # resolutions, text fonts, general text drawing methods and so on.
+        super().__init__()
 
         self.sc_pts = sc_pts  # Spacecraft game points
         self.a_sc_pts = a_sc_pts  # Anti-spacecraft game points
         self.background = pg.image.load('assets/frames/splash_BG.jpg')
         self.star_field = StarField(self.screen_width, self.screen_height)
 
+        # Initialize the 'Main menu' button
         self.menu_button = Button(
             (self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.2, BUTTON_WIDTH, BUTTON_HEIGHT),
             YELLOW, 'Main Menu')
-        # Hold the names of the two players
+
+        # Attributes to hold the spacecraft and anti-spacecraft player names
         self.sc_name = ""
         self.a_sc_name = ""
-        # Holds a value to determine which player's name is being received as input
-        self.player_no = 1
-        self.status = ''
+
+        self.player_no = 1  # Player indicator ('1' - spacecraft, '2' - anti-spacecraft player)
+        self.status = ''  # Attribute to hold the status message (database response)
         from .accounts_scene import AccountsScene  # Avoiding circular dependencies
-        self.accounts = AccountsScene.get_instance()
+        self.accounts = AccountsScene.get_instance()  # Get the AccountsScene instance
+
+        # If any of the players have logged in and the game has finished, save the scores to the DB
         if self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']:
-            # If we are logged in and the game has finished, save the scores to the DB)
             self.connect_DB()
 
-    # A method to populate player names from user input and display them on the screen
     def get_player_name(self, event):
+        """
+        Populate player names from user input and display them on the screen.
+        :param event: current scene Pygame event
+        """
         if event.type == pg.KEYDOWN:
             # If a player has finished writing their name
             if event.key == pg.K_RETURN and self.player_no < 3:
@@ -91,25 +100,24 @@ class ResultScene(SceneBase):
                         self.get_player_name(event)
 
     def update(self):
+        """Nothing to update here."""
         pass
 
     def render(self, screen):
         # Render the background and star field
-        display = self.adjust_screen(screen)
+        display = self.adjust_screen(screen)  # Pygame screen surface
         display.blit(self.background, (0, 0))
         self.star_field.draw_stars(display)
 
         self.display_scene(display)  # Display the scene specific content (depends on the storage to be used)
-
-        # Handle the menu button
-        self.menu_button.update(display)
+        self.menu_button.update(display)  # Update the 'Main menu' button
 
     def display_scene(self, display):
         """
         Show the Result scene indicators and instruction messages.
         :param display: Pygame screen surface
         """
-        # Display main messages
+        # Display indicator messages
         draw_text(display, "GAME RESULTS",
                   (self.screen_width / 2, self.screen_height / 8), FONT_BIG, CYAN)
 
@@ -119,7 +127,7 @@ class ResultScene(SceneBase):
         draw_text(display, f"Player 2 Score = {self.a_sc_pts} points",
                   (self.screen_width / 2, self.screen_height / 1.5), FONT_MEDIUM, CYAN)
 
-        # If not logged in ask for user names for both players for the .cvs safe
+        # If neither of the player has logged in ask for their usernames for the .cvs save
         if not (self.accounts.logged_in['Spacecraft'] or self.accounts.logged_in['Anti-spacecraft']):
             draw_text(display, "Please, type your name or initials!",
                       (self.screen_width / 2, self.screen_height / 5.5), FONT_MEDIUM, CYAN)
@@ -152,7 +160,8 @@ class ResultScene(SceneBase):
             # If the user decides to save scores to the DB, blit status
             draw_text(display, self.status, (self.screen_width / 2, self.screen_height / 3.33), FONT_MEDIUM, CYAN)
 
-    def connect_DB(self):  # Method to connect to the database and update the score of the current user
+    def connect_DB(self):
+        """Connect to the database and update the score of the current user."""
         try:  # Try to connect to DB
             connection = pymysql.connect(host='localhost', user='root', password='', db='users')
             try:

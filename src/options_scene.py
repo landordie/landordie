@@ -2,7 +2,7 @@
 'options_scene.py' module.
 Used in instantiation of the Options scene (window).
 """
-from src.constants import *
+from .constants import *
 from .menu_scene import MenuScene
 from .input_box import InputBox
 from .scene_base import SceneBase
@@ -27,9 +27,11 @@ class OptionsScene(SceneBase):
 
     def __init__(self):
         """Virtually private constructor which initializes the Options scene."""
-        super().__init__()  # Call the super class (SceneBase) constructor method. This statement ensures that this
-        # class inherits its behaviour from its Superclass. Abstract methods of all scenes (ProcessInput, Render,
-        # Update, etc.), screen resolutions, text fonts, general text drawing methods and so on.
+        # Call the super class (SceneBase) initialization method. This
+        # statement ensures that this class inherits its behaviour from its Superclass.
+        # Abstract methods of all scenes (process_input(), update(), render(), etc.), screen
+        # resolutions, text fonts, general text drawing methods and so on.
+        super().__init__()
 
         # Check if there are any instances of the class already created
         if OptionsScene.__instance is not None:
@@ -56,23 +58,24 @@ class OptionsScene(SceneBase):
                             GREEN, "1440x900")
 
         # Container for controls boxes
-        self.button_cont_w, self.button_cont_h = self.screen_width / 2.8, self.screen_height / 1.7
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 1.9), (self.screen_height / 5.4)
-        self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
-        self.button_cont.fill(BLACK_HIGHLIGHT2)
+        self.controls_cont_w, self.controls_cont_h = self.screen_width / 2.8, self.screen_height / 1.7
+        self.controls_cont_x, self.controls_cont_y = (self.screen_width / 1.9), (self.screen_height / 5.4)
+        self.controls_cont = pg.Surface((self.controls_cont_w, self.controls_cont_h)).convert_alpha()
+        self.controls_cont.fill(BLACK_HIGHLIGHT2)
 
         # Input boxes to change controls (and a list allowing iteration over the input boxes)
-        self.input_box1 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.35, 'A')
-        self.input_box2 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.60, 'W')
-        self.input_box3 = InputBox(self.button_cont_x * 1.5, self.button_cont_y * 1.85, 'D')
+        # ('sc' - spacecraft, 'a_sc' - anti-spacecraft)
+        self.sc_left = InputBox(self.controls_cont_x * 1.5, self.controls_cont_y * 1.35, 'A')
+        self.sc_thrust = InputBox(self.controls_cont_x * 1.5, self.controls_cont_y * 1.60, 'W')
+        self.sc_right = InputBox(self.controls_cont_x * 1.5, self.controls_cont_y * 1.85, 'D')
 
-        self.input_box4 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 2.75, 'Left')
-        self.input_box5 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3, 'Up')
-        self.input_box6 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3.25, 'Right')
-        self.input_box7 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3.5, 'Down')
-        self.input_box8 = InputBox(self.button_cont_x * 1.45, self.button_cont_y * 3.75, 'Space')
-        self.input_boxes = [self.input_box1, self.input_box2, self.input_box3, self.input_box4, self.input_box5,
-                            self.input_box6, self.input_box7, self.input_box8]
+        self.a_sc_left = InputBox(self.controls_cont_x * 1.45, self.controls_cont_y * 2.75, 'Left')
+        self.cannon_right = InputBox(self.controls_cont_x * 1.45, self.controls_cont_y * 3, 'Up')
+        self.a_sc_right = InputBox(self.controls_cont_x * 1.45, self.controls_cont_y * 3.25, 'Right')
+        self.cannon_left = InputBox(self.controls_cont_x * 1.45, self.controls_cont_y * 3.5, 'Down')
+        self.cannon_shoot = InputBox(self.controls_cont_x * 1.45, self.controls_cont_y * 3.75, 'Space')
+        self.input_boxes = [self.sc_left, self.sc_thrust, self.sc_right, self.a_sc_left, self.cannon_right,
+                            self.a_sc_right, self.cannon_left, self.cannon_shoot]
 
     def process_input(self, events, pressed_keys):
         for event in events:
@@ -113,17 +116,17 @@ class OptionsScene(SceneBase):
         self._res1.rect.x, self._res1.rect.y = self.res_cont_w / 1.475, self.res_cont_h / .91
         self._res2.rect.x, self._res2.rect.y = self.res_cont_w / 1.475, self.res_cont_h / .64
 
-        self.button_cont_w, self.button_cont_h = self.screen_width / 2.8, self.screen_height / 1.7
-        self.button_cont_x, self.button_cont_y = (self.screen_width / 1.9), (self.screen_height / 5.4)
-        self.button_cont = pg.Surface((self.button_cont_w, self.button_cont_h)).convert_alpha()
+        self.controls_cont_w, self.controls_cont_h = self.screen_width / 2.8, self.screen_height / 1.7
+        self.controls_cont_x, self.controls_cont_y = (self.screen_width / 1.9), (self.screen_height / 5.4)
+        self.controls_cont = pg.Surface((self.controls_cont_w, self.controls_cont_h)).convert_alpha()
 
         # Make adjustments to the input box positions by iterating over the list
         position_fractions = [[1.5, 1.5, 1.5, 1.45, 1.45, 1.45, 1.45, 1.45],
                               [1.35, 1.60, 1.85, 2.75, 3, 3.25, 3.50, 3.75]]
         i = 0
         for input_box in self.input_boxes:
-            input_box.respond_to_resolution(self.button_cont_x * position_fractions[0][i],
-                                            self.button_cont_y * position_fractions[1][i])
+            input_box.respond_to_resolution(self.controls_cont_x * position_fractions[0][i],
+                                            self.controls_cont_y * position_fractions[1][i])
             i += 1
 
     def render(self, screen):
@@ -137,31 +140,31 @@ class OptionsScene(SceneBase):
         draw_text(display, "Resolution", (self.res_cont_x + self.res_cont_w / 2, self.res_cont_y / 1.1),
                   FONT_MEDIUM, WHITE)
 
-        display.blit(self.button_cont,
-                     (self.button_cont_x, self.button_cont_y, self.button_cont_w, self.button_cont_h))
-        draw_text(display, "Controls", (self.button_cont_x + self.button_cont_w // 2, self.button_cont_y // 1.1),
+        display.blit(self.controls_cont,
+                     (self.controls_cont_x, self.controls_cont_y, self.controls_cont_w, self.controls_cont_h))
+        draw_text(display, "Controls", (self.controls_cont_x + self.controls_cont_w // 2, self.controls_cont_y // 1.1),
                   FONT_MEDIUM, WHITE)
-        draw_text(display, "Spacecraft", (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 1.2),
+        draw_text(display, "Spacecraft", (self.controls_cont_x + self.controls_cont_w / 2, self.controls_cont_y * 1.2),
                   FONT_MEDIUM, WHITE)
         draw_text(display, "Anti-Spacecraft",
-                  (self.button_cont_x + self.button_cont_w / 2, self.button_cont_y * 2.6), FONT_MEDIUM, WHITE)
+                  (self.controls_cont_x + self.controls_cont_w / 2, self.controls_cont_y * 2.6), FONT_MEDIUM, WHITE)
 
-        draw_text(display, "Thrust", (self.input_box1.rect.x * 0.8, self.input_box2.rect.y * 1.08),
+        draw_text(display, "Thrust", (self.sc_left.rect.x * 0.8, self.sc_thrust.rect.y * 1.08),
                   FONT_MEDIUM, LIGHT_GREY)
-        draw_text(display, "Rotate Left", (self.input_box1.rect.x * 0.8, self.input_box1.rect.y * 1.08),
+        draw_text(display, "Rotate Left", (self.sc_left.rect.x * 0.8, self.sc_left.rect.y * 1.08),
                   FONT_MEDIUM, LIGHT_GREY)
-        draw_text(display, "Rotate Right", (self.input_box1.rect.x * 0.8, self.input_box3.rect.y * 1.08),
+        draw_text(display, "Rotate Right", (self.sc_left.rect.x * 0.8, self.sc_right.rect.y * 1.08),
                   FONT_MEDIUM, LIGHT_GREY)
 
-        draw_text(display, "Move Left", (self.input_box4.rect.x * 0.85, self.input_box4.rect.y * 1.04),
+        draw_text(display, "Move Left", (self.a_sc_left.rect.x * 0.85, self.a_sc_left.rect.y * 1.04),
                   FONT_MEDIUM, LIGHT_GREY)
-        draw_text(display, "Cannon Right", (self.input_box5.rect.x * 0.85, self.input_box5.rect.y * 1.04),
+        draw_text(display, "Cannon Right", (self.cannon_right.rect.x * 0.85, self.cannon_right.rect.y * 1.04),
                   FONT_MEDIUM, LIGHT_GREY)
-        draw_text(display, "Move Right", (self.input_box6.rect.x * 0.85, self.input_box6.rect.y * 1.04),
+        draw_text(display, "Move Right", (self.a_sc_right.rect.x * 0.85, self.a_sc_right.rect.y * 1.04),
                   FONT_MEDIUM, LIGHT_GREY)
-        draw_text(display, "Cannon Left", (self.input_box7.rect.x * 0.85, self.input_box7.rect.y * 1.04),
+        draw_text(display, "Cannon Left", (self.cannon_left.rect.x * 0.85, self.cannon_left.rect.y * 1.04),
                   FONT_MEDIUM, LIGHT_GREY)
-        draw_text(display, "Shoot", (self.input_box8.rect.x * 0.85, self.input_box8.rect.y * 1.04),
+        draw_text(display, "Shoot", (self.cannon_shoot.rect.x * 0.85, self.cannon_shoot.rect.y * 1.04),
                   FONT_MEDIUM, LIGHT_GREY)
 
         self.menu_button.update(display)

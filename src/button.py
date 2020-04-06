@@ -2,7 +2,7 @@
 'button.py' module.
 Used in the creation of all the buttons in the program.
 """
-from src.constants import *
+from .constants import pg, FONT_SMALL_PLUS, WHITE, HOVER_SOUND
 
 
 class Button:

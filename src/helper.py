@@ -6,7 +6,12 @@ from pymunk.vec2d import Vec2d
 
 
 def flipy(p, h):
-    """Convert chipmunk coordinates to Pygame coordinates."""
+    """
+    Convert chipmunk coordinates to Pygame coordinates.
+    :param p: coordinate point tuple
+    :param h: height of the current scene (window)
+    :return:
+    """
     return Vec2d(p[0], -p[1] + h)
 
 
