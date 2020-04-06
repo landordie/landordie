@@ -44,10 +44,10 @@ class MenuScene(SceneBase):
         self.quit_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.18,
                                    BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Quit')
 
-        self.background = pg.image.load("frames/BG.png")
+        self.background = pg.image.load("Assets/frames/BG.png")
 
         # Set the background glowing title logo
-        self.logos = [pg.image.load("frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]
+        self.logos = [pg.image.load("Assets/frames/logo/LAND (" + str(x) + ").png") for x in range(1, 23)]
         self.logo_counter = 1
         self.current_logo = self.logos[0]
         self.x = 0  # Variable used in simulating the x-axis 'movement' of the background image

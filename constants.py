@@ -7,14 +7,14 @@ from pymunk import Vec2d
 pg.font.init()
 
 # ------------------------FONTS
-FONT_BIG = pg.font.Font("PressStart2P.ttf", 18)
-FONT_MEDIUM_PLUS = pg.font.Font("PressStart2P.ttf", 17)
-FONT_MEDIUM = pg.font.Font("PressStart2P.ttf", 16)
-FONT_SMALL_PLUS = pg.font.Font("PressStart2P.ttf", 15)
-FONT_SMALL = pg.font.Font("PressStart2P.ttf", 14)
-FONT_SMALLEST = pg.font.Font("PressStart2P.ttf", 12)
-FONT_HEADER = pg.font.Font("PressStart2P.ttf", 50)
-FONT_WARNING = pg.font.Font("PressStart2P.ttf", 27)
+FONT_BIG = pg.font.Font("Assets/PressStart2P.ttf", 18)
+FONT_MEDIUM_PLUS = pg.font.Font("Assets/PressStart2P.ttf", 17)
+FONT_MEDIUM = pg.font.Font("Assets/PressStart2P.ttf", 16)
+FONT_SMALL_PLUS = pg.font.Font("Assets/PressStart2P.ttf", 15)
+FONT_SMALL = pg.font.Font("Assets/PressStart2P.ttf", 14)
+FONT_SMALLEST = pg.font.Font("Assets/PressStart2P.ttf", 12)
+FONT_HEADER = pg.font.Font("Assets/PressStart2P.ttf", 50)
+FONT_WARNING = pg.font.Font("Assets/PressStart2P.ttf", 27)
 
 # ------------------------COLORS
 BLACK = (0, 0, 0, 255)
@@ -45,7 +45,7 @@ DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 800
 
 # ------------------------SOUNDS
-HOVER_SOUND = "blipshort1.wav"
+HOVER_SOUND = "Assets/blipshort1.wav"
 
 # ------------------------PYMUNK
 FPS = 60

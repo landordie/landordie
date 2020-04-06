@@ -59,7 +59,7 @@ class AccountsScene(SceneBase):
         self.scores_button = Button((self.screen_width / 2 - (BUTTON_WIDTH / 2), self.screen_height / 1.85,
                                      BUTTON_WIDTH, BUTTON_HEIGHT), RED, 'Get scores')
 
-        self.background = pg.image.load("frames/BG.png")  # Initialize the background
+        self.background = pg.image.load("Assets/frames/BG.png")  # Initialize the background
 
         # Container for credential fields
         self.cred_cont_w, self.cred_cont_h = self.screen_width / 2.3, self.screen_height / 4

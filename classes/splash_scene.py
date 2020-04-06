@@ -28,7 +28,7 @@ class SplashScene(SceneBase):
         self.controls_background = pg.Surface((self.splash_w, self.splash_h)).convert_alpha()
         self.controls_background.fill(BLACK_HIGHLIGHT)
 
-        self.background = pg.image.load('frames/splash_BG.jpg')  # Load the background image
+        self.background = pg.image.load('Assets/frames/splash_BG.jpg')  # Load the background image
         # https://images.wallpaperscraft.com/image/texture_surface_dark_128260_1920x1080.jpg
 
         # Create the 'Continue' button
@@ -50,23 +50,23 @@ class SplashScene(SceneBase):
         game_controls = Controls.get_controls_str()  # Fetch the game controls
         if player_num == 1:  # Load spacecraft control images
             rotate_left = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[0]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[0]}.png')
             thrust = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[1]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[1]}.png')
             rotate_right = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[2]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[2]}.png')
             return rotate_left, rotate_right, thrust
         elif player_num == 2:  # Load anti-spacecraft control images
             move_left = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[3]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[3]}.png')
             move_right = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[5]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[5]}.png')
             shoot = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[7]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[7]}.png')
             cannon_left = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[6]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[6]}.png')
             cannon_right = pg.image.load(
-                f'frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[4]}.png')
+                f'Assets/frames/keys/Keyboard & Mouse/Light/Keyboard_White_{game_controls[4]}.png')
             return move_left, move_right, shoot, cannon_left, cannon_right
         else:
             raise ValueError("Error when specifying player number.")

@@ -15,7 +15,7 @@ class Spacecraft(Sprite):
     def __init__(self):
         # Call the Sprite initializer (this creates an image surface object, a Rectangle object
         # and provides the 'get_attachment_coordinates() method)
-        super().__init__('frames/lander.gif')
+        super().__init__('Assets/frames/lander.gif')
 
         # This variable holds the rotated image if the lander is being rotated or the original
         # image by default
@@ -24,7 +24,7 @@ class Spacecraft(Sprite):
         # This variable holds the image for the case when thrust is applied and must appear.
         # The original is swapped with this image every time the activate engine button is
         # pressed on keyboard
-        self.activated_img = pg.image.load("frames/lander_active.png")
+        self.activated_img = pg.image.load("Assets/frames/lander_active.png")
         
         # This method takes the actual size of the image ignoring its transparent parts
         self.mask = pg.mask.from_surface(self.image)
@@ -51,7 +51,7 @@ class Spacecraft(Sprite):
         self.shape.collision_type = 2  # Set the shape collision type for the collision handler
         self.body.position = 600, 700
 
-        self.health_bar_img = pg.image.load("frames/heart.png")  # Load the health bar image
+        self.health_bar_img = pg.image.load("Assets/frames/heart.png")  # Load the health bar image
         self.velocity = 0  # Spacecraft velocity attribute
         self.flicker_time = 90  # Used when displaying the malfunction text (90 frames or 1.5 seconds)
 

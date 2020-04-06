@@ -56,7 +56,7 @@ class GameScene(SceneBase):
         self.pm_landing_pad = self.landing_pad.pymunk_pad(self.space, self.screen_height)
         self.game_controls = Controls.get_controls()  # Fetch the game controls
         self.star_field = StarField(self.screen_width, self.screen_height)  # The stars moving in the background
-        self.background = pg.image.load("frames/splash_BG.jpg")  # A background image
+        self.background = pg.image.load("Assets/frames/splash_BG.jpg")  # A background image
         self.release_time = 0  # Used for making the cooldown function of the shooter.
         # Between 0 and 120 frames (2 sec)
         # --------------------------------------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ class GameScene(SceneBase):
         # Clock attributes to calculate the impulse strength to be applied to the missile
         self.end_time = 0
         self.start_time = 0
-        self.clock_img = pg.image.load("frames/timer.png")  # Load the clock icon image
+        self.clock_img = pg.image.load("Assets/frames/timer.png")  # Load the clock icon image
 
     # TODO: !!! THIS IS IMPORTANT, TOO !!!
     # The next sequence of 5 methods (process_input(), update(), render(), switch_to_scene(),
