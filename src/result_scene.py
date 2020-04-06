@@ -5,7 +5,7 @@ Used in instantiation of a Result scene (window).
 import csv
 from datetime import date
 import pymysql
-from classes.constants import *
+from src.constants import *
 from .scene_base import SceneBase
 from .button import Button
 from .star_field import StarField

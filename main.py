@@ -10,7 +10,7 @@ Runs the game loop.
 # ------------------------------------------#
 
 import pygame as pg
-from classes.menu_scene import MenuScene
+from src.menu_scene import MenuScene
 
 
 class Game:
