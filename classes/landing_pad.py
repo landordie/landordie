@@ -10,7 +10,7 @@ from .helper import flipy
 
 class LandingPad(Sprite):
     def __init__(self, width, height):
-        super().__init__('Assets/frames/landing_pad.png')
+        super().__init__('assets/frames/landing_pad.png')
         self.rect.top = random.randint(height // 1.7, height // 1.5)
         self.rect.right = random.randint(155, width - 100)
         self.mask = pg.mask.from_surface(self.image)

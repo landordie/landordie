@@ -37,7 +37,7 @@ class OptionsScene(SceneBase):
         else:
             OptionsScene.__instance = self
 
-        self.background = pg.image.load("Assets/frames/BG.png")  # Initialize the background
+        self.background = pg.image.load("assets/frames/BG.png")  # Initialize the background
 
         # Create button allowing the user to return to main menu
         self.menu_button = Button((self.screen_width * 0.25, self.screen_height * 0.8, BUTTON_WIDTH, BUTTON_HEIGHT),

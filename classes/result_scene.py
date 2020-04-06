@@ -22,7 +22,7 @@ class ResultScene(SceneBase):
 
         self.sc_pts = sc_pts  # Spacecraft game points
         self.a_sc_pts = a_sc_pts  # Anti-spacecraft game points
-        self.background = pg.image.load('Assets/frames/splash_BG.jpg')
+        self.background = pg.image.load('assets/frames/splash_BG.jpg')
         self.star_field = StarField(self.screen_width, self.screen_height)
 
         self.menu_button = Button(

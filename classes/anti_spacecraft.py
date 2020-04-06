@@ -48,8 +48,8 @@ class AntiSpaceCraft:
                                                          position[1] + ANTI_SPACECRAFT_CHASSIS[1] / 2),
                                                         ANTI_SPACECRAFT_CANNON)
         self.cannon_s.color = DARK_GREY  # Set the anti-spacecraft cannon color
-        self.body_sprite = Sprite("Assets/frames/tanker.png")  # Sprite for the body (a tank image)
-        self.cannon_sprite = Sprite("Assets/frames/cannon.png")  # Sprite for the cannon
+        self.body_sprite = Sprite("assets/frames/tanker.png")  # Sprite for the body (a tank image)
+        self.cannon_sprite = Sprite("assets/frames/cannon.png")  # Sprite for the cannon
 
         # Anti-spacecraft joints which are used to connect all the components together with wires.
         # These connections ensure the flexibility of the vehicle during collisions and slope conquering
@@ -70,8 +70,8 @@ class AntiSpaceCraft:
         self.cannon_mt = pymunk.SimpleMotor(self.cannon_b, self.chassis_b, 0)
 
         self.missile = Missile()  # Create missile instance
-        self.fuel_bar_img = pg.image.load("Assets/frames/lightning.png")
-        self.power_bar_img = pg.image.load("Assets/frames/power_bar.png")
+        self.fuel_bar_img = pg.image.load("assets/frames/lightning.png")
+        self.power_bar_img = pg.image.load("assets/frames/power_bar.png")
 
     @staticmethod
     def create_body(mass, position, shape_type, friction=TERRAIN_FRICTION):

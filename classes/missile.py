@@ -12,7 +12,7 @@ from .sprite_class import Sprite
 class Missile(Sprite):
 
     def __init__(self):
-        super().__init__('Assets/frames/missile_small.gif')  # call Sprite initializer
+        super().__init__('assets/frames/missile_small.gif')  # call Sprite initializer
         self.body, self.shape = None, None
         self.launched = False
         self.collided = True

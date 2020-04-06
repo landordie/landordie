@@ -21,8 +21,8 @@ class Button:
         self.text_string = text
         self.text = self.font.render(text, True, WHITE)
         self.hovered = False
-        self.image = pg.image.load("Assets/frames/Table_01.png")
-        self.active_image = pg.image.load("Assets/frames/Table_01_active.png")
+        self.image = pg.image.load("assets/frames/Table_01.png")
+        self.active_image = pg.image.load("assets/frames/Table_01_active.png")
 
     def on_click(self, event):
         """
