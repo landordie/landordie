@@ -3,7 +3,7 @@
 Used for player input when changing controls in the Options scene, logging in
 and registering in Accounts scene and storing results in the Result scene.
 """
-from constants import *
+from classes.constants import *
 import pygame
 
 

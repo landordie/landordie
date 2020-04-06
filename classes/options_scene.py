@@ -2,7 +2,7 @@
 'options_scene.py' module.
 Used in instantiation of the Options scene (window).
 """
-from constants import *
+from classes.constants import *
 from .menu_scene import MenuScene
 from .input_box import InputBox
 from .scene_base import SceneBase

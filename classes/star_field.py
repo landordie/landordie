@@ -5,7 +5,7 @@ Credits: https://gist.github.com/ogilviemt/9b05a89d023054e6279f
 """
 import pygame
 import random
-from constants import *
+from classes.constants import *
 
 
 class StarField:

@@ -4,7 +4,7 @@ Used in instantiating the game anti-spacecraft.
 """
 from math import radians, pi
 import pymunk
-from constants import *
+from classes.constants import *
 from .missile import Missile
 from .sprite_class import Sprite
 from .helper import flipy

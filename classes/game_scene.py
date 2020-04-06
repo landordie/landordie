@@ -2,7 +2,6 @@
 'game_scene.py' module.
 Used in instantiation of the Game scene (window).
 """
-from math import pi, radians
 import random
 import pymunk as pm
 from pymunk import pygame_util
@@ -14,7 +13,7 @@ from .result_scene import ResultScene
 from .anti_spacecraft import AntiSpaceCraft
 from .controls import Controls
 from .star_field import StarField
-from constants import *
+from classes.constants import *
 
 # TODO: NO GAMEPLAY INSTRUCTIONS WHATSOEVER... TRIAL AND ERROR - FUNDAMENTAL METHOD OF PROBLEM SOLVING
 #  ( INCLUDE IN REP!)

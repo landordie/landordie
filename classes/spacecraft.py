@@ -4,7 +4,7 @@ Used in instantiating the game spacecraft.
 """
 import pymunk
 from math import degrees, sqrt, pow, radians
-from constants import *
+from classes.constants import *
 from .sprite_class import Sprite
 from .helper import flipy, draw_text
 

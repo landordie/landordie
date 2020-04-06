@@ -5,7 +5,7 @@ Used in creating the cannon missile body and shape.
 from math import pi, pow, degrees
 import pymunk as pm
 from pymunk.vec2d import Vec2d
-from constants import MISSILE_DRAG_CONSTANT
+from classes.constants import MISSILE_DRAG_CONSTANT
 from .sprite_class import Sprite
 
 

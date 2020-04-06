@@ -2,8 +2,7 @@
 'scene_base.py' module.
 Contains SceneBase abstract superclass.
 """
-import pygame as pg
-from constants import *
+from classes.constants import *
 pg.font.init()  # Initialize the Pygame font objects
 
 
